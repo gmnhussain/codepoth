@@ -1,0 +1,16 @@
+# Normalise every text file to LF, in the repo and in working copies (also on Windows).
+* text=auto eol=lf
+
+# Binaries: never convert or diff as text.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.avif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
+*.pdf binary
