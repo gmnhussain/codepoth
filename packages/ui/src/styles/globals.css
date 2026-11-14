@@ -47,6 +47,7 @@
   --color-background: var(--background);
   --color-success: var(--success);
   --color-warning: var(--warning);
+  --color-code: var(--code);
   --color-track: var(--track);
   --color-track-dot: var(--track-dot);
   --leading-reading: 1.85;
@@ -83,6 +84,8 @@
   --ring: #1c1a17;
   --success: #1e7a4c;
   --warning: #9a5b00;
+  /* Code blocks are dark in both modes; text colours come from the Shiki theme (ADR-0010). */
+  --code: #1c1a17;
   --chart-1: var(--track-indigo);
   --chart-2: var(--track-green-dot);
   --chart-3: var(--track-amber-dot);
@@ -148,6 +151,7 @@
   --ring: #f2eee6;
   --success: #5bd08f;
   --warning: #ffc46b;
+  --code: #0c0b0a;
   --sidebar: #1b1a17;
   --sidebar-foreground: #f2eee6;
   --sidebar-primary: #f2eee6;

@@ -11,11 +11,20 @@
   },
   "dependencies": {
     "@content-collections/core": "catalog:",
+    "@mdx-js/mdx": "catalog:",
     "@workspace/config": "workspace:*",
+    "github-slugger": "^2.0.0",
+    "mdast-util-to-string": "^4.0.0",
+    "rehype-pretty-code": "^0.14.6",
+    "remark-gfm": "^4.0.1",
+    "shiki": "^4.6.0",
+    "unist-util-visit": "^5.2.0",
     "zod": "catalog:"
   },
   "devDependencies": {
     "@content-collections/cli": "^0.1.9",
+    "@types/hast": "^3.0.5",
+    "@types/mdast": "^4.0.4",
     "@types/node": "catalog:",
     "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",

@@ -47,7 +47,7 @@ content/
 - Topic `_meta.json`: `description` is required. Optional `start: true` marks a beginner entry topic (map flag and filter). Optional `titleEn` is used where an English name is needed.
 - Group `_meta.json`: `description` is required.
 - Groups are optional. Small topics have lessons directly. Never nest deeper than Track → Topic → Group → Lesson.
-- Sections are the lesson's own `###` headings inside a block. Each block renders its own `h2`, so author headings start at `###`. They are not files. The right-side TOC is generated from them, nested under the lesson block they belong to.
+- Sections are the lesson's own `###` headings inside a block. Each block renders its own `h2`, so author headings start at `###`. They are not files. The right-side TOC is generated from them, nested under the lesson block they belong to. Each section's anchor comes from its text (`github-slugger`; Bangla letters are kept, e.g. `#তুলনা-কখন-কোনটা`), and renaming the heading changes the anchor ([ADR-0011](decisions/ADR-0011-mdx-compiled-at-build-time.md)).
 - Small sub-topics (e.g. var/let/const) are Sections in one lesson. A sub-topic becomes its own Lesson only if it needs its own code, quiz, or > ~5 min of reading.
 
 ## URLs and keys
@@ -191,7 +191,7 @@ Every lesson follows `content/_templates/lesson.mdx`. Each block is an MDX compo
 | 7   | Quiz (কুইজ)                         | `<Quiz />`   | renders the frontmatter `quiz`                                       |
 | 8   | Prev/next lesson                    | —            | generated, not written                                               |
 
-- The build fails if a block is out of order, or, in a published lesson, missing. Each heading is tagged with the block it sits in, which gives the nested TOC. Block numbers (০১ …) are computed.
+- Lesson bodies are compiled at build time ([ADR-0011](decisions/ADR-0011-mdx-compiled-at-build-time.md)). In every lesson the build fails if a block is out of order or appears twice, if a `#`/`##` heading sits inside a block, or if a heading sits outside a block. A published lesson also fails if a block is missing or any content sits outside a block. Each `###` is tagged with the block it sits in, which gives the nested TOC. Block numbers (০১ …) are computed.
 - Glossary terms are marked with `<Term id="side-effect">side effect</Term>`.
 
 Writing style for lesson content: see [writing-guide.md](writing-guide.md).

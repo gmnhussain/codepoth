@@ -43,6 +43,8 @@ export function lesson(input: LessonInput): LessonFile {
     previousSlugs: [],
     quiz: QUIZ,
     content: "কয়েকটা শব্দ।",
+    mdx: "",
+    sections: [],
     ...input,
   }
 }
@@ -172,6 +174,7 @@ export function fixtureFiles(): {
         track: "frontend",
         draft: false,
         content: "সংজ্ঞা।",
+        mdx: "",
       },
     ],
     map: {

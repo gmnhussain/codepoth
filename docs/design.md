@@ -25,24 +25,25 @@ Loading rules (`next/font`, subsets, `swap`): [performance.md](development/perfo
 
 Tokens live in `packages/ui/src/styles/globals.css`, mapped onto the shadcn variables so every shadcn component picks them up ([ADR-0008](decisions/ADR-0008-design-tokens.md)). Components use Tailwind utilities on these tokens only, never hex values.
 
-| Design name | Token (utility)                                            | Light     | Dark      |
-| ----------- | ---------------------------------------------------------- | --------- | --------- |
-| paper       | `background`                                               | `#FAF8F3` | `#131210` |
-| surface     | `card`, `popover`                                          | `#FFFFFF` | `#1B1A17` |
-| sunk        | `muted`, `secondary`, `accent`                             | `#F1EDE3` | `#24221E` |
-| ink         | `foreground`, `primary`, `ring`                            | `#1C1A17` | `#F2EEE6` |
-| ink2        | `foreground/80` (opacity modifier, no token)               | —         | —         |
-| ink3        | `muted-foreground`                                         | `#69645A` | `#A49E91` |
-| line        | `border`                                                   | `#E7E1D4` | `#2C2A25` |
-| line2       | `foreground/20` for decorative edges (dashed cards, chips) | —         | —         |
-| —           | `input` (control edges, 3:1)                               | `#8C877B` | `#6F6D68` |
-| ok          | `success`                                                  | `#1E7A4C` | `#5BD08F` |
-| bad         | `destructive`                                              | `#B4322C` | `#FF8A80` |
-| warn        | `warning`                                                  | `#9A5B00` | `#FFC46B` |
+| Design name | Token (utility)                                                                    | Light     | Dark      |
+| ----------- | ---------------------------------------------------------------------------------- | --------- | --------- |
+| paper       | `background`                                                                       | `#FAF8F3` | `#131210` |
+| surface     | `card`, `popover`                                                                  | `#FFFFFF` | `#1B1A17` |
+| sunk        | `muted`, `secondary`, `accent`                                                     | `#F1EDE3` | `#24221E` |
+| ink         | `foreground`, `primary`, `ring`                                                    | `#1C1A17` | `#F2EEE6` |
+| ink2        | `foreground/80` (opacity modifier, no token)                                       | —         | —         |
+| ink3        | `muted-foreground`                                                                 | `#69645A` | `#A49E91` |
+| line        | `border`                                                                           | `#E7E1D4` | `#2C2A25` |
+| line2       | `foreground/20` for decorative edges (dashed cards, chips)                         | —         | —         |
+| —           | `input` (control edges, 3:1)                                                       | `#8C877B` | `#6F6D68` |
+| ok          | `success`                                                                          | `#1E7A4C` | `#5BD08F` |
+| bad         | `destructive`                                                                      | `#B4322C` | `#FF8A80` |
+| warn        | `warning`                                                                          | `#9A5B00` | `#FFC46B` |
+| code        | `code` (code-block background, [ADR-0010](decisions/ADR-0010-dark-code-blocks.md)) | `#1C1A17` | `#0C0B0A` |
 
 - The heatmap uses `bg-muted` (no activity), `bg-success/35`, `bg-success/65` and `bg-success`.
 - The shadcn `chart-*` and `sidebar-*` slots are kept and point at the same palette.
-- Code-block colours come from the Shiki theme, not from tokens.
+- Code blocks are dark in both modes: background `bg-code`, text colours from one Shiki theme, Catppuccin Mocha ([ADR-0010](decisions/ADR-0010-dark-code-blocks.md)). `packages/content/src/mdx/code-theme.test.ts` checks every token colour of the theme at 4.5:1 on both `--code` values (lowest today: 6.15:1). Inline `code` in prose is not highlighted.
 - Differences from the design: `input` is darker than line2 so control edges reach 3:1. The heatmap uses `success` instead of the backend green.
 
 ## Track colors

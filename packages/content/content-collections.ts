@@ -10,6 +10,7 @@ import {
   parseMetaPath,
   TRACKS_DIR,
 } from "./src/paths"
+import { compileGlossary, compileLesson } from "./src/mdx/compile"
 import { glossaryDocumentSchema } from "./src/schemas/glossary-term.schema"
 import { groupMetaSchema } from "./src/schemas/group-meta.schema"
 import { lessonDocumentSchema } from "./src/schemas/lesson.schema"
@@ -73,10 +74,13 @@ const lessons = defineCollection({
   include: "**/*.mdx",
   parser: "frontmatter",
   schema: lessonDocumentSchema,
-  transform: (lesson) => ({
-    ...lesson,
-    location: parseLessonPath(tracksPath(lesson._meta.filePath)),
-  }),
+  transform: async (lesson) => {
+    const location = parseLessonPath(tracksPath(lesson._meta.filePath))
+    const { code, sections } = await compileLesson(lesson.content, {
+      isPublished: !lesson.draft,
+    })
+    return { ...lesson, location, mdx: code, sections: [...sections] }
+  },
 })
 
 const glossary = defineCollection({
@@ -85,7 +89,11 @@ const glossary = defineCollection({
   include: "*.mdx",
   parser: "frontmatter",
   schema: glossaryDocumentSchema,
-  transform: (term) => ({ ...term, id: glossaryIdOf(term._meta.filePath) }),
+  transform: async (term) => ({
+    ...term,
+    id: glossaryIdOf(term._meta.filePath),
+    mdx: await compileGlossary(term.content),
+  }),
 })
 
 // Optional until the content lands; the cross-file validation makes them

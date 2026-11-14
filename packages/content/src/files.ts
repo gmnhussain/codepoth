@@ -1,3 +1,4 @@
+import type { LessonSection } from "./mdx/blocks"
 import type { LessonLocation, MetaLocation } from "./paths"
 import type { GlossaryTerm } from "./schemas/glossary-term.schema"
 import type { GroupMeta } from "./schemas/group-meta.schema"
@@ -15,12 +16,18 @@ export type MetaFile<TMeta> = TMeta & { readonly location: MetaLocation }
 export type LessonFile = LessonFrontmatter & {
   readonly content: string
   readonly location: LessonLocation
+  /** Compiled MDX function body (src/mdx/compile.ts). */
+  readonly mdx: string
+  /** Author sections (`###`) and the block each sits in. */
+  readonly sections: readonly LessonSection[]
 }
 
 /** A glossary entry after schema validation; `id` is its file name. */
 export type GlossaryFile = GlossaryTerm & {
   readonly id: string
   readonly content: string
+  /** Compiled MDX function body of the definition. */
+  readonly mdx: string
 }
 
 /**
