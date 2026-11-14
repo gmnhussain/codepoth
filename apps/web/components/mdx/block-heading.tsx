@@ -22,7 +22,11 @@ export function BlockHeading({
       className="flex flex-wrap items-center gap-x-3 gap-y-2 text-3xl font-semibold"
     >
       {number === undefined ? null : (
-        <span className="rounded-md border border-input px-2 font-mono text-sm font-medium text-muted-foreground">
+        // Hidden from assistive technology: the heading's name is its title.
+        <span
+          aria-hidden="true"
+          className="rounded-md border border-input px-2 font-mono text-sm font-medium text-muted-foreground"
+        >
           {formatTwoDigits(number)}
         </span>
       )}

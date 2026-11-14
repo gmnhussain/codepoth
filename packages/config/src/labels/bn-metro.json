@@ -10,7 +10,8 @@
     "main": "প্রধান মেনু",
     "mobile": "মোবাইল মেনু",
     "menu": "মেনু",
-    "skipToContent": "মূল অংশে যাও"
+    "skipToContent": "মূল অংশে যাও",
+    "roadmap": "রোডম্যাপ"
   },
   "theme": {
     "toDark": "ডার্ক মোডে যাও",
@@ -55,7 +56,21 @@
   },
   "lesson": {
     "deepTag": "অভিজ্ঞদের জন্য",
-    "stepLabel": "ধাপ {n}"
+    "stepLabel": "ধাপ {n}",
+    "breadcrumb": "অবস্থান",
+    "trackChip": "{track} · লাইন {n}",
+    "topicChip": "স্টেশন {pos}",
+    "groupChip": "{group} · {pos}",
+    "lessonChip": "পাঠ {pos}",
+    "updated": "হালনাগাদ {date}",
+    "readingTime": "পড়তে ~{n} মিনিট",
+    "pager": "আগের ও পরের পাঠ",
+    "prevLesson": "← আগের পাঠ",
+    "nextLesson": "পরের পাঠ →",
+    "prevGroup": "আগের গ্রুপ: {group}",
+    "nextGroup": "পরের গ্রুপ: {group}",
+    "prevTopic": "আগের স্টেশন: {topic}",
+    "nextTopic": "পরের স্টেশন: {topic}"
   },
   "quiz": {
     "count": "{n}টি প্রশ্ন",

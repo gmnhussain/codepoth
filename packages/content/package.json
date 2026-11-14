@@ -37,6 +37,7 @@
     "./blocks": "./src/mdx/block-list.ts",
     "./env": "./src/env.ts",
     "./graph": "./src/graph.ts",
+    "./routes": "./src/routes.ts",
     "./paths": "./src/paths.ts",
     "./schemas/*": "./src/schemas/*.schema.ts",
     "./generated": {
