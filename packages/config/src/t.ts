@@ -1,5 +1,5 @@
 import { formatNumber } from "./format"
-import { activeLabels } from "./labels"
+import { activeLabels } from "./labels/active"
 import type { LeafPath } from "./labels"
 
 /** Values for `{name}` placeholders; numbers are shown with Bangla digits. */

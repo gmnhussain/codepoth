@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { LABEL_SETS } from "./labels"
+import { LABEL_SETS } from "./label-sets"
 import { labelSetSchema } from "./labels.schema"
 
 const reference = LABEL_SETS["bn-metro"]

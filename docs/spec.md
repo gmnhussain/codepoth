@@ -48,6 +48,7 @@ Footer links stay inside the v1 pages: author → the author block on Home (`/#a
 - `packages/config/src/site.ts`: site name (Bangla + English), logo component/path, domain, author links (optional; a link without a value is not rendered). Also selects the active label set.
 - `packages/config/src/labels/*.json`: every UI string (nav, buttons, statuses, block titles, level names). Components read labels through one helper, e.g. `t("nav.roadmap")`. No Bangla UI string is hardcoded inside a component.
 - Label variants: `bn-metro.json` (লাইন/স্টেশন), `bn-path.json` (পথ/ধাপ). Both have exactly the same keys and placeholders; a test enforces it, and a set with a missing key also fails typecheck.
+- Only the active set reaches the browser: `packages/config/src/labels/active.ts` imports it statically, and a test checks it is the set `site.labelSet` names. Switching terminology changes both lines. `label-sets.ts` (all sets) is for tests only.
 - `t(key, values?)` (`packages/config/src/t.ts`): keys are typed from `bn-metro.json`; `{name}` placeholders are filled from `values`, numbers are shown with Bangla digits, and a placeholder without a value throws.
 - Format helpers (`packages/config/src/format.ts`): `formatNumber` and `formatDate` use `Intl` with the `bn-BD` locale (Bangla digits and month names, e.g. "১১ নভেম্বর, ২০২৬"). Date-only content dates are formatted in UTC.
 
