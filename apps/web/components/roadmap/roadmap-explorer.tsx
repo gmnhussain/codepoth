@@ -11,7 +11,6 @@ import {
 import { MinusIcon, PlusIcon, SearchIcon } from "lucide-react"
 
 import { formatNumber, formatTwoDigits } from "@workspace/config/format"
-import { t } from "@workspace/config/t"
 import type { Roadmap, RoadmapTopic } from "@workspace/content/roadmap"
 import { isTopicVisible } from "@workspace/content/roadmap"
 import { Button } from "@workspace/ui/components/button"
@@ -22,6 +21,7 @@ import { cn } from "@workspace/ui/lib/utils"
 import { AppSheetContent } from "@/components/app-sheet"
 import { RoadmapCanvas } from "@/components/roadmap/roadmap-canvas"
 import { RoadmapPanel } from "@/components/roadmap/roadmap-panel"
+import { useT } from "@/lib/labels-context"
 import { useMediaQuery } from "@/lib/use-media-query"
 import { useUrlParam, writeUrlParams } from "@/lib/url-state"
 
@@ -60,6 +60,8 @@ export function RoadmapExplorer({
   readonly title: string
   readonly summary: string
 }) {
+  // "topic" for the canvas, which gets this `t`.
+  const t = useT(["roadmap", "lesson", "topic"])
   const searchId = useId()
   const isDesktop = useMediaQuery(DESKTOP)
   const scroller = useRef<HTMLDivElement>(null)
@@ -284,6 +286,7 @@ export function RoadmapExplorer({
               }}
             >
               <RoadmapCanvas
+                t={t}
                 roadmap={roadmap}
                 scale={scale}
                 isVisible={isVisible}

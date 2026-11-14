@@ -12,6 +12,7 @@ import {
 
 import { GlossaryControls } from "@/components/glossary/glossary-controls"
 import { TermCard } from "@/components/glossary/term-card"
+import { LabelScope } from "@/components/label-scope"
 import { buildPageMetadata } from "@/lib/metadata"
 
 const LIST_ID = "glossary-list"
@@ -66,7 +67,9 @@ export default function GlossaryPage() {
           {t("glossary.empty")}
         </p>
       ) : (
-        <>
+        // The controls' labels, and the copy buttons in the cards' code
+        // examples (ADR-0013).
+        <LabelScope namespaces={["glossary", "copy"]}>
           <GlossaryControls
             rootId={LIST_ID}
             terms={graph.glossary.map((term) => ({
@@ -100,7 +103,7 @@ export default function GlossaryPage() {
           <p className="text-center text-muted-foreground">
             {t("glossary.growing")}
           </p>
-        </>
+        </LabelScope>
       )}
     </div>
   )

@@ -7,6 +7,7 @@ import { isIndexableBuild } from "@workspace/content/env"
 import { t } from "@workspace/config/t"
 import { cn } from "@workspace/ui/lib/utils"
 
+import { LabelScope } from "@/components/label-scope"
 import { SiteFooter } from "@/components/site-footer"
 import { SiteHeader } from "@/components/site-header"
 import { SkipLink } from "@/components/skip-link"
@@ -40,6 +41,9 @@ const codeFont = JetBrains_Mono({
 
 const MAIN_CONTENT_ID = "main"
 
+/** Label groups the shell's client components and error.tsx need. */
+const SHELL_LABELS = ["common", "theme", "nav", "error"] as const
+
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: { default: site.name.bn, template: `%s · ${site.name.bn}` },
@@ -71,12 +75,16 @@ export default function RootLayout({
     >
       <body className="flex min-h-svh flex-col">
         <ThemeProvider>
-          <SkipLink targetId={MAIN_CONTENT_ID} />
-          <SiteHeader />
-          <main id={MAIN_CONTENT_ID} tabIndex={-1} className="flex-1">
-            {children}
-          </main>
-          <SiteFooter />
+          {/* Labels the shell's islands and error.tsx use; pages add their
+              own groups with a nested LabelScope (ADR-0013). */}
+          <LabelScope namespaces={SHELL_LABELS}>
+            <SkipLink targetId={MAIN_CONTENT_ID} />
+            <SiteHeader />
+            <main id={MAIN_CONTENT_ID} tabIndex={-1} className="flex-1">
+              {children}
+            </main>
+            <SiteFooter />
+          </LabelScope>
         </ThemeProvider>
       </body>
     </html>

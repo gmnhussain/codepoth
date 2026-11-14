@@ -7,11 +7,11 @@ import {
   SearchIcon,
 } from "lucide-react"
 
-import { t } from "@workspace/config/t"
 import { matchesQuery } from "@workspace/content/search"
 import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
 
+import { useT } from "@/lib/labels-context"
 import { useUrlParam, writeUrlParams } from "@/lib/url-state"
 
 /** The search query's URL parameter: /contents?q=… */
@@ -46,6 +46,7 @@ export function ContentsControls({
   /** Every lesson's searchable text, the same as its `data-lesson-search`. */
   readonly searchTexts: readonly string[]
 }) {
+  const t = useT(["contents"])
   const inputId = useId()
   const inputRef = useRef<HTMLInputElement>(null)
   const query = useUrlParam(QUERY_PARAM)

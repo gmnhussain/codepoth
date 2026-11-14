@@ -3,10 +3,11 @@
 import type { ComponentProps } from "react"
 import { XIcon } from "lucide-react"
 
-import { t } from "@workspace/config/t"
 import { Button } from "@workspace/ui/components/button"
 import { SheetClose, SheetContent } from "@workspace/ui/components/sheet"
 import { cn } from "@workspace/ui/lib/utils"
+
+import { useT } from "@/lib/labels-context"
 
 /**
  * The panel every sheet in the app uses instead of `SheetContent`. The
@@ -19,6 +20,7 @@ export function AppSheetContent({
   className,
   ...props
 }: Omit<ComponentProps<typeof SheetContent>, "showCloseButton">) {
+  const t = useT(["common"])
   return (
     <SheetContent
       showCloseButton={false}

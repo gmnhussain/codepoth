@@ -4,6 +4,7 @@ import { t } from "@workspace/config/t"
 import { getContentGraph } from "@workspace/content/content"
 import { buildRoadmap } from "@workspace/content/roadmap"
 
+import { LabelScope } from "@/components/label-scope"
 import { RoadmapExplorer } from "@/components/roadmap/roadmap-explorer"
 import { buildPageMetadata } from "@/lib/metadata"
 
@@ -27,10 +28,12 @@ export function generateMetadata(): Metadata {
  */
 export default function RoadmapPage() {
   return (
-    <RoadmapExplorer
-      roadmap={buildRoadmap(getContentGraph())}
-      title={t("nav.roadmap")}
-      summary={summaryOf()}
-    />
+    <LabelScope namespaces={["roadmap", "lesson", "topic"]}>
+      <RoadmapExplorer
+        roadmap={buildRoadmap(getContentGraph())}
+        title={t("nav.roadmap")}
+        summary={summaryOf()}
+      />
+    </LabelScope>
   )
 }

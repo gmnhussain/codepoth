@@ -3,9 +3,9 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
-import { t } from "@workspace/config/t"
 import { cn } from "@workspace/ui/lib/utils"
 
+import { useT } from "@/lib/labels-context"
 import { isActiveRoute, NAV_ROUTES } from "@/lib/routes"
 
 /** The page links; the current page is marked for sight and screen readers. */
@@ -18,6 +18,7 @@ export function NavLinks({
   readonly linkClassName?: string
   readonly onNavigate?: () => void
 }) {
+  const t = useT(["nav"])
   const pathname = usePathname()
   return (
     <ul className={className}>

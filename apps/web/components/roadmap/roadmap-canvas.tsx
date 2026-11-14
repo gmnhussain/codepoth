@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react"
 import { FlagIcon } from "lucide-react"
 
-import { t } from "@workspace/config/t"
+import type { Translate } from "@workspace/config/translate"
 import type { Roadmap, RoadmapTopic } from "@workspace/content/roadmap"
 import { cn } from "@workspace/ui/lib/utils"
 
@@ -53,9 +53,11 @@ function labelPlacement(topic: RoadmapTopic): {
 /**
  * The roadmap drawing: track lines, topic labels, start flags and a 44px
  * button per topic. Presentational and hook-free, so a server page can
- * render it as a static preview (no `onSelect`: no buttons).
+ * render it as a static preview (no `onSelect`: no buttons); the caller
+ * passes its `t` (server `t`, or `useT()` in an island, ADR-0013).
  */
 export function RoadmapCanvas({
+  t,
   roadmap,
   scale,
   isVisible,
@@ -63,6 +65,7 @@ export function RoadmapCanvas({
   focusedTrack,
   onSelect,
 }: {
+  readonly t: Translate<"roadmap" | "topic">
   readonly roadmap: Roadmap
   readonly scale: number
   readonly isVisible: (topic: RoadmapTopic) => boolean

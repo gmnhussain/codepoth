@@ -3,13 +3,14 @@
 import type { ReactNode } from "react"
 import { ArrowRightIcon } from "lucide-react"
 
-import { t } from "@workspace/config/t"
 import {
   Popover,
   PopoverContent,
   PopoverTitle,
   PopoverTrigger,
 } from "@workspace/ui/components/popover"
+
+import { useT } from "@/lib/labels-context"
 
 /**
  * A glossary term in lesson prose: a dotted-underline button that opens the
@@ -30,6 +31,7 @@ export function TermPopover({
   readonly definition: ReactNode
   readonly children?: ReactNode
 }) {
+  const t = useT(["term"])
   return (
     <Popover>
       {/* The visible text is the accessible name (WCAG 2.5.3); Base UI

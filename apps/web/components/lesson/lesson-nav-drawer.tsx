@@ -4,11 +4,11 @@ import type { ReactNode } from "react"
 import { useState } from "react"
 import { ListIcon } from "lucide-react"
 
-import { t } from "@workspace/config/t"
 import { Button } from "@workspace/ui/components/button"
 import { Sheet, SheetTitle, SheetTrigger } from "@workspace/ui/components/sheet"
 
 import { AppSheetContent } from "@/components/app-sheet"
+import { useT } from "@/lib/labels-context"
 
 /**
  * The lesson's track navigation in a left sheet, below `lg` where the side
@@ -23,6 +23,7 @@ export function LessonNavDrawer({
   readonly title: string
   readonly children: ReactNode
 }) {
+  const t = useT(["lesson"])
   const [isOpen, setIsOpen] = useState(false)
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>

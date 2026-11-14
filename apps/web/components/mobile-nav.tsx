@@ -3,15 +3,16 @@
 import { useState } from "react"
 import { MenuIcon } from "lucide-react"
 
-import { t } from "@workspace/config/t"
 import { Button } from "@workspace/ui/components/button"
 import { Sheet, SheetTitle, SheetTrigger } from "@workspace/ui/components/sheet"
 
 import { AppSheetContent } from "@/components/app-sheet"
 import { NavLinks } from "@/components/nav-links"
+import { useT } from "@/lib/labels-context"
 
 /** The page links in a top sheet, below the `lg` breakpoint. */
 export function MobileNav() {
+  const t = useT(["nav"])
   const [isOpen, setIsOpen] = useState(false)
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>

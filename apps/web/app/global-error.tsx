@@ -1,10 +1,12 @@
 "use client"
 
 import "@workspace/ui/globals.css"
-import { site } from "@workspace/config/site"
-import { t } from "@workspace/config/t"
+import { lazy, Suspense } from "react"
 
-import { ErrorMessage } from "@/components/error-message"
+// Loaded only when this page is shown: it carries the error labels, which
+// would otherwise put the whole label set in every page's JavaScript
+// (ADR-0013).
+const GlobalErrorBody = lazy(() => import("@/components/global-error-body"))
 
 /**
  * Shown when the root layout itself fails. It replaces the whole document,
@@ -20,8 +22,9 @@ export default function GlobalError({
   return (
     <html lang="bn">
       <body>
-        <title>{`${t("error.title")} · ${site.name.bn}`}</title>
-        <ErrorMessage onRetry={retry} />
+        <Suspense fallback={null}>
+          <GlobalErrorBody onRetry={retry} />
+        </Suspense>
       </body>
     </html>
   )

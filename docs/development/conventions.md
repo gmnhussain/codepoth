@@ -134,7 +134,7 @@ File role suffixes: `.schema.ts` (Zod schemas), `.client.ts` (browser-only helpe
 - Performance rules (client islands, fonts, build-time rendering, lazy loading, targets): [performance.md](performance.md).
 - Every app has `error.tsx` (with a try-again button), a styled `not-found.tsx` and `global-error.tsx`.
 - **localStorage:** every access is wrapped in `try/catch` behind a `typeof window` guard, in `*.client.ts` helpers, and validated with Zod on read. Corrupt data falls back to empty, never crashes the page.
-- **MUST:** no UI text hard-coded; read it through `t("…")` from the label config.
+- **MUST:** no UI text hard-coded; read it through `t("…")` from the label config. Server code imports `t` from `@workspace/config/t`; a client component declares its label groups with `useT(["quiz"])` (its `t` then accepts only those keys) and its page (or the layout) puts them in scope with `LabelScope`, so only those groups reach the browser. A key outside the declared groups fails typecheck, and a declared group missing from scope fails the prerender even if its strings appear only after a click ([ADR-0013](../decisions/ADR-0013-labels-in-client-islands.md); importing `t` in a `"use client"` file is lint-enforced).
 - **MUST:** Tailwind utility classes and theme tokens only; no new colours outside the token system. Merge classes with `cn()`.
 - **MUST:** a shadcn/ui component wherever one fits, added with the CLI, not written by hand or forked without a documented reason.
 - One component per file; kebab-case filename; PascalCase named export. Pages and layouts use `export default`. List props are `readonly`.

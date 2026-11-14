@@ -45,6 +45,7 @@ What becomes easier or harder because of it.
 | [ADR-0010](ADR-0010-dark-code-blocks.md)                 | Dark code blocks with one Shiki theme (amends ADR-0008) | accepted |
 | [ADR-0011](ADR-0011-mdx-compiled-at-build-time.md)       | MDX compiled at build time, structure checked           | accepted |
 | [ADR-0012](ADR-0012-about-page-content.md)               | About page as content, privacy text kept true           | accepted |
+| [ADR-0013](ADR-0013-labels-in-client-islands.md)         | Client islands get only the label groups they use       | accepted |
 
 ## Open questions (do NOT hardcode)
 

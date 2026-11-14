@@ -3,9 +3,10 @@
 import { useEffect, useRef, useState } from "react"
 import { CheckIcon, CopyIcon } from "lucide-react"
 
-import { t } from "@workspace/config/t"
 import { Button } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
+
+import { useT } from "@/lib/labels-context"
 
 type CopyState = "idle" | "done" | "failed"
 
@@ -25,6 +26,7 @@ export function CopyButton({
   readonly label: string
   readonly className?: string
 }) {
+  const t = useT(["copy"])
   const [state, setState] = useState<CopyState>("idle")
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 

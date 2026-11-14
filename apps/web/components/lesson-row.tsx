@@ -1,6 +1,6 @@
 import Link from "next/link"
 
-import { t } from "@workspace/config/t"
+import type { Translate } from "@workspace/config/translate"
 import type { GraphLesson } from "@workspace/content/graph"
 import { cn } from "@workspace/ui/lib/utils"
 
@@ -8,14 +8,17 @@ import { cn } from "@workspace/ui/lib/utils"
  * A lesson in a numbered list: number, title (the link) and minutes.
  * Its accessible name is "title, N মিনিট": the number is hidden (the
  * surrounding <ol> gives the order) and "মি" is spelled out for screen
- * readers (design.md#topic-page).
+ * readers (design.md#topic-page). Rendered on the server and in the
+ * roadmap island, so the caller passes its `t` (ADR-0013).
  */
 export function LessonRow({
+  t,
   lesson,
   number,
   className,
   numberClassName,
 }: {
+  readonly t: Translate<"topic">
   readonly lesson: Pick<GraphLesson, "url" | "title" | "readingMinutes">
   readonly number: string
   readonly className?: string

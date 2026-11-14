@@ -8,6 +8,7 @@ import { lessonSearchText } from "@workspace/content/search"
 
 import { ContentsControls } from "@/components/contents/contents-controls"
 import { TrackSection } from "@/components/contents/track-section"
+import { LabelScope } from "@/components/label-scope"
 import { buildPageMetadata } from "@/lib/metadata"
 
 const LIST_ID = "contents-list"
@@ -66,7 +67,9 @@ export default function ContentsPage() {
         </dl>
       </header>
 
-      <ContentsControls rootId={LIST_ID} searchTexts={searchTexts} />
+      <LabelScope namespaces={["contents"]}>
+        <ContentsControls rootId={LIST_ID} searchTexts={searchTexts} />
+      </LabelScope>
 
       <div className="flex items-start gap-10">
         <nav

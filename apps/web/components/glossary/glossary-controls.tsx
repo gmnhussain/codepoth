@@ -4,11 +4,11 @@ import { useEffect, useId, useRef } from "react"
 import { SearchIcon } from "lucide-react"
 
 import { formatNumber } from "@workspace/config/format"
-import { t } from "@workspace/config/t"
 import { matchesQuery } from "@workspace/content/search"
 import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
 
+import { useT } from "@/lib/labels-context"
 import { useUrlParam, writeUrlParams } from "@/lib/url-state"
 
 /** URL parameters: /glossary?q=token&letter=T */
@@ -52,6 +52,7 @@ export function GlossaryControls({
     readonly count: number
   }[]
 }) {
+  const t = useT(["glossary"])
   const inputId = useId()
   const inputRef = useRef<HTMLInputElement>(null)
   const query = useUrlParam(PARAM.query)

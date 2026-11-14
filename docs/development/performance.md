@@ -7,6 +7,7 @@ Every route is pre-rendered ([ADR-0004](../decisions/ADR-0004-vercel-ssg-not-sta
 ## Rendering
 
 - Server Components by default. Client components are small islands only where the browser is needed: quiz, mark-done and bookmark buttons, theme toggle, search trigger, progress overlays.
+- Islands get their labels as data, only the groups in scope (`LabelScope` + `useT()`), never the whole label set in the JavaScript ([ADR-0013](../decisions/ADR-0013-labels-in-client-islands.md)); measured on 2026-11-15, this took about 4.4 KB gzip off every route's First Load JS.
 - Reader progress is read from localStorage after hydration through a `useSyncExternalStore` hook, so the server HTML is the same for every reader and there is no hydration mismatch. Storage rules: [conventions](conventions.md#10-frontend).
 - Reading time, the table of contents and prev/next links are computed at build time, never in the browser.
 

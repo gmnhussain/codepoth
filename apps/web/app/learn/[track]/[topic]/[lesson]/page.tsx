@@ -9,6 +9,7 @@ import { lessonJsonLd } from "@workspace/content/json-ld"
 import { findLesson, lessonRouteParams } from "@workspace/content/routes"
 
 import { JsonLd } from "@/components/json-ld"
+import { LabelScope } from "@/components/label-scope"
 import { LessonHeader } from "@/components/lesson/lesson-header"
 import { LessonNav } from "@/components/lesson/lesson-nav"
 import { LessonNavDrawer } from "@/components/lesson/lesson-nav-drawer"
@@ -60,58 +61,62 @@ export default async function LessonPage({ params }: LessonPageProps) {
   const nav = <LessonNav graph={graph} lesson={lesson} />
 
   return (
-    <div data-track-color={track?.color}>
-      {lessonJsonLd(graph, lesson, t("nav.roadmap")).map((data) => (
-        <JsonLd key={String(data["@type"])} data={data} />
-      ))}
-      <div aria-hidden="true" className="h-1.5 bg-track-dot" />
-      <div className="mx-auto flex max-w-7xl gap-10 px-4 py-10 sm:px-8">
-        <aside className="hidden w-56 shrink-0 lg:block">
-          <div className="sticky top-6 max-h-svh overflow-y-auto pb-10">
-            {nav}
-          </div>
-        </aside>
-        <article className="flex max-w-3xl min-w-0 flex-1 flex-col gap-12">
-          <LessonHeader
-            graph={graph}
-            lesson={lesson}
-            navTrigger={
-              <LessonNavDrawer
-                title={t("lesson.trackNav", {
-                  track: track?.titleEn ?? "",
-                })}
-              >
-                {nav}
-              </LessonNavDrawer>
-            }
-          />
-          {tocItems.length > 0 ? (
-            <div className="xl:hidden">
-              <LessonToc
-                items={tocItems}
-                sectionCount={lesson.sections.length}
-                variant="bar"
-              />
-            </div>
-          ) : null}
-          <MdxContent
-            code={lesson.mdx}
-            components={lessonComponentsFor(lesson)}
-          />
-          <LessonPager graph={graph} lessonId={lesson.id} />
-        </article>
-        {tocItems.length > 0 ? (
-          <aside className="hidden w-48 shrink-0 xl:block">
+    // Labels for the TOC, the drawer, copy buttons, the quiz and Term
+    // popovers (ADR-0013).
+    <LabelScope namespaces={["lesson", "copy", "quiz", "term"]}>
+      <div data-track-color={track?.color}>
+        {lessonJsonLd(graph, lesson, t("nav.roadmap")).map((data) => (
+          <JsonLd key={String(data["@type"])} data={data} />
+        ))}
+        <div aria-hidden="true" className="h-1.5 bg-track-dot" />
+        <div className="mx-auto flex max-w-7xl gap-10 px-4 py-10 sm:px-8">
+          <aside className="hidden w-56 shrink-0 lg:block">
             <div className="sticky top-6 max-h-svh overflow-y-auto pb-10">
-              <LessonToc
-                items={tocItems}
-                sectionCount={lesson.sections.length}
-                variant="sidebar"
-              />
+              {nav}
             </div>
           </aside>
-        ) : null}
+          <article className="flex max-w-3xl min-w-0 flex-1 flex-col gap-12">
+            <LessonHeader
+              graph={graph}
+              lesson={lesson}
+              navTrigger={
+                <LessonNavDrawer
+                  title={t("lesson.trackNav", {
+                    track: track?.titleEn ?? "",
+                  })}
+                >
+                  {nav}
+                </LessonNavDrawer>
+              }
+            />
+            {tocItems.length > 0 ? (
+              <div className="xl:hidden">
+                <LessonToc
+                  items={tocItems}
+                  sectionCount={lesson.sections.length}
+                  variant="bar"
+                />
+              </div>
+            ) : null}
+            <MdxContent
+              code={lesson.mdx}
+              components={lessonComponentsFor(lesson)}
+            />
+            <LessonPager graph={graph} lessonId={lesson.id} />
+          </article>
+          {tocItems.length > 0 ? (
+            <aside className="hidden w-48 shrink-0 xl:block">
+              <div className="sticky top-6 max-h-svh overflow-y-auto pb-10">
+                <LessonToc
+                  items={tocItems}
+                  sectionCount={lesson.sections.length}
+                  variant="sidebar"
+                />
+              </div>
+            </aside>
+          ) : null}
+        </div>
       </div>
-    </div>
+    </LabelScope>
   )
 }

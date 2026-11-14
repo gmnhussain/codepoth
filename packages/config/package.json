@@ -24,6 +24,7 @@
     "./site": "./src/site.ts",
     "./labels": "./src/labels.ts",
     "./t": "./src/t.ts",
+    "./translate": "./src/translate.ts",
     "./format": "./src/format.ts",
     "./track-colors": "./src/track-colors.ts",
     "./logo": "./src/logo.tsx",

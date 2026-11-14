@@ -1,4 +1,5 @@
 import { formatNumber } from "@workspace/config/format"
+import { t } from "@workspace/config/t"
 import type { ContentGraph } from "@workspace/content/graph"
 
 import { LessonRow } from "@/components/lesson-row"
@@ -22,6 +23,7 @@ export function LessonList({
         return (
           <li key={id}>
             <LessonRow
+              t={t}
               lesson={lesson}
               number={formatNumber(
                 lesson.numberInGroup ?? lesson.numberInTopic

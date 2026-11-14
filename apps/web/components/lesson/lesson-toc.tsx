@@ -3,8 +3,9 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import { ChevronDownIcon } from "lucide-react"
 
-import { t } from "@workspace/config/t"
 import { cn } from "@workspace/ui/lib/utils"
+
+import { useT } from "@/lib/labels-context"
 
 /** One TOC entry: a block (numbered) or an author section under it. */
 export type TocItem = {
@@ -129,6 +130,7 @@ export function LessonToc({
   readonly sectionCount: number
   readonly variant: "sidebar" | "bar"
 }) {
+  const t = useT(["lesson"])
   const ids = useMemo(() => flatIds(items), [items])
   const activeId = useActiveId(ids)
   const barRef = useRef<HTMLDetailsElement>(null)

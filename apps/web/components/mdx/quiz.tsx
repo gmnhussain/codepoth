@@ -5,9 +5,10 @@ import { useState } from "react"
 import { CheckIcon, XIcon } from "lucide-react"
 
 import { formatNumber } from "@workspace/config/format"
-import { t } from "@workspace/config/t"
 import { Button } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
+
+import { useT } from "@/lib/labels-context"
 
 /** One question as the lesson frontmatter defines it (ADR-0009). */
 export type QuizQuestion = {
@@ -48,6 +49,7 @@ export function QuizQuestions({
 }: {
   readonly questions: readonly QuizQuestion[]
 }) {
+  const t = useT(["quiz"])
   const [answers, setAnswers] = useState<ReadonlyMap<number, number>>(
     () => new Map()
   )

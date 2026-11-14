@@ -8,4 +8,21 @@ export default [
       parserOptions: { tsconfigRootDir: import.meta.dirname },
     },
   },
+  {
+    // ADR-0013: `t` binds the whole label set, so importing it in a client
+    // file ships every label to the browser. Client files use `useT()` with
+    // the groups a `LabelScope` puts in scope.
+    files: ["**/*.tsx", "**/*.ts"],
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector:
+            "Program:has(> ExpressionStatement[directive='use client']) ImportDeclaration[source.value='@workspace/config/t']",
+          message:
+            'A "use client" file may not import @workspace/config/t (it bundles every label). Use useT() from @/lib/labels-context under a LabelScope (ADR-0013).',
+        },
+      ],
+    },
+  },
 ]

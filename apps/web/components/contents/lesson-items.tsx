@@ -1,3 +1,4 @@
+import { t } from "@workspace/config/t"
 import type { GraphLesson } from "@workspace/content/graph"
 import { lessonSearchText } from "@workspace/content/search"
 
@@ -31,6 +32,7 @@ export function LessonItems({
           )}
         >
           <LessonRow
+            t={t}
             lesson={lesson}
             number={numberOf(lesson)}
             className="min-h-11 rounded-lg px-3 py-2"

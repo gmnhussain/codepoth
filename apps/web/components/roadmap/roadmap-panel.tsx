@@ -1,3 +1,5 @@
+"use client"
+
 import type { Ref } from "react"
 import Link from "next/link"
 import { ArrowRightIcon, ChevronRightIcon, XIcon } from "lucide-react"
@@ -7,7 +9,6 @@ import {
   formatNumber,
   formatTwoDigits,
 } from "@workspace/config/format"
-import { t } from "@workspace/config/t"
 import { roundedDuration } from "@workspace/content/reading-time"
 import type { Roadmap, RoadmapTopic } from "@workspace/content/roadmap"
 import { topicNeighbours } from "@workspace/content/roadmap"
@@ -16,6 +17,7 @@ import { cn } from "@workspace/ui/lib/utils"
 
 import { Chip } from "@/components/chip"
 import { LessonRow } from "@/components/lesson-row"
+import { useT } from "@/lib/labels-context"
 
 /**
  * The selected topic: where it is, what it covers, how long it takes, where
@@ -36,6 +38,7 @@ export function RoadmapPanel({
   readonly onClose?: (() => void) | undefined
   readonly headingRef?: Ref<HTMLHeadingElement> | undefined
 }) {
+  const t = useT(["roadmap", "topic", "lesson"])
   const trackOf = (id: string) => roadmap.tracks.find((item) => item.id === id)
   const topicOf = (key: string) =>
     roadmap.topics.find((item) => item.key === key)
@@ -196,6 +199,7 @@ export function RoadmapPanel({
                 {group.lessons.map((lesson, lessonIndex) => (
                   <li key={lesson.id}>
                     <LessonRow
+                      t={t}
                       lesson={lesson}
                       number={formatNumber(lessonIndex + 1)}
                       className="min-h-11 gap-3 rounded-lg px-2.5 py-1.5"
@@ -211,6 +215,7 @@ export function RoadmapPanel({
               {topic.lessons.map((lesson, lessonIndex) => (
                 <li key={lesson.id}>
                   <LessonRow
+                    t={t}
                     lesson={lesson}
                     number={formatNumber(lessonIndex + 1)}
                     className="min-h-11 gap-3 rounded-lg px-2.5 py-1.5"
