@@ -8,7 +8,9 @@
     "lint": "turbo lint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "typecheck": "turbo typecheck"
+    "typecheck": "turbo typecheck",
+    "prepare": "node scripts/setup-git-hooks.mjs",
+    "test:commit-msg": "node --test scripts/commit-message.test.mjs"
   },
   "devDependencies": {
     "@workspace/eslint-config": "workspace:*",

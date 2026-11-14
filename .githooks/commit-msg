@@ -1,0 +1,4 @@
+#!/bin/sh
+# Rejects commit messages that break docs/development/conventions.md §3.
+# Rules live in scripts/commit-message.mjs. Enabled by the root `prepare` script.
+exec node "$(git rev-parse --show-toplevel)/scripts/check-commit-message.mjs" "$1"
