@@ -19,9 +19,10 @@ quiz: # 3–5 questions; 2–4 options each; answer is the 0-based index of the 
   - question: নিচের কোড কী দেখাবে?
     code: | # optional code shown with the question
       console.log(typeof null);
-    options: ['"null"', '"object"', '"undefined"']
+    # `backticks` mark inline code in a question, option or explanation; quote the string
+    options: ['`"null"`', '`"object"`', '`"undefined"`']
     answer: 1
-    explanation: JavaScript-এর একটা পুরনো ভুল — typeof null হলো "object"।
+    explanation: JavaScript-এর একটা পুরনো ভুল — `typeof null` হলো `"object"`।
   - question: তৃতীয় প্রশ্ন?
     options: [হ্যাঁ, না]
     answer: 0

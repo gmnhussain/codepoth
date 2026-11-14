@@ -51,5 +51,25 @@
   "lesson": {
     "deepTag": "অভিজ্ঞদের জন্য",
     "stepLabel": "ধাপ {n}"
+  },
+  "quiz": {
+    "count": "{n}টি প্রশ্ন",
+    "question": "প্রশ্ন {n}",
+    "optionKeys": "ক খ গ ঘ",
+    "right": "ঠিক!",
+    "wrong": "হয়নি।",
+    "score": "{total}টির মধ্যে {right}টি ঠিক",
+    "retry": "আবার চেষ্টা করো",
+    "correctAnswerIs": "সঠিক উত্তর: {answer}।"
+  },
+  "copy": {
+    "code": "কোড কপি করো",
+    "prompt": "প্রম্পট কপি করো",
+    "short": "কপি",
+    "done": "কপি হয়েছে",
+    "failed": "কপি করা যায়নি"
+  },
+  "term": {
+    "tag": "পরিভাষা"
   }
 }

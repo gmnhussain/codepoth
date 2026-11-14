@@ -26,10 +26,10 @@ quiz:
     explanation: Dependency বদলালে React আগে পুরনো effect-এর cleanup চালায়, তারপর নতুন effect। Component সরে গেলেও একবার চলে।
   - question: নিচের কোনটা infinite loop ঘটাবে?
     options:
-      - "useEffect(() => setCount(count + 1), [count])"
-      - "useEffect(() => setCount(1), [])"
-      - "useEffect(() => console.log(count), [count])"
-      - "useEffect(() => { document.title = name }, [name])"
+      - "`useEffect(() => setCount(count + 1), [count])`"
+      - "`useEffect(() => setCount(1), [])`"
+      - "`useEffect(() => console.log(count), [count])`"
+      - "`useEffect(() => { document.title = name }, [name])`"
     answer: 0
     explanation: count বদলায় → effect চলে → আবার count বদলায় → আবার effect। Effect নিজেই নিজের dependency বদলাচ্ছে।
 ---

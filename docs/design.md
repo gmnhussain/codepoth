@@ -178,6 +178,11 @@ The MDX components for lesson bodies live in `apps/web/components/mdx/` and are 
 - `<DeepDive>`: a native `<details>`, closed by default, with the "অভিজ্ঞদের জন্য" chip and the one-line `hint`.
 - Code blocks: see [Colors](#colors) and [ADR-0010](decisions/ADR-0010-dark-code-blocks.md); file name in the caption, Bangla line numbers that screen readers skip.
 - Tables scroll sideways inside a bordered card on narrow screens.
+- Interactive islands (client components, the only JavaScript in a lesson body):
+  - Copy buttons on every code block and AI prompt. They read the text from the page (no copy of it in the bundle), trim trailing spaces, and announce "কপি হয়েছে" through a status region.
+  - `<Term>`: a dotted-underline button opening a popover with the server-rendered definition; Escape closes it and focus returns to the term.
+  - `<Quiz />`: one fieldset per question whose options are buttons, not radios, so arrow keys never answer by accident: Tab moves between options, Enter or Space answers. An answered question locks (`aria-disabled`, so focus stays) and shows ✓/✗, the explanation in a live region, the score and "আবার চেষ্টা করো". `backtick` spans in quiz text show as inline code. The score is not saved yet (reader progress).
+  - `<Term>`'s trigger has no `aria-label`: its visible text is its name (WCAG 2.5.3).
 
 ## shadcn customisations
 

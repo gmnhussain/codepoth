@@ -252,6 +252,11 @@
       transition: none;
     }
   }
+  /* Hind Siliguri loads 400–600; "bold" would be a faked 700 (design.md#fonts). */
+  b,
+  strong {
+    @apply font-semibold;
+  }
   /* No programming ligatures: beginners should see `=>` and `!==` as typed. */
   code,
   kbd,

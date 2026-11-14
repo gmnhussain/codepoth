@@ -115,6 +115,7 @@ quiz: # 3–5 questions; required unless draft: true
 - "নতুন / হালনাগাদ" tags and the "নতুন কী" list are computed at build time from `published` and `updated` (30-day window), so they are as fresh as the last build.
 - Completeness rules apply only to published lessons (`draft` false): `description`, `level`, `published` and `quiz` are required, and so are the seven template blocks. A draft may be an incomplete stub. `updated` is never before `published`.
 - Each quiz question has 2–4 options, a valid `answer` index and an `explanation`.
+- Quiz text is plain text; the only markup is `backticks` for inline code, in the question, the options and the explanation (e.g. ``"`useEffect(fn, [])`"``; quote the YAML string). A longer snippet goes in `code`.
 
 ## Glossary entries
 
