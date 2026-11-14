@@ -33,6 +33,8 @@ content/
   glossary/                   # one file per term, e.g. side-effect.mdx
   map.json                    # map drawing: line polylines and topic coordinates
   start-routes.json           # Home's "where to start" routes
+  pages/
+    about.mdx                 # the About page's prose and privacy section
 ```
 
 `content/` is plain files, not a workspace package. `packages/content` reads it at build time.
@@ -152,9 +154,13 @@ The MDX body is the definition, optionally followed by a code example. The lesso
 
 `content/start-routes.json` holds Home's "where to start" cards: `{ "routes": [{ "level", "title", "description", "steps": ["@track/topic" | { "label" }] }] }`. The list sits under `routes` because Content Collections needs an object at the root of a JSON file. Free labels are content, so they never use display terms such as লাইন/স্টেশন, which depend on the label set ([ADR-0003](decisions/ADR-0003-neutral-names-config-labels.md)). Every topic reference must resolve to an existing topic. A step whose topic has no published lesson renders like the Map: unlinked, marked as planned; it is not a build error. Home's main "start" button goes to the first published lesson along the routes (in route and step order); if no lesson is published yet, it links to `/roadmap`.
 
+## Pages
+
+`content/pages/about.mdx` is the About page ([ADR-0012](decisions/ADR-0012-about-page-content.md)), a required singleton. Frontmatter: `title`, `description` (the lead and meta description), `updated`, `draft` (default `false`; a draft is shown only when drafts are included, otherwise `/about` is a 404 and the footer hides its links). The body is prose (paragraphs, `##`/`###`, lists, links, bold, inline code) and exactly one `<Privacy>…</Privacy>`, rendered as the `#privacy` section the footer links to; any other component, or zero or two `<Privacy>`, fails the build. The privacy text must stay literally true: a code change that affects what is stored, sent or loaded from elsewhere updates it in the same commit.
+
 ## Validation
 
-Every content file is parsed with its Zod schema from `packages/content` at build time: lesson frontmatter, `_meta.json`, glossary entries, `map.json` and `start-routes.json`. Cross-file rules:
+Every content file is parsed with its Zod schema from `packages/content` at build time: lesson frontmatter, `_meta.json`, glossary entries, `map.json`, `start-routes.json` and `pages/about.mdx`. Cross-file rules:
 
 - Track, topic, group and lesson file names are lower-case kebab-case (they become URL segments).
 - Lesson ids are unique; lesson file names are unique within a topic.

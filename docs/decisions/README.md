@@ -44,6 +44,7 @@ What becomes easier or harder because of it.
 | [ADR-0009](ADR-0009-lesson-blocks-and-content-fields.md) | Lesson blocks, quiz data, drafts, new fields            | accepted |
 | [ADR-0010](ADR-0010-dark-code-blocks.md)                 | Dark code blocks with one Shiki theme (amends ADR-0008) | accepted |
 | [ADR-0011](ADR-0011-mdx-compiled-at-build-time.md)       | MDX compiled at build time, structure checked           | accepted |
+| [ADR-0012](ADR-0012-about-page-content.md)               | About page as content, privacy text kept true           | accepted |
 
 ## Open questions (do NOT hardcode)
 

@@ -1,4 +1,5 @@
 import {
+  aboutDocument,
   allGlossaries,
   allGroups,
   allLessons,
@@ -10,6 +11,8 @@ import {
 } from "../.content-collections/generated"
 import { siteToday } from "@workspace/config/today"
 
+import type { AboutFile } from "./about"
+import { aboutPageFor } from "./about"
 import { contentOptionsFrom } from "./env"
 import type { ContentFiles } from "./files"
 import type { ContentGraph } from "./graph"
@@ -25,6 +28,14 @@ export const contentFiles: ContentFiles = {
   glossary: allGlossaries,
   map,
   startRoutes,
+}
+
+/**
+ * The about page if this build shows it (a draft only with drafts
+ * included); undefined means `/about` is a 404 and the footer hides its links.
+ */
+export function getAboutPage(): AboutFile | undefined {
+  return aboutPageFor(aboutDocument, contentOptionsFrom(process.env))
 }
 
 let cachedGraph: ContentGraph | undefined

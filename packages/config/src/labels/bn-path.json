@@ -49,7 +49,12 @@
     "course": "কোর্স",
     "site": "সাইট",
     "author": "লেখক পরিচিতি",
-    "whatsNew": "নতুন কী"
+    "whatsNew": "নতুন কী",
+    "about": "সম্পর্কে",
+    "privacy": "প্রাইভেসি"
+  },
+  "about": {
+    "privacyHeading": "প্রাইভেসি"
   },
   "home": {
     "heroChip": "বিনামূল্যে · বাংলায় · লগইন ছাড়াই",

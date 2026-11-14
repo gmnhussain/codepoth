@@ -1,7 +1,6 @@
 "use client"
 
 import type { ReactNode } from "react"
-import Link from "next/link"
 import { ArrowRightIcon } from "lucide-react"
 
 import { t } from "@workspace/config/t"
@@ -49,13 +48,15 @@ export function TermPopover({
           </span>
         </PopoverTitle>
         <div className="flex flex-col gap-3 leading-reading">{definition}</div>
-        <Link
+        {/* A plain <a>: a full navigation sets :target, which outlines the
+            term's card; next/link's pushState would not. */}
+        <a
           href={href}
           className="inline-flex min-h-11 items-center gap-1.5 self-start text-sm font-semibold underline decoration-foreground/30 underline-offset-4 hover:decoration-foreground"
         >
           {t("term.seeInGlossary")}
           <ArrowRightIcon aria-hidden="true" className="size-4" />
-        </Link>
+        </a>
       </PopoverContent>
     </Popover>
   )

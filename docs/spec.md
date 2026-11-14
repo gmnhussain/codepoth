@@ -22,7 +22,7 @@ Header search opens Pagefind (⌘K).
 
 URLs: `/learn/[track]/[topic]` and `/learn/[track]/[topic]/[lesson]` (no group in the URL), plus `/roadmap`, `/contents`, `/glossary`, `/dashboard`, `/about` ([ADR-0006](decisions/ADR-0006-urls-and-content-keys.md)).
 
-Footer links stay inside the v1 pages: author → the author block on Home (`/#author`), what's new → `/#new`, privacy → a privacy section on About (`/about#privacy`). GitHub and LinkedIn links render only when they are set in `site.ts`.
+Footer links stay inside the v1 pages: author → the author block on Home (`/#author`), what's new → `/#new`, about → `/about`, privacy → a privacy section on About (`/about#privacy`; the About content is in `content/pages/about.mdx`, [ADR-0012](decisions/ADR-0012-about-page-content.md)). GitHub and LinkedIn links render only when they are set in `site.ts`.
 
 ## Reader progress (client only)
 

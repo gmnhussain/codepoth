@@ -2,6 +2,7 @@ import { compile } from "@mdx-js/mdx"
 import rehypePrettyCode from "rehype-pretty-code"
 import remarkGfm from "remark-gfm"
 
+import { remarkAboutPage } from "./about"
 import type { LessonBlockId } from "./block-list"
 import type { LessonSection } from "./blocks"
 import { remarkLessonBlocks } from "./blocks"
@@ -51,6 +52,15 @@ export async function compileLesson(
 }
 
 /** Compiles a glossary definition (plain MDX, no template blocks). */
+/** Compiles the about page; throws unless it has exactly one `<Privacy>` (ADR-0012). */
+export async function compileAbout(source: string): Promise<string> {
+  const file = await compile(source, {
+    outputFormat: "function-body",
+    remarkPlugins: [remarkGfm, remarkAboutPage],
+  })
+  return String(file)
+}
+
 export async function compileGlossary(source: string): Promise<string> {
   const file = await compile(source, {
     outputFormat: "function-body",

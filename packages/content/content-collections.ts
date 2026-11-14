@@ -10,7 +10,8 @@ import {
   parseMetaPath,
   TRACKS_DIR,
 } from "./src/paths"
-import { compileGlossary, compileLesson } from "./src/mdx/compile"
+import { compileAbout, compileGlossary, compileLesson } from "./src/mdx/compile"
+import { aboutDocumentSchema } from "./src/schemas/about.schema"
 import { glossaryDocumentSchema } from "./src/schemas/glossary-term.schema"
 import { groupMetaSchema } from "./src/schemas/group-meta.schema"
 import { lessonDocumentSchema } from "./src/schemas/lesson.schema"
@@ -129,8 +130,22 @@ const startRoutes = defineSingleton({
   optional: true,
 })
 
+// Required: the footer's privacy link depends on it (ADR-0012).
+const about = defineSingleton({
+  name: "about",
+  typeName: "AboutDocument",
+  filePath: `${CONTENT_DIR}/pages/about.mdx`,
+  parser: "frontmatter",
+  schema: aboutDocumentSchema,
+  transform: async (page) => ({
+    ...page,
+    mdx: await compileAbout(page.content),
+  }),
+})
+
 export default defineConfig({
   content: [
+    about,
     tracksOrder,
     tracks,
     topics,
