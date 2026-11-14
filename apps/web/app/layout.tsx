@@ -3,6 +3,7 @@ import { Anek_Bangla, Hind_Siliguri, JetBrains_Mono } from "next/font/google"
 
 import "@workspace/ui/globals.css"
 import { site } from "@workspace/config/site"
+import { isIndexableBuild } from "@workspace/content/env"
 import { t } from "@workspace/config/t"
 import { cn } from "@workspace/ui/lib/utils"
 
@@ -45,6 +46,11 @@ export const metadata: Metadata = {
   description: t("site.tagline"),
   applicationName: site.name.bn,
   openGraph: { siteName: site.name.bn, locale: "bn_BD", type: "website" },
+  // Pages inherit this; only a production deploy without drafts is indexed
+  // (conventions §12).
+  ...(isIndexableBuild(process.env)
+    ? {}
+    : { robots: { index: false, follow: false } }),
 }
 
 export default function RootLayout({

@@ -161,6 +161,7 @@ File role suffixes: `.schema.ts` (Zod schemas), `.client.ts` (browser-only helpe
 - Shared layout pieces (header, footer, container) are used by every page.
 - Every indexable page has metadata from one `buildPageMetadata()` helper (title, description, canonical, Open Graph); root metadata with a title template; `sitemap.ts` and `robots.ts` covering every route; JSON-LD through one escaping component.
 - No thin pages created only for SEO.
+- Only a Vercel production deploy without drafts is indexable (`isIndexableBuild` in `packages/content/src/env.ts`). Every other build (previews, local builds, any build with `CONTENT_INCLUDE_DRAFTS=1`) sends `noindex, nofollow` on every page from the root metadata. `robots.txt` always allows crawling: a page blocked there is never fetched, so its `noindex` is never seen and a linked URL can still be indexed. The sitemap line appears only in an indexable build, and the sitemap never lists drafts.
 - Fonts, images and Core Web Vitals targets: [performance.md](performance.md). Targets are checked before launch.
 - When implementing from the design reference, the design wins over prose descriptions of it; deferred choices become `> **Open question:**` notes.
 

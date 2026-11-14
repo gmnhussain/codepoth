@@ -34,3 +34,18 @@ export function contentOptionsFrom(
   }
   return { includeDrafts }
 }
+
+/**
+ * Whether search engines may index this build: only a Vercel production
+ * deploy without drafts. Previews, local builds and any build with drafts
+ * get `noindex` and a robots.txt that disallows everything, so drafts and
+ * preview URLs never reach search results (docs/development/conventions.md#12).
+ */
+export function isIndexableBuild(
+  env: Readonly<Record<string, string | undefined>>
+): boolean {
+  const parsed = contentEnvSchema.parse(env)
+  return (
+    parsed.VERCEL_ENV === "production" && !contentOptionsFrom(env).includeDrafts
+  )
+}

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { contentOptionsFrom } from "./env"
+import { contentOptionsFrom, isIndexableBuild } from "./env"
 
 describe("contentOptionsFrom", () => {
   it("includes drafts only when CONTENT_INCLUDE_DRAFTS is 1", () => {
@@ -36,5 +36,30 @@ describe("contentOptionsFrom", () => {
       contentOptionsFrom({ CONTENT_INCLUDE_DRAFTS: "true" })
     ).toThrow()
     expect(() => contentOptionsFrom({ VERCEL_ENV: "prod" })).toThrow()
+  })
+})
+
+describe("isIndexableBuild", () => {
+  it("is true only for a production deploy without drafts", () => {
+    expect(isIndexableBuild({ VERCEL_ENV: "production" })).toBe(true)
+    expect(
+      isIndexableBuild({
+        VERCEL_ENV: "production",
+        CONTENT_INCLUDE_DRAFTS: "0",
+      })
+    ).toBe(true)
+  })
+
+  it("is false for previews, development and local builds", () => {
+    expect(isIndexableBuild({ VERCEL_ENV: "preview" })).toBe(false)
+    expect(isIndexableBuild({ VERCEL_ENV: "development" })).toBe(false)
+    expect(isIndexableBuild({})).toBe(false)
+  })
+
+  it("is false whenever drafts are included", () => {
+    expect(
+      isIndexableBuild({ VERCEL_ENV: "preview", CONTENT_INCLUDE_DRAFTS: "1" })
+    ).toBe(false)
+    expect(isIndexableBuild({ CONTENT_INCLUDE_DRAFTS: "1" })).toBe(false)
   })
 })
