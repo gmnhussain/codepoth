@@ -167,7 +167,16 @@ File role suffixes: `.schema.ts` (Zod schemas), `.client.ts` (browser-only helpe
 ## 13. Security
 
 - No secrets in the repo, logs or error messages; `.env*` git-ignored.
-- Fixed security headers on every path: HSTS, `nosniff`, `X-Frame-Options: DENY`, Referrer-Policy, Permissions-Policy; `poweredByHeader: false`. Add a CSP once third-party scripts (Giscus) arrive.
+- Fixed security headers on every path, declared in `apps/web/next.config.ts`; `poweredByHeader: false`. Add a CSP once third-party scripts (Giscus) arrive.
+
+  | Header                      | Value                                                          |
+  | --------------------------- | -------------------------------------------------------------- |
+  | `Strict-Transport-Security` | `max-age=63072000; includeSubDomains` (no `preload`)           |
+  | `X-Content-Type-Options`    | `nosniff`                                                      |
+  | `X-Frame-Options`           | `DENY`                                                         |
+  | `Referrer-Policy`           | `strict-origin-when-cross-origin`                              |
+  | `Permissions-Policy`        | `camera=(), microphone=(), geolocation=(), browsing-topics=()` |
+
 - No `dangerouslySetInnerHTML` without sanitising (the JSON-LD component is the one escaped exception).
 - Validate imported progress JSON with Zod before using it.
 - Lockfile committed. `pnpm audit --prod` in CI and Dependabot are [not set up yet](#not-set-up-yet).
