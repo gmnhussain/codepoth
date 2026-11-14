@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useEffectEvent, useId, useRef, useState } from "react"
+import { useEffect, useId, useRef } from "react"
 import {
   ChevronsDownUpIcon,
   ChevronsUpDownIcon,
@@ -12,7 +12,7 @@ import { matchesQuery } from "@workspace/content/search"
 import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
 
-import { readUrlParam, writeUrlParams } from "@/lib/url-state"
+import { useUrlParam, writeUrlParams } from "@/lib/url-state"
 
 /** The search query's URL parameter: /contents?q=… */
 const QUERY_PARAM = "q"
@@ -36,30 +36,35 @@ function openHashTarget() {
  * Search, open-all/close-all and hash handling for the contents page. The
  * list itself is server-rendered (track-section.tsx); this island only sets
  * `hidden` and `open` on it, so the page works without JS as plain
- * `<details>`.
+ * `<details>`. The query lives only in the URL (`?q=`).
  */
-export function ContentsControls({ rootId }: { readonly rootId: string }) {
+export function ContentsControls({
+  rootId,
+  searchTexts,
+}: {
+  readonly rootId: string
+  /** Every lesson's searchable text, the same as its `data-lesson-search`. */
+  readonly searchTexts: readonly string[]
+}) {
   const inputId = useId()
   const inputRef = useRef<HTMLInputElement>(null)
-  const [query, setQuery] = useState("")
-  const [matched, setMatched] = useState<number | undefined>(undefined)
+  const query = useUrlParam(QUERY_PARAM)
+  const isFiltering = query.trim() !== ""
+  const matched = isFiltering
+    ? searchTexts.filter((text) => matchesQuery(text, query)).length
+    : undefined
   // Open state before a search, restored when the query is cleared.
   const savedOpen = useRef<Map<HTMLDetailsElement, boolean> | undefined>(
     undefined
   )
 
-  /**
-   * Shows only matching lessons (and their groups, topics, tracks), opened,
-   * and keeps the query in `?q=` so a search can be shared.
-   */
-  const applyQuery = (next: string) => {
-    setQuery(next)
-    writeUrlParams({ [QUERY_PARAM]: next })
+  // Show only matching lessons (and their groups, topics, tracks), opened.
+  useEffect(() => {
     const root = document.getElementById(rootId)
     if (root === null) return
     const details = [...root.querySelectorAll("details")]
 
-    if (next.trim() === "") {
+    if (query.trim() === "") {
       for (const element of root.querySelectorAll<HTMLElement>("[hidden]")) {
         element.hidden = false
       }
@@ -67,18 +72,14 @@ export function ContentsControls({ rootId }: { readonly rootId: string }) {
         for (const [element, open] of savedOpen.current) element.open = open
         savedOpen.current = undefined
       }
-      setMatched(undefined)
       return
     }
 
     savedOpen.current ??= new Map(
       details.map((element) => [element, element.open])
     )
-    let count = 0
     for (const lesson of root.querySelectorAll<HTMLElement>(LESSON)) {
-      const hit = matchesQuery(lesson.dataset.lessonSearch ?? "", next)
-      lesson.hidden = !hit
-      if (hit) count += 1
+      lesson.hidden = !matchesQuery(lesson.dataset.lessonSearch ?? "", query)
     }
     for (const element of root.querySelectorAll<HTMLElement>(
       "[data-filter-referenced]"
@@ -93,23 +94,13 @@ export function ContentsControls({ rootId }: { readonly rootId: string }) {
       }
     }
     for (const element of details) element.open = true
-    setMatched(count)
-  }
+  }, [query, rootId])
 
-  // On load: apply a shared ?q=, then open a #track-… target.
-  const onMount = useEffectEvent(() => {
-    const initial = readUrlParam(QUERY_PARAM)
-    if (initial.trim() !== "") applyQuery(initial)
-    openHashTarget()
-  })
-
+  // Open a #track-… target on load and on in-page links.
   useEffect(() => {
-    // The URL is an external source; read it in a callback after hydration
-    // rather than setting state synchronously in the effect body.
-    const frame = window.requestAnimationFrame(onMount)
+    openHashTarget()
     window.addEventListener("hashchange", openHashTarget)
     return () => {
-      window.cancelAnimationFrame(frame)
       window.removeEventListener("hashchange", openHashTarget)
     }
   }, [])
@@ -137,7 +128,7 @@ export function ContentsControls({ rootId }: { readonly rootId: string }) {
             type="search"
             value={query}
             onChange={(event) => {
-              applyQuery(event.target.value)
+              writeUrlParams({ [QUERY_PARAM]: event.target.value })
             }}
             placeholder={t("contents.searchPlaceholder")}
             className="h-11 bg-background ps-10"
@@ -185,7 +176,7 @@ export function ContentsControls({ rootId }: { readonly rootId: string }) {
           <Button
             variant="outline"
             onClick={() => {
-              applyQuery("")
+              writeUrlParams({ [QUERY_PARAM]: undefined })
               inputRef.current?.focus()
             }}
           >

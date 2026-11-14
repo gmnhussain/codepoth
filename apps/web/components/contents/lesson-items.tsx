@@ -1,5 +1,5 @@
 import type { GraphLesson } from "@workspace/content/graph"
-import { normalizeForSearch } from "@workspace/content/search"
+import { lessonSearchText } from "@workspace/content/search"
 
 import { LessonRow } from "@/components/lesson-row"
 
@@ -11,19 +11,23 @@ import { LessonRow } from "@/components/lesson-row"
 export function LessonItems({
   lessons,
   numberOf,
-  searchContext,
+  groupTitle,
+  topicTitle,
 }: {
   readonly lessons: readonly GraphLesson[]
   readonly numberOf: (lesson: GraphLesson) => string
-  readonly searchContext: string
+  readonly groupTitle?: string | undefined
+  readonly topicTitle: string
 }) {
   return (
     <ol className="flex flex-col">
       {lessons.map((lesson) => (
         <li
           key={lesson.id}
-          data-lesson-search={normalizeForSearch(
-            `${lesson.title} ${searchContext}`
+          data-lesson-search={lessonSearchText(
+            lesson.title,
+            groupTitle,
+            topicTitle
           )}
         >
           <LessonRow

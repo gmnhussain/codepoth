@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { matchesQuery, normalizeForSearch } from "./search"
+import { lessonSearchText, matchesQuery, normalizeForSearch } from "./search"
 
 describe("normalizeForSearch", () => {
   it("lower-cases, collapses spaces and trims", () => {
@@ -15,6 +15,17 @@ describe("normalizeForSearch", () => {
     const single = String.fromCodePoint(0x9df)
     expect(decomposed).not.toBe(single)
     expect(normalizeForSearch(decomposed)).toBe(normalizeForSearch(single))
+  })
+})
+
+describe("lessonSearchText", () => {
+  it("joins lesson, group and topic titles, skipping a missing group", () => {
+    expect(lessonSearchText("useState", "Hooks", "React")).toBe(
+      "usestate hooks react"
+    )
+    expect(lessonSearchText("Big-O", undefined, "Algorithms")).toBe(
+      "big-o algorithms"
+    )
   })
 })
 

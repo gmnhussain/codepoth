@@ -4,6 +4,7 @@ import { formatNumber } from "@workspace/config/format"
 import { t } from "@workspace/config/t"
 import { getContentGraph } from "@workspace/content/content"
 import { trackAnchorOf } from "@workspace/content/routes"
+import { lessonSearchText } from "@workspace/content/search"
 
 import { ContentsControls } from "@/components/contents/contents-controls"
 import { TrackSection } from "@/components/contents/track-section"
@@ -31,6 +32,16 @@ export default function ContentsPage() {
     { label: t("contents.statTopics"), value: graph.stats.topics },
     { label: t("contents.statLessons"), value: graph.stats.lessons },
   ]
+  // The same text each lesson row carries, so the island can count matches.
+  const searchTexts = [...graph.lessonById.values()].map((lesson) =>
+    lessonSearchText(
+      lesson.title,
+      lesson.groupKey === undefined
+        ? undefined
+        : graph.groupByKey.get(lesson.groupKey)?.title,
+      graph.topicByKey.get(lesson.topicKey)?.title ?? ""
+    )
+  )
 
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-7 px-4 py-12 sm:px-8">
@@ -55,7 +66,7 @@ export default function ContentsPage() {
         </dl>
       </header>
 
-      <ContentsControls rootId={LIST_ID} />
+      <ContentsControls rootId={LIST_ID} searchTexts={searchTexts} />
 
       <div className="flex items-start gap-10">
         <nav

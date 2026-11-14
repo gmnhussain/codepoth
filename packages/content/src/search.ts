@@ -9,6 +9,22 @@ export function normalizeForSearch(text: string): string {
 }
 
 /**
+ * A lesson's searchable text on the contents page: its title, its group's
+ * title (if any) and its topic's title, normalised.
+ */
+export function lessonSearchText(
+  lessonTitle: string,
+  groupTitle: string | undefined,
+  topicTitle: string
+): string {
+  return normalizeForSearch(
+    [lessonTitle, groupTitle, topicTitle]
+      .filter((part) => part !== undefined)
+      .join(" ")
+  )
+}
+
+/**
  * Whether every word of `query` appears in `haystack` (already normalised).
  * An empty query matches everything.
  */

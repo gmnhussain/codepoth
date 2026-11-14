@@ -1,10 +1,9 @@
 "use client"
 
 import {
-  useEffect,
-  useEffectEvent,
   useId,
   useLayoutEffect,
+  useMemo,
   useRef,
   useState,
   type KeyboardEvent,
@@ -24,7 +23,7 @@ import { AppSheetContent } from "@/components/app-sheet"
 import { RoadmapCanvas } from "@/components/roadmap/roadmap-canvas"
 import { RoadmapPanel } from "@/components/roadmap/roadmap-panel"
 import { useMediaQuery } from "@/lib/use-media-query"
-import { readUrlParam, writeUrlParams } from "@/lib/url-state"
+import { useUrlParam, writeUrlParams } from "@/lib/url-state"
 
 /** Zoom steps (D-35: 50–120 %); the map opens at 80 %. */
 const ZOOMS = [0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.2] as const
@@ -74,45 +73,44 @@ export function RoadmapExplorer({
     { readonly to: "panel" } | { readonly to: "dot"; readonly key: string }
   >(undefined)
 
-  const [selected, setSelected] = useState<string | undefined>(undefined)
-  const [track, setTrack] = useState<string | undefined>(undefined)
-  const [startOnly, setStartOnly] = useState(false)
-  const [query, setQuery] = useState("")
+  /**
+   * Whether the map is centred on the next topic selected. True at first, so
+   * a shared ?topic= link opens centred; a pick on the map itself turns it
+   * off (that dot is already in view).
+   */
+  const centerNext = useRef(true)
+
   const [zoom, setZoom] = useState(DEFAULT_ZOOM)
   const scale = ZOOMS[zoom] ?? 1
 
-  const topicByKey = new Map(roadmap.topics.map((item) => [item.key, item]))
-  const selectedTopic =
-    selected === undefined ? undefined : topicByKey.get(selected)
+  // Selection, track focus, search and filter live only in the URL; unknown
+  // values in a shared link are ignored.
+  const topicByKey = useMemo(
+    () => new Map(roadmap.topics.map((item) => [item.key, item])),
+    [roadmap]
+  )
+  const topicParam = useUrlParam(PARAM.topic)
+  const trackParam = useUrlParam(PARAM.track)
+  const query = useUrlParam(PARAM.query)
+  const startOnly = useUrlParam(PARAM.filter) === FILTER_START
+  const selectedTopic = topicByKey.get(topicParam)
+  const selected = selectedTopic?.key
+  const track = roadmap.tracks.some((item) => item.id === trackParam)
+    ? trackParam
+    : undefined
   const filter = { track, startOnly, query }
   const isVisible = (topic: RoadmapTopic) => isTopicVisible(topic, filter)
   const isFiltering = startOnly || query.trim() !== ""
   const matched = roadmap.topics.filter(isVisible).length
 
-  /** Scrolls the map so a topic sits in the middle (no smooth scroll). */
-  const centerOn = (key: string) => {
-    const topic = topicByKey.get(key)
-    const box = scroller.current
-    if (topic === undefined || box === null) return
-    box.scrollTo({
-      left: topic.x * scale + PAD_X - box.clientWidth / 2,
-      top: topic.y * scale + PAD_TOP - box.clientHeight / 2,
-    })
-  }
-
   const select = (
     key: string | undefined,
     options: { center?: boolean; focusPanel?: boolean } = {}
   ) => {
-    setSelected(key)
-    writeUrlParams({ [PARAM.topic]: key })
     pendingFocus.current =
       options.focusPanel === true ? { to: "panel" } : undefined
-    if (key !== undefined && options.center === true) {
-      window.requestAnimationFrame(() => {
-        centerOn(key)
-      })
-    }
+    centerNext.current = options.center === true
+    writeUrlParams({ [PARAM.topic]: key })
   }
 
   /** Closes the panel and puts focus back on the topic's dot. */
@@ -123,9 +121,22 @@ export function RoadmapExplorer({
   }
 
   const focusTrack = (id: string | undefined) => {
-    setTrack(id)
     writeUrlParams({ [PARAM.track]: id })
   }
+
+  // After the commit that selects a topic: centre the map on it if asked
+  // (a pick from the panel, or a shared link on load).
+  useLayoutEffect(() => {
+    if (selected === undefined || !centerNext.current) return
+    centerNext.current = false
+    const topic = topicByKey.get(selected)
+    const box = scroller.current
+    if (topic === undefined || box === null) return
+    box.scrollTo({
+      left: topic.x * scale + PAD_X - box.clientWidth / 2,
+      top: topic.y * scale + PAD_TOP - box.clientHeight / 2,
+    })
+  }, [selected, scale, topicByKey])
 
   // Right after the commit that opens or closes the panel: move focus to
   // the panel's heading (desktop; the sheet manages its own focus) or back
@@ -147,23 +158,6 @@ export function RoadmapExplorer({
       )
       ?.focus()
   }, [selected, isDesktop])
-
-  // On load: apply the URL's state (shared links), centring a chosen topic.
-  const readUrl = useEffectEvent(() => {
-    const topic = readUrlParam(PARAM.topic)
-    const trackId = readUrlParam(PARAM.track)
-    if (roadmap.tracks.some((item) => item.id === trackId)) setTrack(trackId)
-    setStartOnly(readUrlParam(PARAM.filter) === FILTER_START)
-    setQuery(readUrlParam(PARAM.query))
-    if (topicByKey.has(topic)) select(topic, { center: true })
-  })
-  useEffect(() => {
-    // The URL is an external source; read it in a callback after hydration.
-    const frame = window.requestAnimationFrame(readUrl)
-    return () => {
-      window.cancelAnimationFrame(frame)
-    }
-  }, [])
 
   const panel =
     selectedTopic === undefined ? null : (
@@ -326,7 +320,6 @@ export function RoadmapExplorer({
                 type="button"
                 aria-pressed={item.pressed}
                 onClick={() => {
-                  setStartOnly(item.value)
                   writeUrlParams({
                     [PARAM.filter]: item.value ? FILTER_START : undefined,
                   })
@@ -350,7 +343,6 @@ export function RoadmapExplorer({
               type="search"
               value={query}
               onChange={(event) => {
-                setQuery(event.target.value)
                 writeUrlParams({ [PARAM.query]: event.target.value })
               }}
               placeholder={t("roadmap.searchPlaceholder")}

@@ -142,7 +142,8 @@ export function TopicItem({
                 <LessonItems
                   lessons={lessonsOf(graph, group.lessonIds)}
                   numberOf={numberOf}
-                  searchContext={`${group.title} ${topic.title}`}
+                  groupTitle={group.title}
+                  topicTitle={topic.title}
                 />
               </div>
             </details>
@@ -156,7 +157,7 @@ export function TopicItem({
             )
           )}
           numberOf={numberOf}
-          searchContext={topic.title}
+          topicTitle={topic.title}
         />
       </div>
     </li>
