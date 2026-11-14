@@ -38,6 +38,7 @@
     "./env": "./src/env.ts",
     "./glossary": "./src/glossary.ts",
     "./graph": "./src/graph.ts",
+    "./home": "./src/home.ts",
     "./reading-time": "./src/reading-time.ts",
     "./roadmap": "./src/roadmap.ts",
     "./routes": "./src/routes.ts",

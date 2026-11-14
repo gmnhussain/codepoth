@@ -247,6 +247,19 @@ The MDX components for lesson bodies live in `apps/web/components/mdx/` and are 
 - A card's id is the term id, so the Term popover's "পরিভাষায় দেখো →" link (`/glossary#<id>`) lands on it; `:target` outlines it.
 - With no published term (the production build today) the page shows an empty state instead of the controls.
 
+## Home page
+
+`/`, every number computed (`graph.stats`), every string from the label set.
+
+- Hero: chip, title, text with the track count, "শুরু করো" and "রোডম্যাপ দেখো", and a static SVG of the whole map (`roadmap-preview.tsx`, from `buildRoadmap`) linking to the roadmap. "শুরু করো" goes to the first published lesson along the start routes (`homeStartLesson`, ADR-0009) with a "প্রথম পাঠ: …" line; with nothing published it goes to `/roadmap` and the line says lessons are coming.
+- Stats: tracks, topics, lessons and quiz questions. The design's "১০০% বাংলা" is left out: it is not a computed count.
+- "কোথা থেকে শুরু করবে?": a card per route in `start-routes.json` (`start-route-card.tsx`): level with filled dots by position, title, description, the suggested route (topics without a published lesson are muted and marked planned for screen readers), and a button to the first topic on it with a page, else "রোডম্যাপ থেকে বেছে নাও".
+- The tracks as cards linking to `/roadmap?track=…`, with topic and lesson counts.
+- "কেন কোডপথ?": six tiles (lucide icons, copy in labels).
+- "নতুন কী" (`#new`): `recentLessons` (5), dated by the later of published/updated, tagged "নতুন"/"হালনাগাদ" by `freshnessOf(siteToday())`; an empty state while nothing is published.
+- Author block (`#author`): name, bio and initials from `site.author`; only the profile links that are set render.
+- The resume card ("যেখানে থেমেছিলে") arrives with reader progress.
+
 ## shadcn customisations
 
 Generated shadcn components (`packages/ui/src/components/`) are added with the CLI and not edited, except for the changes listed here. Re-apply them whenever a component is regenerated.
