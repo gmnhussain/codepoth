@@ -217,7 +217,7 @@ The MDX components for lesson bodies live in `apps/web/components/mdx/` and are 
 `/contents`: the whole curriculum, tracks → topics → groups → lessons, in reading order.
 
 - Header: title, intro and computed stats (tracks, topics, lessons).
-- Toolbar (client island, `contents-controls.tsx`): a search field and "সব খোলো / সব বন্ধ করো". Search matches every word of the query against a lesson's title, its group and its topic (`matchesQuery` in `packages/content/src/search.ts`). Matching lessons stay visible with their groups, topics and tracks, all opened; the count is announced in a status line. Clearing the search restores what was open before. The query lives in `?q=` (conventions §10): written with `history.replaceState` as the reader types (no history entry per keystroke), applied on load, removed when cleared. Pages with URL state read it with `useUrlParam` (a `useSyncExternalStore` hook: "" on the server and during hydration, the URL's value on the client, updated by `writeUrlParams` and back/forward) and change it with `writeUrlParams`, both in `apps/web/lib/url-state.ts`. The URL is the only copy of that state: counts are derived from data passed as props, and effects keyed on the values only update the DOM. No `requestAnimationFrame` for state or focus: it never fires in a page that is not being rendered (a background tab, a hidden pane).
+- Toolbar (client island, `contents-controls.tsx`): a search field and "সব খোলো / সব বন্ধ করো". Search matches every word of the query against a lesson's title, its group and its topic (`matchesQuery` in `packages/content/src/search.ts`). Matching lessons stay visible with their groups, topics and tracks, all opened; the count is announced in a status line. Clearing the search restores what was open before. The query lives in `?q=` (conventions §10): written with `history.replaceState` as the reader types (no history entry per keystroke), applied on load, removed when cleared. Pages with URL state read it with `useUrlParam` (a `useSyncExternalStore` hook: "" on the server and during hydration, the URL's value on the client, updated by `writeUrlParams` and back/forward) and change it with `writeUrlParams`, both in `apps/web/lib/url-state.ts`. The URL is the only copy of that state: counts are derived from data passed as props, and effects keyed on the values only update the DOM. No `requestAnimationFrame` for state or focus: it never fires in a page that is not being rendered (a background tab, a hidden pane). `useUrlParam` hears `popstate` and `writeUrlParams`, not Next's own `pushState`: a control that changes only the query on the same page calls `writeUrlParams` rather than rendering a `<Link>` (links into these pages from other pages are fine, since the page mounts with the new URL).
 - The list is server-rendered native `<details>`, so it works without JS. The first track starts open, the rest closed; groups start closed. The island only sets `hidden` and `open`.
 - Each track: number badge, name (the `h2`), subtitle with topic and lesson counts, then its topics on a line in the track colour: topic link (`h3`), position, lesson count, an interchange chip, then its groups (`h4` in a `<details>`) or lessons. A topic whose home is another track shows "পাঠগুলো {track} লাইনে →" instead of lessons, linking to `#track-{id}`.
 - Lesson numbers are track.topic.lesson (`৪.৪.৩`), `aria-hidden`, and hidden below `sm`.
@@ -236,6 +236,16 @@ The MDX components for lesson bodies live in `apps/web/components/mdx/` and are 
 - Planned topics (no published lesson) are on the map, muted, with "পরিকল্পনায় আছে" and no start or topic-page link.
 - Links in: the breadcrumbs' "রোডম্যাপ" and track (`/roadmap?track=…`), the header and footer, and the not-found page.
 - Status filters, progress bars and bookmarks arrive with reader progress.
+
+## Glossary page
+
+`/glossary`: every term in this build, A–Z.
+
+- Header: title, intro and a sample of the dotted underline that marks a `<Term>` in lessons.
+- Controls (client island, `glossary-controls.tsx`): a search field (term, Bangla name and the definition's prose; code examples are left out, `glossarySearchText`) with a count, and an A–Z bar ("সব" plus a button per letter, disabled when no term starts with it; "#" appears only for terms not starting with A–Z). Search and letter combine; the result count is announced; with no match, a card offers "সব পরিভাষা দেখাও". State lives in `?q=&letter=` (`lib/url-state.ts`).
+- Terms are server-rendered cards in letter sections (`term-card.tsx`): term (`lang="en"`), Bangla name, track chip, the definition with its code example (the same components as the popover, `definition-components.tsx`), and "যে পাঠে আছে": each lesson as track › topic › group › lesson (the `›` is hidden from screen readers and read as a comma).
+- A card's id is the term id, so the Term popover's "পরিভাষায় দেখো →" link (`/glossary#<id>`) lands on it; `:target` outlines it.
+- With no published term (the production build today) the page shows an empty state instead of the controls.
 
 ## shadcn customisations
 

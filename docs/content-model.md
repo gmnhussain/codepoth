@@ -71,7 +71,7 @@ Every lesson has an `id` in frontmatter, e.g. `frontend.react.hooks.use-effect`.
 
 ## Drafts
 
-- `draft: true` on a lesson or glossary entry keeps it out of production builds. Local and preview builds include drafts when `CONTENT_INCLUDE_DRAFTS=1` is set: in `apps/web/.env.local` locally (see `apps/web/.env.example`), and as a Vercel environment variable for Preview only. Any value other than `0` or `1` fails the build, and so does `CONTENT_INCLUDE_DRAFTS=1` on a production deploy (`VERCEL_ENV=production`, set by Vercel), so a mistaken setting can never publish drafts (`packages/content/src/env.ts`).
+- `draft: true` on a lesson or glossary entry keeps it out of production builds. Local and preview builds include drafts when `CONTENT_INCLUDE_DRAFTS=1` is set: in `apps/web/.env.local` locally (see `apps/web/.env.example`), and as a Vercel environment variable for Preview only. Any value other than `0` or `1` fails the build, and so does `CONTENT_INCLUDE_DRAFTS=1` on a production deploy (`VERCEL_ENV=production`, set by Vercel), so a mistaken setting can never publish drafts (`packages/content/src/env.ts`). With `.env.local` in place, a plain local `pnpm build` includes drafts; to check the production content locally, run `CONTENT_INCLUDE_DRAFTS=0 pnpm build` (a variable already set wins over `.env.local`).
 - Validation always runs over every file, drafts included; only the published graph leaves drafts out.
 - A build that includes drafts is never indexed by search engines ([conventions §12](development/conventions.md#12-public-site-and-seo)).
 - Content copied from the design reference starts as a draft and is published only after the author reviews it.

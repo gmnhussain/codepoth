@@ -1,6 +1,8 @@
 "use client"
 
 import type { ReactNode } from "react"
+import Link from "next/link"
+import { ArrowRightIcon } from "lucide-react"
 
 import { t } from "@workspace/config/t"
 import {
@@ -13,16 +15,19 @@ import {
 /**
  * A glossary term in lesson prose: a dotted-underline button that opens the
  * definition on click or keyboard (the definition is rendered on the server
- * and passed in).
+ * and passed in), with a link to the term on the glossary page.
  */
 export function TermPopover({
   term,
   termBn,
+  href,
   definition,
   children,
 }: {
   readonly term: string
   readonly termBn: string
+  /** The term's card on the glossary page: /glossary#<id>. */
+  readonly href: string
   readonly definition: ReactNode
   readonly children?: ReactNode
 }) {
@@ -44,6 +49,13 @@ export function TermPopover({
           </span>
         </PopoverTitle>
         <div className="flex flex-col gap-3 leading-reading">{definition}</div>
+        <Link
+          href={href}
+          className="inline-flex min-h-11 items-center gap-1.5 self-start text-sm font-semibold underline decoration-foreground/30 underline-offset-4 hover:decoration-foreground"
+        >
+          {t("term.seeInGlossary")}
+          <ArrowRightIcon aria-hidden="true" className="size-4" />
+        </Link>
       </PopoverContent>
     </Popover>
   )

@@ -36,6 +36,7 @@
     "./content": "./src/content.ts",
     "./blocks": "./src/mdx/block-list.ts",
     "./env": "./src/env.ts",
+    "./glossary": "./src/glossary.ts",
     "./graph": "./src/graph.ts",
     "./reading-time": "./src/reading-time.ts",
     "./roadmap": "./src/roadmap.ts",

@@ -2,17 +2,9 @@ import type { ReactNode } from "react"
 
 import { getContentGraph } from "@workspace/content/content"
 
-import { CodeCaption, CodeFigure, CodePre } from "@/components/mdx/code-figure"
+import { definitionComponents } from "@/components/mdx/definition-components"
 import { MdxContent } from "@/components/mdx/mdx-content"
 import { TermPopover } from "@/components/mdx/term-popover"
-
-/** Components for a glossary definition inside the popover. */
-const definitionComponents = {
-  p: (props: { readonly children?: ReactNode }) => <p {...props} />,
-  figure: CodeFigure,
-  figcaption: CodeCaption,
-  pre: CodePre,
-}
 
 /**
  * `<Term id="…">` in lesson MDX. Validation guarantees the id exists and,
@@ -33,6 +25,7 @@ export function Term({
     <TermPopover
       term={term.term}
       termBn={term.termBn}
+      href={`/glossary#${term.id}`}
       definition={
         <MdxContent code={term.mdx} components={definitionComponents} />
       }
