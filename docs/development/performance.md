@@ -49,3 +49,47 @@ Core Web Vitals at the 75th percentile, on mobile:
 - Lighthouse CI on Home, Lesson and Map pages with score thresholds (planned; CI gate in [conventions](conventions.md#15-ci-gates-every-pull-request)).
 - `@next/bundle-analyzer` to inspect client bundles when a page's JavaScript grows (planned).
 - Turborepo remote cache on Vercel to keep builds fast.
+
+## Baseline (2026-11-15, end of Phase 2)
+
+Lighthouse 13.6.0, default mobile profile (simulated slow 4G and 4× CPU throttling), against a local production build with drafts (`next start`, commit `ed3ed97`); median of 3 runs per page.
+
+| Page                  | Performance | LCP    | CLS | TBT    | Accessibility | Best practices | SEO  |
+| --------------------- | ----------- | ------ | --- | ------ | ------------- | -------------- | ---- |
+| Home                  | 99          | 0.92 s | 0   | 112 ms | 100           | 100            | 66\* |
+| Lesson (`use-effect`) | 100         | 0.92 s | 0   | 49 ms  | 100           | 100            | 66\* |
+| Map (`/roadmap`)      | 100         | 0.91 s | 0   | 40 ms  | 100           | 100            | 66\* |
+
+\* The only failing audit is `is-crawlable`: this build sends `noindex, nofollow` on purpose (a build with drafts is never indexable, [conventions §12](conventions.md#12-public-site-and-seo)). On an indexable build (`VERCEL_ENV=production`, no drafts) Home and the Map score 100 on SEO with no failing audit; lessons could not be measured there while every lesson is a draft.
+
+Limits of these numbers:
+
+- Lab scores on localhost: network latency is only Lighthouse's simulated throttle, not a real connection or CDN.
+- INP cannot be measured in a lab run; TBT stands in for it.
+- Field data (the 75th-percentile targets above) comes only from real visitors after launch.
+
+Other findings from the same runs:
+
+- First Load JS per route after the label-bundle change ([ADR-0013](../decisions/ADR-0013-labels-in-client-islands.md)): about 176 KB gzip for most pages, 184 KB for the Map and 197 KB for a lesson.
+- The one stylesheet (13 KB) is render-blocking; Lighthouse estimates 30–50 ms to gain. Not acted on.
+
+### Font bytes
+
+The same 9 files load on all three pages, 379.4 KB in all (transfer size, from Lighthouse's network requests):
+
+| File (family · weight · subset)   | Size         | Preloaded              |
+| --------------------------------- | ------------ | ---------------------- |
+| Anek Bangla · variable · Bangla   | 152.8 KB     | yes                    |
+| Anek Bangla · variable · Latin    | 42.4 KB      | yes                    |
+| Hind Siliguri · 400 · Bangla      | 39.8 KB      | yes                    |
+| Hind Siliguri · 500 · Bangla      | 39.8 KB      | yes                    |
+| Hind Siliguri · 600 · Bangla      | 39.3 KB      | yes                    |
+| Hind Siliguri · 400 · Latin       | 8.3 KB       | yes                    |
+| Hind Siliguri · 500 · Latin       | 8.5 KB       | yes                    |
+| Hind Siliguri · 600 · Latin       | 8.4 KB       | yes                    |
+| JetBrains Mono · variable · Latin | 40.1 KB      | no                     |
+| **Total**                         | **379.4 KB** | 8 preloaded (339.3 KB) |
+
+- They do not delay LCP: every `@font-face` uses `font-display: swap` with a metric-matched fallback (`next/font`), Lighthouse's font-display check passes, and in these runs every font had finished (94–147 ms) before the first paint (205–228 ms observed), where LCP equals FCP. The LCP element is text: Home's heading, the lesson's description, the Map's summary.
+- JetBrains Mono is not preloaded but loads on all three pages, because each shows some monospace text (track numbers, lesson numbers, code). On a slow connection that is 40 KB fetched after the CSS.
+- The largest single file is Anek Bangla's Bangla subset (152.8 KB, the variable font). It is the first candidate if font bytes ever need to shrink.

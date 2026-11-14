@@ -19,7 +19,7 @@ Loading rules (`next/font`, subsets, `swap`): [performance.md](development/perfo
 - next/font exposes `--font-display`, `--font-body` and `--font-code`; `globals.css` maps them to `font-heading`, `font-sans` and `font-mono`. The names differ from the Tailwind theme variables so no variable refers to itself.
 - Code shows no ligatures (`font-variant-ligatures: none` in `globals.css`), so `=>` and `!==` look the way a beginner types them.
 - JetBrains Mono has no Bangla glyphs, so `font-mono` falls back to Hind Siliguri for Bangla text in code (comments, strings).
-- Anek Bangla and Hind Siliguri are preloaded (Bangla + Latin subsets, about 340 KB across 8 files measured on the first build); JetBrains Mono is not. Re-measure with Lighthouse when the pages exist.
+- Anek Bangla and Hind Siliguri are preloaded (Bangla + Latin subsets): 8 files, 339.3 KB. JetBrains Mono is not preloaded and adds 40.1 KB on pages with monospace text, 379.4 KB in all. Measured with Lighthouse on 2026-11-15 on Home, a lesson and the Map: fonts finish before the first paint and do not delay LCP (`font-display: swap`). Per-file numbers: [performance.md](development/performance.md#font-bytes).
 - Heading weights in use: 500–700. Body line height: `leading-reading` (1.85, see [Type scale](#type-scale)).
 
 ## Colors
