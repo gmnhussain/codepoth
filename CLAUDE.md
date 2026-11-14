@@ -23,11 +23,13 @@ apps/web/                    # Next.js site (App Router, SSG)
 packages/ui/                 # shadcn/ui components + Tailwind theme
 packages/eslint-config/      # shared ESLint flat configs
 packages/typescript-config/  # shared tsconfig bases
-packages/content/            # content schema, loader, validation, types (planned)
-packages/config/             # site config, labels, design tokens (planned)
+packages/content/            # content schemas, loader (Content Collections), validation, graph
+packages/config/             # site config, labels + t(), format helpers, track hue list
 content/                     # MDX content, plain files at the root
 docs/                        # spec, design, decisions, development
 ```
+
+Design tokens (colours, track hues, type scale) live in `packages/ui/src/styles/globals.css` ([ADR-0008](docs/decisions/ADR-0008-design-tokens.md)).
 
 ## Hard rules
 
@@ -59,5 +61,5 @@ Run from the repo root.
 - `pnpm format:check`: check formatting without writing
 - Add a shadcn component: `pnpm dlx shadcn@latest add <name> -c apps/web`
 - `pnpm test:commit-msg`: test the commit message rules
-- `pnpm test`: run every package's Vitest tests (unit, label sets, theme contrast)
-- Content validation and end-to-end tests: to be added
+- `pnpm test`: run every package's Vitest tests (unit, label sets, theme contrast, content validation)
+- End-to-end tests: to be added
