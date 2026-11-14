@@ -1,43 +1,62 @@
-import { createRequire } from "node:module"
-import babelParser from "@babel/eslint-parser"
 import js from "@eslint/js"
+import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript"
 import eslintConfigPrettier from "eslint-config-prettier"
-import onlyWarn from "eslint-plugin-only-warn"
+import { createNodeResolver, importX } from "eslint-plugin-import-x"
 import turboPlugin from "eslint-plugin-turbo"
+import tseslint from "typescript-eslint"
 
-const require = createRequire(import.meta.url)
+// File extensions and parser import-x needs to follow .ts/.tsx imports; its legacy
+// `import-x/resolver` entry is dropped in favour of `import-x/resolver-next` below.
+const { "import-x/resolver": _legacyResolver, ...importXTypeScriptSettings } =
+  importX.flatConfigs.typescript.settings
 
 /**
- * A shared ESLint configuration for the repository.
+ * Shared ESLint configuration (docs/development/conventions.md §6).
+ * Type-aware: each package sets `parserOptions.tsconfigRootDir` in its own
+ * eslint.config.js so the TypeScript project service finds its tsconfig.
  *
  * @type {import("eslint").Linter.Config[]}
  */
 export const config = [
   js.configs.recommended,
-  eslintConfigPrettier,
+  ...tseslint.configs.strictTypeChecked,
   {
     languageOptions: {
-      parser: babelParser,
       parserOptions: {
-        requireConfigFile: false,
-        babelOptions: {
-          presets: [require.resolve("@babel/preset-typescript")],
-        },
+        projectService: true,
       },
     },
     plugins: {
+      "import-x": importX,
       turbo: turboPlugin,
     },
+    settings: {
+      ...importXTypeScriptSettings,
+      // TypeScript resolver first so `@/*` and `@workspace/*` paths resolve.
+      "import-x/resolver-next": [
+        createTypeScriptImportResolver({ alwaysTryTypes: true }),
+        createNodeResolver(),
+      ],
+    },
     rules: {
-      "turbo/no-undeclared-env-vars": "warn",
+      "@typescript-eslint/consistent-type-imports": [
+        "error",
+        { prefer: "type-imports", fixStyle: "separate-type-imports" },
+      ],
+      "@typescript-eslint/switch-exhaustiveness-check": "error",
+      eqeqeq: ["error", "always"],
+      "import-x/no-cycle": "error",
+      "no-console": "error",
+      "turbo/no-undeclared-env-vars": "error",
     },
   },
   {
-    plugins: {
-      onlyWarn,
-    },
+    // Plain JS config files are not part of any tsconfig, so type-aware rules cannot run on them.
+    files: ["**/*.{js,mjs,cjs}"],
+    ...tseslint.configs.disableTypeChecked,
   },
   {
     ignores: ["dist/**"],
   },
+  eslintConfigPrettier,
 ]
