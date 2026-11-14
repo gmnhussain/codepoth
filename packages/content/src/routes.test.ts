@@ -7,6 +7,7 @@ import {
   groupAnchorOf,
   lessonRouteParams,
   nextTopicOn,
+  roadmapTrackUrl,
   topicPositionOn,
   topicRouteParams,
   trackAnchorOf,
@@ -59,6 +60,12 @@ describe("topic routes", () => {
   it("names a group's and a track's anchor", () => {
     expect(groupAnchorOf("hooks")).toBe("group-hooks")
     expect(trackAnchorOf("frontend")).toBe("track-frontend")
+  })
+
+  it("links to the roadmap focused on a track", () => {
+    expect(roadmapTrackUrl("system-design")).toBe(
+      "/roadmap?track=system-design"
+    )
   })
 })
 

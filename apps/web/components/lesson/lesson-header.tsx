@@ -8,14 +8,17 @@ import {
 } from "@workspace/config/format"
 import { t } from "@workspace/config/t"
 import type { ContentGraph, GraphLesson } from "@workspace/content/graph"
-import { groupAnchorOf, topicPositionOn } from "@workspace/content/routes"
+import {
+  groupAnchorOf,
+  roadmapTrackUrl,
+  topicPositionOn,
+} from "@workspace/content/routes"
 
 import { Chip } from "@/components/chip"
 
 /**
  * Breadcrumb, position chips, title, description and the updated/reading-time
- * line. Breadcrumb items become links as the roadmap and topic pages exist
- * (conventions §2: no links to missing pages).
+ * line.
  */
 export function LessonHeader({
   graph,
@@ -38,11 +41,13 @@ export function LessonHeader({
       ? undefined
       : topicPositionOn(graph, lesson.track, topic)
 
-  // Topic and group link to the topic page; the roadmap link arrives with
-  // the roadmap page (conventions §2).
+  // The track opens the roadmap focused on it; topic and group link to the
+  // topic page.
   const crumbs: readonly { label: string; href?: string }[] = [
-    { label: t("nav.roadmap") },
-    ...(track === undefined ? [] : [{ label: track.titleEn }]),
+    { label: t("nav.roadmap"), href: "/roadmap" },
+    ...(track === undefined
+      ? []
+      : [{ label: track.titleEn, href: roadmapTrackUrl(track.id) }]),
     ...(topic === undefined ? [] : [{ label: topic.title, href: topic.url }]),
     ...(topic === undefined || group === undefined
       ? []

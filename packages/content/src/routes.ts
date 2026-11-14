@@ -48,6 +48,11 @@ export function nextTopicOn(
     : undefined
 }
 
+/** The roadmap focused on one track: `/roadmap?track=frontend`. */
+export function roadmapTrackUrl(trackId: string): string {
+  return `/roadmap?track=${encodeURIComponent(trackId)}`
+}
+
 /** Id of a track's section on the contents page, the target of `#track-…` links. */
 export function trackAnchorOf(trackId: string): string {
   return `track-${trackId}`

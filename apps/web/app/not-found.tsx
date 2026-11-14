@@ -14,8 +14,8 @@ export const metadata: Metadata = {
 
 /**
  * Unknown URLs and every `dynamicParams = false` miss land here, inside the
- * site shell. Next.js adds `noindex` and sends 404. Links to more pages are
- * added as those pages exist (conventions §2).
+ * site shell. Next.js adds `noindex` and sends 404. Offers Home and the
+ * roadmap as ways back in.
  */
 export default function NotFound() {
   return (
@@ -27,9 +27,17 @@ export default function NotFound() {
       <p className="leading-reading text-foreground/80">
         {t("notFound.description")}
       </p>
-      <Link href="/" className={buttonVariants()}>
-        {t("notFound.home")}
-      </Link>
+      <div className="flex flex-wrap gap-3">
+        <Link href="/" className={buttonVariants()}>
+          {t("notFound.home")}
+        </Link>
+        <Link
+          href="/roadmap"
+          className={buttonVariants({ variant: "outline" })}
+        >
+          {t("notFound.roadmap")}
+        </Link>
+      </div>
     </div>
   )
 }

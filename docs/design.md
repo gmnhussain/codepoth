@@ -224,6 +224,19 @@ The MDX components for lesson bodies live in `apps/web/components/mdx/` and are 
 - "লাইনে যাও" (from `lg`): plain `<a href="#track-…">` links, so `hashchange` fires and the island opens the target track. In-page links that must open a `<details>` use `<a>`, not `next/link`, which changes the hash without that event.
 - The reader's progress (status filters, done counts, "এখন পড়ছ", "এখানে থেমেছিলে") arrives with reader progress.
 
+## Roadmap page
+
+`/roadmap`: every track and topic as a metro-style map, drawn from `content/map.json` (D-35).
+
+- Data: `buildRoadmap(graph)` in `packages/content/src/roadmap.ts` gives the canvas size, track lines and each topic's position, flags and lesson tree; `isTopicVisible` (track focus, start-only, search) and `topicNeighbours` are tested there.
+- Drawing (`roadmap-canvas.tsx`, hook-free so Home can reuse it as a static preview): SVG polylines in the track colour, a label per topic placed by `map.json`'s `label`, "শুরু এখান থেকে" flags on start topics, and a button per topic (interchanges have a larger dot with a dark ring). Positions come from data, so they are inline `left`/`top`/size styles; colours and look stay in classes. Topics are in track order, which is the keyboard order.
+- Each topic's hit area counter-scales with the zoom, so it stays 44px on screen at 50–120 %.
+- Island (`roadmap-explorer.tsx`): track focus (legend column from `md`, a chip row below it), "সব / শুরুর স্টেশন", topic search, zoom (−/+, 50–120 %, opens at 80 %), and the topic panel. Filtering dims topics and lines (`opacity-15`); a status line announces the count. State lives in the URL: `?topic=&track=&q=&filter=start`, through `lib/url-state.ts`; a shared link opens with the topic's panel and the map centred on it.
+- Topic panel (`roadmap-panel.tsx`): track chips, kicker (line, position), name, description, lessons and reading time, "শুরু করো" to the first lesson and the topic page, the lessons (groups as `<details>`, the first open), the interchange note, the home track's topics (select another) and previous/next. Beside the map from `md`, where picking a topic moves focus to the panel's heading and Escape closes it and returns focus to the dot; a bottom sheet below `md`.
+- Planned topics (no published lesson) are on the map, muted, with "পরিকল্পনায় আছে" and no start or topic-page link.
+- Links in: the breadcrumbs' "রোডম্যাপ" and track (`/roadmap?track=…`), the header and footer, and the not-found page.
+- Status filters, progress bars and bookmarks arrive with reader progress.
+
 ## shadcn customisations
 
 Generated shadcn components (`packages/ui/src/components/`) are added with the CLI and not edited, except for the changes listed here. Re-apply them whenever a component is regenerated.

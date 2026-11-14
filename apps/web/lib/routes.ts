@@ -13,6 +13,7 @@ export type NavRoute = {
  */
 export const NAV_ROUTES = [
   { href: "/", labelKey: "nav.home" },
+  { href: "/roadmap", labelKey: "nav.roadmap" },
   { href: "/contents", labelKey: "nav.contents" },
 ] as const satisfies readonly NavRoute[]
 

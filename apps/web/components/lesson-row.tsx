@@ -16,7 +16,7 @@ export function LessonRow({
   className,
   numberClassName,
 }: {
-  readonly lesson: GraphLesson
+  readonly lesson: Pick<GraphLesson, "url" | "title" | "readingMinutes">
   readonly number: string
   readonly className?: string
   readonly numberClassName?: string

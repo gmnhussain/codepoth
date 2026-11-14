@@ -11,6 +11,7 @@ import {
   findTopic,
   groupAnchorOf,
   nextTopicOn,
+  roadmapTrackUrl,
   topicPositionOn,
   topicRouteParams,
 } from "@workspace/content/routes"
@@ -22,6 +23,9 @@ import { TopicName } from "@/components/topic/topic-name"
 import { TrackStrip } from "@/components/topic/track-strip"
 import { totalTimeLabel } from "@/lib/duration"
 import { buildPageMetadata } from "@/lib/metadata"
+
+const CRUMB_LINK =
+  "underline decoration-foreground/30 underline-offset-4 hover:text-foreground"
 
 type TopicPageProps = {
   readonly params: Promise<TopicRouteParams>
@@ -110,11 +114,15 @@ export default async function TopicPage({ params }: TopicPageProps) {
           <nav aria-label={t("lesson.breadcrumb")}>
             <ol className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
               <li className="flex items-center gap-2">
-                <span>{t("nav.roadmap")}</span>
+                <Link href="/roadmap" className={CRUMB_LINK}>
+                  {t("nav.roadmap")}
+                </Link>
                 <span aria-hidden="true">/</span>
               </li>
               <li className="flex items-center gap-2">
-                <span>{track.titleEn}</span>
+                <Link href={roadmapTrackUrl(track.id)} className={CRUMB_LINK}>
+                  {track.titleEn}
+                </Link>
                 <span aria-hidden="true">/</span>
               </li>
               <li aria-current="page" className="text-foreground">
