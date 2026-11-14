@@ -87,8 +87,8 @@ level: beginner # beginner | intermediate | advanced
 draft: false # optional, default false
 glossary: [side-effect, race-condition]
 prerequisites: [frontend.react.hooks.use-state]
-previousSlugs: [] # optional: old URL paths after a move
-quiz: # 3–5 questions
+previousSlugs: [] # optional: old URL paths after a move, e.g. /learn/frontend/react/old-name
+quiz: # 3–5 questions; required unless draft: true
   - question: useEffect(fn, []) কখন চলে?
     options:
       [
@@ -109,8 +109,39 @@ quiz: # 3–5 questions
 
 - Reading time is computed at build time, not written by hand: prose words ÷ a Bangla words-per-minute constant + code lines ÷ 10 per minute, rounded up, at least 1 minute.
 - "নতুন / হালনাগাদ" tags and the "নতুন কী" list are computed at build time from `published` and `updated` (30-day window), so they are as fresh as the last build.
-- `published` is required when `draft` is false; a draft may omit it.
+- Completeness rules apply only to published lessons (`draft` false): `published` and `quiz` are required, and so are the seven template blocks. A draft may be an incomplete stub. `updated` is never before `published`.
 - Each quiz question has 2–4 options, a valid `answer` index and an `explanation`.
+
+## Glossary entries
+
+`content/glossary/<id>.mdx`, one file per term; the file name is the id used by `<Term id>` and `glossary`.
+
+```yaml
+---
+term: Side effect # the term in English
+termBn: সাইড ইফেক্ট # its Bangla name
+track: frontend # track whose colour marks the term
+draft: false # optional, default false
+---
+```
+
+The MDX body is the definition, optionally followed by a code example. The lessons that use a term are computed (from `glossary` frontmatter), never written in the entry.
+
+## Map
+
+`content/map.json` draws the roadmap:
+
+```json
+{
+  "width": 1400,
+  "height": 880,
+  "lines": { "frontend": "400,100 400,440" },
+  "topics": { "frontend/react": { "x": 400, "y": 360, "label": "left" } }
+}
+```
+
+- `lines`: track id → polyline points (`"x,y x,y …"`, at least two).
+- `topics`: topic key → dot position inside the map and label side (`top`, `bottom`, `left`, `right`, `top-right`).
 
 ## Start routes
 
@@ -120,6 +151,7 @@ quiz: # 3–5 questions
 
 Every content file is parsed with its Zod schema from `packages/content` at build time: lesson frontmatter, `_meta.json`, glossary entries, `map.json` and `start-routes.json`. Cross-file rules:
 
+- Track, topic, group and lesson file names are lower-case kebab-case (they become URL segments).
 - Lesson ids are unique; lesson file names are unique within a topic.
 - `order` arrays match the folders exactly; every `@track/topic` reference resolves.
 - Every `<Term id>` in a lesson and every entry in its `glossary` frontmatter exists in `content/glossary/`.
@@ -127,6 +159,7 @@ Every content file is parsed with its Zod schema from `packages/content` at buil
 - A published lesson only references published content: its `<Term id>`, `glossary` and `prerequisites` entries must not point to drafts. The build fails otherwise.
 - Every topic reference in `start-routes.json` resolves to an existing topic. A topic without published lessons is shown as planned, not rejected.
 - `pnpm build` without `CONTENT_INCLUDE_DRAFTS` must pass when every lesson is a draft.
+- Every track in `map.json` `lines` and every topic key in `topics` exists.
 - Every topic has coordinates in `map.json`. A missing one is a **warning** while developing (the topic is left off the map) and an **error** in CI (the content-validation test fails).
 
 ## Lesson template
@@ -144,7 +177,7 @@ Every lesson follows `content/_templates/lesson.mdx`. Each block is an MDX compo
 | 7   | Quiz (কুইজ)                         | `<Quiz />`   | renders the frontmatter `quiz`                                       |
 | 8   | Prev/next lesson                    | —            | generated, not written                                               |
 
-- The build fails if a block is missing or out of order. Each heading is tagged with the block it sits in, which gives the nested TOC. Block numbers (০১ …) are computed.
+- The build fails if a block is out of order, or, in a published lesson, missing. Each heading is tagged with the block it sits in, which gives the nested TOC. Block numbers (০১ …) are computed.
 - Glossary terms are marked with `<Term id="side-effect">side effect</Term>`.
 
 Writing style for lesson content: see [writing-guide.md](writing-guide.md).

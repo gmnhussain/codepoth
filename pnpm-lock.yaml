@@ -137,6 +137,34 @@ importers:
         specifier: 'catalog:'
         version: 5.1.0(@types/node@24.19.2)(vite@8.3.8(@types/node@24.19.2)(jiti@2.7.0))
 
+  packages/content:
+    dependencies:
+      '@workspace/config':
+        specifier: workspace:*
+        version: link:../config
+      zod:
+        specifier: 'catalog:'
+        version: 4.6.7
+    devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 24.19.2
+      '@workspace/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@workspace/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      eslint:
+        specifier: 'catalog:'
+        version: 10.14.0(jiti@2.7.0)(supports-color@7.2.0)
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vitest:
+        specifier: 'catalog:'
+        version: 5.1.0(@types/node@24.19.2)(vite@8.3.8(@types/node@24.19.2)(jiti@2.7.0))
+
   packages/eslint-config:
     devDependencies:
       '@eslint/js':

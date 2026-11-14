@@ -20,7 +20,7 @@ Separately, the curriculum skeleton and the design's sample lessons are needed d
 ### Lesson template blocks
 
 - All seven template blocks are MDX components, in this order: `<Summary>`, `<Concept>`, `<Example>`, `<Mistakes>`, `<DeepDive>`, `<Practice>`, `<Quiz />`. Prev/next is generated.
-- At build time each heading is tagged with the block it sits in, which gives the nested TOC. The build fails if blocks are missing or out of order.
+- At build time each heading is tagged with the block it sits in, which gives the nested TOC. The build fails if blocks are out of order, or, in a published lesson, missing.
 - Block numbers (০১ …) are computed from the order. The Summary has no number.
 
 ### Quiz data in frontmatter
@@ -49,7 +49,7 @@ quiz:
 | ------------------ | ------------- | ------------------------------------------------------------------------------- |
 | Lesson frontmatter | `published`   | Date of first publication. Required when `draft` is false; drafts may omit it.  |
 | Lesson frontmatter | `draft`       | Optional boolean, default `false`.                                              |
-| Lesson frontmatter | `quiz`        | Required, as above.                                                             |
+| Lesson frontmatter | `quiz`        | As above. Required when `draft` is false; drafts may omit it.                   |
 | Glossary entry     | `draft`       | Optional boolean, default `false`.                                              |
 | Track `_meta.json` | `titleEn`     | Required. The UI shows it as the track name and `title` as the Bangla subtitle. |
 | Track `_meta.json` | `color`       | A hue from the palette ([ADR-0008](ADR-0008-design-tokens.md)).                 |
@@ -83,6 +83,7 @@ quiz:
 - A lesson or glossary entry with `draft: true` is excluded from production builds. Local and preview builds include drafts when `CONTENT_INCLUDE_DRAFTS=1` is set; the variable is declared in the env schema and `.env.example`.
 - A published lesson only references published content. The build fails if its `<Term id>`, `glossary` or `prerequisites` entry points to a draft. Every lesson id in `prerequisites` must exist.
 - `pnpm build` without `CONTENT_INCLUDE_DRAFTS` must pass when every lesson is a draft (as it is right after the seed content lands).
+- Completeness rules apply only to published lessons: `published`, `quiz` and the seven template blocks are required when `draft` is false. A draft may be an incomplete stub (title, description and the other required fields only), so seed stubs need no invented quizzes.
 - A lesson id becomes permanent only when the lesson is first published ([ADR-0006](ADR-0006-urls-and-content-keys.md)).
 - All seed content copied from the design (sample lessons, stub lessons and glossary terms) starts as `draft: true` and is published only after the author reviews it.
 - The curriculum skeleton (tracks, topics, groups and `map.json`) is published content. In a build without drafts, a topic with no published lessons gets no page. It still appears on the Map and in Contents, unlinked and marked as planned, because the roadmap is the curriculum plan.
