@@ -9,6 +9,7 @@ import {
   nextTopicOn,
   topicPositionOn,
   topicRouteParams,
+  trackAnchorOf,
 } from "./routes"
 import { fixtureFiles, must } from "./test-fixtures"
 
@@ -55,8 +56,9 @@ describe("topic routes", () => {
     expect(nextTopicOn(graph, "lang", "frontend/react")).toBeUndefined()
   })
 
-  it("names a group's anchor", () => {
+  it("names a group's and a track's anchor", () => {
     expect(groupAnchorOf("hooks")).toBe("group-hooks")
+    expect(trackAnchorOf("frontend")).toBe("track-frontend")
   })
 })
 

@@ -212,6 +212,18 @@ The MDX components for lesson bodies live in `apps/web/components/mdx/` and are 
 - Totals are whole hours from 90 minutes, otherwise minutes rounded to 5 (`roundedDuration`).
 - The reader's state per lesson, "এখন পড়ছ" and the progress card arrive with reader progress.
 
+## Contents page
+
+`/contents`: the whole curriculum, tracks → topics → groups → lessons, in reading order.
+
+- Header: title, intro and computed stats (tracks, topics, lessons).
+- Toolbar (client island, `contents-controls.tsx`): a search field and "সব খোলো / সব বন্ধ করো". Search matches every word of the query against a lesson's title, its group and its topic (`matchesQuery` in `packages/content/src/search.ts`). Matching lessons stay visible with their groups, topics and tracks, all opened; the count is announced in a status line. Clearing the search restores what was open before. The query lives in `?q=` (conventions §10): written with `history.replaceState` as the reader types (no history entry per keystroke), applied on load, removed when cleared. Pages with URL state use `readUrlParam` / `writeUrlParams` from `apps/web/lib/url-state.ts`.
+- The list is server-rendered native `<details>`, so it works without JS. The first track starts open, the rest closed; groups start closed. The island only sets `hidden` and `open`.
+- Each track: number badge, name (the `h2`), subtitle with topic and lesson counts, then its topics on a line in the track colour: topic link (`h3`), position, lesson count, an interchange chip, then its groups (`h4` in a `<details>`) or lessons. A topic whose home is another track shows "পাঠগুলো {track} লাইনে →" instead of lessons, linking to `#track-{id}`.
+- Lesson numbers are track.topic.lesson (`৪.৪.৩`), `aria-hidden`, and hidden below `sm`.
+- "লাইনে যাও" (from `lg`): plain `<a href="#track-…">` links, so `hashchange` fires and the island opens the target track. In-page links that must open a `<details>` use `<a>`, not `next/link`, which changes the hash without that event.
+- The reader's progress (status filters, done counts, "এখন পড়ছ", "এখানে থেমেছিলে") arrives with reader progress.
+
 ## shadcn customisations
 
 Generated shadcn components (`packages/ui/src/components/`) are added with the CLI and not edited, except for the changes listed here. Re-apply them whenever a component is regenerated.
@@ -224,6 +236,7 @@ Generated shadcn components (`packages/ui/src/components/`) are added with the C
 Used as generated, with these notes:
 
 - `sheet.tsx`: its built-in close button has an English "Close" label and its overlay uses `bg-black/80` (kept: a scrim carries no text). Every sheet uses `AppSheetContent` (`apps/web/components/app-sheet.tsx`) instead of `SheetContent`: it turns the built-in button off, adds a close button labelled through `t()`, and turns the slide off for reduced motion. The overlay fade is turned off for reduced motion in `globals.css`, since the wrapper cannot reach it.
+- `input.tsx`: its `bg-input/30` fill turns grey for the same reason as the button's; search fields pass `bg-background` (the design's paper colour) and `h-11` where they are used.
 - The CLI (`pnpm dlx shadcn@latest add <name> -c apps/web`) also adds `cn` to `apps/web/package.json`. The components live in `packages/ui`, which already depends on it, so revert that line.
 
 ## Style

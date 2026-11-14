@@ -48,6 +48,11 @@ export function nextTopicOn(
     : undefined
 }
 
+/** Id of a track's section on the contents page, the target of `#track-…` links. */
+export function trackAnchorOf(trackId: string): string {
+  return `track-${trackId}`
+}
+
 /** Id of a group's section on its topic page, the target of `#group-…` links. */
 export function groupAnchorOf(groupSlug: string): string {
   return `group-${groupSlug}`

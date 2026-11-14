@@ -11,7 +11,30 @@
     "mobile": "মোবাইল মেনু",
     "menu": "মেনু",
     "skipToContent": "মূল অংশে যাও",
-    "roadmap": "রোডম্যাপ"
+    "roadmap": "রোডম্যাপ",
+    "contents": "সূচিপত্র"
+  },
+  "footer": {
+    "course": "কোর্স"
+  },
+  "contents": {
+    "intro": "পুরো কারিকুলাম এক পাতায় — পথ থেকে ধাপ, ধাপের ভেতরে গ্রুপ, আর তার পাঠ, যে ক্রমে পড়লে সবচেয়ে সহজ হয়।",
+    "statTracks": "পথ",
+    "statTopics": "ধাপ",
+    "statLessons": "পাঠ",
+    "searchLabel": "পাঠ, গ্রুপ বা ধাপ খোঁজো",
+    "searchPlaceholder": "পাঠ, গ্রুপ বা ধাপ খোঁজো… যেমন useState",
+    "expandLabel": "সব অংশ খোলা বা বন্ধ",
+    "openAll": "সব খোলো",
+    "closeAll": "সব বন্ধ করো",
+    "jumpTo": "পথে যাও",
+    "matched": "{n}টি পাঠ মিলেছে",
+    "noResults": "কিছু পাওয়া যায়নি",
+    "noResultsHint": "অন্য শব্দ দিয়ে খোঁজো।",
+    "clearSearch": "খোঁজ মুছে দাও",
+    "trackMeta": "{topics}টি ধাপ · {n}টি পাঠ",
+    "interchangeChip": "সংযোগ · {tracks}",
+    "lessonsElsewhere": "পাঠগুলো {track} পথে →"
   },
   "theme": {
     "toDark": "ডার্ক মোডে যাও",

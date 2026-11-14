@@ -13,6 +13,7 @@ export type NavRoute = {
  */
 export const NAV_ROUTES = [
   { href: "/", labelKey: "nav.home" },
+  { href: "/contents", labelKey: "nav.contents" },
 ] as const satisfies readonly NavRoute[]
 
 /** Whether `pathname` is `href` or a page below it ("/" matches only itself). */
