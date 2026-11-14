@@ -2,7 +2,7 @@
 
 **The visual system: design reference, tokens, fonts, track colours, style and accessibility rules.**
 
-Reference: the "কোডপথ" Claude Design artifact, pages `* v3` (Home, Map, Topic, Lesson, Contents, Dashboard, Glossary). v1/v2 are outdated.
+Reference: the design handoff (pages Home, Map, Topic, Lesson, Contents, Dashboard, Glossary), kept locally in `reference/handoff/` and not committed.
 
 Tokens are CSS variables mapped onto the shadcn theme variables in `packages/ui`.
 

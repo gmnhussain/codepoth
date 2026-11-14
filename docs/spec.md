@@ -6,7 +6,7 @@ CodePoth (কোডপথ) is a free, public, reader-first Bangla learning site 
 
 - Live URL (planned): https://codepoth.nazmulhussain.com
 - UI language: Bangla. Technical terms stay in English (React, useEffect, Docker…). Numbers in UI use Bangla digits.
-- Design reference: the "কোডপথ" Claude Design artifact, pages `* v3` (Home, Map, Topic, Lesson, Contents, Dashboard, Glossary). v1/v2 are outdated. See [design.md](design.md).
+- Design reference: the design handoff (pages Home, Map, Topic, Lesson, Contents, Dashboard, Glossary), kept locally in `reference/handoff/` and not committed. See [design.md](design.md).
 
 ## Principles
 
@@ -20,27 +20,32 @@ Home · Map (roadmap) · Contents (all lessons) · Topic · Lesson · Glossary �
 
 Header search opens Pagefind (⌘K).
 
+URLs: `/learn/[track]/[topic]` and `/learn/[track]/[topic]/[lesson]` (no group in the URL), plus `/roadmap`, `/contents`, `/glossary`, `/dashboard`, `/about` ([ADR-0006](decisions/ADR-0006-urls-and-content-keys.md)).
+
+Footer links stay inside the v1 pages: author → the author block on Home (`/#author`), what's new → `/#new`, privacy → a privacy section on About (`/about#privacy`). GitHub and LinkedIn links render only when they are set in `site.ts`.
+
 ## Reader progress (client only)
 
 - Progress, bookmarks and quiz scores belong to the READER and live in the browser (localStorage).
-- localStorage key `codepoth:v1`. Shape (validated with Zod):
+- localStorage key `codepoth:v1`, validated with Zod on every read. Shape and rules: [ADR-0007](decisions/ADR-0007-reader-progress-shape.md).
 
   ```ts
   {
-    lessons: { [id]: { done, doneAt, quiz?: { score, total, at } } },
-    bookmarks: string[],
-    lastRead: { id, at, anchor? }
+    lessons: { [id]: { openedAt, doneAt?, quiz?: { score, total, at } } },
+    bookmarks: { [id]: { at } },
+    lastRead?: { id, at, anchor? },
+    activity: { ["YYYY-MM-DD"]: lessonId[] } // last 140 days
   }
   ```
 
 - Keys are lesson stable IDs (see [content-model.md](content-model.md#stable-ids)).
-- Lesson states: done / in progress (opened, not done) / not started.
-- Dashboard ("আমার অগ্রগতি"/"ড্যাশবোর্ড") supports export to JSON, import, and clear-all with confirmation.
+- Lesson states: done (`doneAt` present) / in progress (entry without `doneAt`) / not started (no entry). Topic, group and track states are derived from their lessons.
+- Dashboard ("আমার অগ্রগতি"/"ড্যাশবোর্ড") supports export to JSON, import (merge or replace) and clear-all with confirmation.
 - Never send progress anywhere. Footer says: কোনো ট্র্যাকিং নেই · অগ্রগতি শুধু তোমার ব্রাউজারে.
 
 ## Config
 
-- `packages/config/src/site.ts`: site name (Bangla + English), logo component/path, domain, author links. Also selects the active label set.
+- `packages/config/src/site.ts`: site name (Bangla + English), logo component/path, domain, author links (optional; a link without a value is not rendered). Also selects the active label set.
 - `packages/config/src/labels/*.json`: every UI string (nav, buttons, statuses, block titles, level names). Components read labels through one helper, e.g. `t("nav.roadmap")`. No Bangla UI string is hardcoded inside a component.
 - Label variants: `bn-metro.json` (লাইন/স্টেশন), `bn-path.json` (পথ/ধাপ).
 
@@ -50,7 +55,7 @@ Header search opens Pagefind (⌘K).
 - Tailwind CSS + shadcn/ui (in `packages/ui`). Dark mode via next-themes.
 - Zod for schemas (frontmatter, `_meta.json`, labels, localStorage data).
 - Testing: Vitest (unit), Playwright (E2E).
-- MDX compiled at build time with a typed content layer (Velite or Content Collections — to be decided, record as an ADR in [decisions/](decisions/)).
+- MDX compiled at build time with Content Collections as the typed content layer ([ADR-0005](decisions/ADR-0005-content-layer.md)).
 - Shiki for code highlighting. Pagefind for static search. Giscus for comments (later).
 - pnpm + Turborepo. Deploy on Vercel (Root Directory `apps/web`). Git + GitHub.
 
