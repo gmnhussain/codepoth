@@ -12,11 +12,11 @@ Most built-in dark Shiki themes fail WCAG AA on these backgrounds; GitHub Dark's
 
 ## Decision
 
-- A new token, `--code`, is the code-block background: `#1C1A17` in light mode and `#0C0B0A` in dark mode, available as `bg-code`. It is the only addition to ADR-0008's palette.
+- Two new tokens: `--code`, the code-block background (`#1C1A17` in light mode, `#0C0B0A` in dark mode, `bg-code`), and `--code-foreground` (`#EDE8DE` in both, the design's code text colour) for the file-name caption and line numbers (`text-code-foreground`). They are the only additions to ADR-0008's palette.
 - Every code block uses one dark Shiki theme in both modes: **Catppuccin Mocha** (`CODE_THEME` in `packages/content/src/mdx/compile.ts`). Its keyword, string and function colours are close to the design's (pink, green, blue).
 - The theme's background is not used (`keepBackground: false`); the block sits on `--code`.
 - Inline `code` in prose is not highlighted; the page styles it like other text.
-- `packages/content/src/mdx/code-theme.test.ts` checks every text colour of the theme against both `--code` values at 4.5:1, so a theme or token change that breaks AA fails `pnpm test`.
+- `packages/content/src/mdx/code-theme.test.ts` checks every text colour of the theme, and `--code-foreground`, against both `--code` values at 4.5:1, so a theme or token change that breaks AA fails `pnpm test`.
 
 ## Alternatives considered
 

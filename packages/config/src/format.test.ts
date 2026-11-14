@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { formatDate, formatNumber, formatYear } from "./format"
+import { formatDate, formatNumber, formatTwoDigits, formatYear } from "./format"
 
 describe("formatNumber", () => {
   it("uses Bangla digits", () => {
@@ -10,6 +10,14 @@ describe("formatNumber", () => {
 
   it("groups large numbers", () => {
     expect(formatNumber(1234)).toBe("১,২৩৪")
+  })
+})
+
+describe("formatTwoDigits", () => {
+  it("pads to two Bangla digits", () => {
+    expect(formatTwoDigits(1)).toBe("০১")
+    expect(formatTwoDigits(7)).toBe("০৭")
+    expect(formatTwoDigits(12)).toBe("১২")
   })
 })
 

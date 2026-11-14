@@ -37,5 +37,19 @@
     "done": "পড়া শেষ",
     "inProgress": "পড়ছ",
     "notStarted": "শুরু হয়নি"
+  },
+  "blocks": {
+    "summary": "TL;DR",
+    "concept": "ধারণা",
+    "example": "কোডে দেখি",
+    "mistakes": "সাধারণ ভুল",
+    "deep-dive": "গভীরে যাও",
+    "practice": "AI দিয়ে অনুশীলন",
+    "quiz": "কুইজ",
+    "next": "পরের পাঠ"
+  },
+  "lesson": {
+    "deepTag": "অভিজ্ঞদের জন্য",
+    "stepLabel": "ধাপ {n}"
   }
 }

@@ -11,6 +11,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@mdx-js/mdx": "catalog:",
     "@workspace/config": "workspace:*",
     "@workspace/content": "workspace:*",
     "@workspace/ui": "workspace:*",

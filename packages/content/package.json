@@ -34,6 +34,7 @@
   },
   "exports": {
     "./content": "./src/content.ts",
+    "./blocks": "./src/mdx/block-list.ts",
     "./env": "./src/env.ts",
     "./graph": "./src/graph.ts",
     "./paths": "./src/paths.ts",

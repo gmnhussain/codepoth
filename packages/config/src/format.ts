@@ -5,6 +5,11 @@ export const UI_LOCALE = "bn-BD"
 
 const numberFormat = new Intl.NumberFormat(UI_LOCALE)
 
+const twoDigitFormat = new Intl.NumberFormat(UI_LOCALE, {
+  minimumIntegerDigits: 2,
+  useGrouping: false,
+})
+
 const dateFormat = new Intl.DateTimeFormat(UI_LOCALE, {
   day: "numeric",
   month: "long",
@@ -25,6 +30,11 @@ const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/
 /** Formats a number with Bangla digits, e.g. `1234` → `"১,২৩৪"`. */
 export function formatNumber(value: number): string {
   return numberFormat.format(value)
+}
+
+/** Formats a number with at least two Bangla digits, e.g. `1` → `"০১"` (block numbers). */
+export function formatTwoDigits(value: number): string {
+  return twoDigitFormat.format(value)
 }
 
 /** Formats a date-only string (`YYYY-MM-DD`) as e.g. `"১১ নভেম্বর, ২০২৬"`. */

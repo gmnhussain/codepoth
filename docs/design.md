@@ -17,6 +17,7 @@ Loading rules (`next/font`, subsets, `swap`): [performance.md](development/perfo
 | JetBrains Mono | code, numbers in chips | variable font, Latin only     | `font-mono`    |
 
 - next/font exposes `--font-display`, `--font-body` and `--font-code`; `globals.css` maps them to `font-heading`, `font-sans` and `font-mono`. The names differ from the Tailwind theme variables so no variable refers to itself.
+- Code shows no ligatures (`font-variant-ligatures: none` in `globals.css`), so `=>` and `!==` look the way a beginner types them.
 - JetBrains Mono has no Bangla glyphs, so `font-mono` falls back to Hind Siliguri for Bangla text in code (comments, strings).
 - Anek Bangla and Hind Siliguri are preloaded (Bangla + Latin subsets, about 340 KB across 8 files measured on the first build); JetBrains Mono is not. Re-measure with Lighthouse when the pages exist.
 - Heading weights in use: 500–700. Body line height: `leading-reading` (1.85, see [Type scale](#type-scale)).
@@ -40,6 +41,7 @@ Tokens live in `packages/ui/src/styles/globals.css`, mapped onto the shadcn vari
 | bad         | `destructive`                                                                      | `#B4322C` | `#FF8A80` |
 | warn        | `warning`                                                                          | `#9A5B00` | `#FFC46B` |
 | code        | `code` (code-block background, [ADR-0010](decisions/ADR-0010-dark-code-blocks.md)) | `#1C1A17` | `#0C0B0A` |
+| —           | `code-foreground` (caption and line numbers on `code`)                             | `#EDE8DE` | `#EDE8DE` |
 
 - The heatmap uses `bg-muted` (no activity), `bg-success/35`, `bg-success/65` and `bg-success`.
 - The shadcn `chart-*` and `sidebar-*` slots are kept and point at the same palette.
@@ -165,6 +167,17 @@ WCAG 2.2 AA, computed from the values in `globals.css`: text needs 4.5:1, while 
 - Every text pair passes 4.5:1 on all three surfaces in both modes.
 - Track marks are checked on background and card, where they are placed. On `muted` several light-mode marks are below 3:1, so a mark never sits on `muted` without its value also shown as text (e.g. a progress bar next to its "৩/৬" fraction).
 - "tint only" rows are the bright `track` value, which is not used as a mark in light mode.
+
+## Lesson blocks
+
+The MDX components for lesson bodies live in `apps/web/components/mdx/` and are rendered on the server.
+
+- Each block is a `<section>` with the block's id and a numbered `h2` (`০১` …, computed; the summary has no number). Author sections are `h3`.
+- `<Summary>`: tinted card in the track colour (`border-track/30 bg-track/5`).
+- `<Mistakes>` and `<Steps>`: the author writes a plain numbered list; the component renumbers it with Bangla digits (round badges for mistakes, "ধাপ ১" cards for steps).
+- `<DeepDive>`: a native `<details>`, closed by default, with the "অভিজ্ঞদের জন্য" chip and the one-line `hint`.
+- Code blocks: see [Colors](#colors) and [ADR-0010](decisions/ADR-0010-dark-code-blocks.md); file name in the caption, Bangla line numbers that screen readers skip.
+- Tables scroll sideways inside a bordered card on narrow screens.
 
 ## shadcn customisations
 

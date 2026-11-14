@@ -12,11 +12,12 @@ const css = readFileSync(
   "utf8"
 )
 
-function codeBackground(selector: string): string {
+/** A hex custom property declared in the `selector` rule of globals.css. */
+function token(selector: string, name: string): string {
   const start = css.indexOf(`\n${selector} {`)
   const block = css.slice(start, css.indexOf("}", start))
-  const match = /--code:\s*(#[0-9a-f]{6});/i.exec(block)
-  if (match?.[1] === undefined) throw new Error(`No --code in ${selector}`)
+  const match = new RegExp(`--${name}:\\s*(#[0-9a-f]{6});`, "i").exec(block)
+  if (match?.[1] === undefined) throw new Error(`No --${name} in ${selector}`)
   return match[1]
 }
 
@@ -77,13 +78,22 @@ describe(`code theme ${CODE_THEME}`, async () => {
   it.each([":root", ".dark"])(
     "every text colour reaches 4.5:1 on --code in %s",
     (selector) => {
-      const background = rgb(codeBackground(selector))
+      const background = rgb(token(selector, "code"))
       for (const color of textColors) {
         expect(
           contrast(rgb(color, background), background),
           color
         ).toBeGreaterThanOrEqual(4.5)
       }
+    }
+  )
+
+  it.each([":root", ".dark"])(
+    "--code-foreground reaches 4.5:1 on --code in %s",
+    (selector) => {
+      const background = rgb(token(selector, "code"))
+      const foreground = rgb(token(selector, "code-foreground"))
+      expect(contrast(foreground, background)).toBeGreaterThanOrEqual(4.5)
     }
   )
 })
