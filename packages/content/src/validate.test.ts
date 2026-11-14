@@ -169,9 +169,25 @@ describe("validateContent", () => {
       expect.stringContaining(
         'prerequisite "frontend.html.intro" does not exist'
       ),
+      expect.stringContaining(
+        '<Term id="hoisting"> is used but "hoisting" is not in its glossary frontmatter'
+      ),
       expect.stringContaining('glossary term "closure" does not exist'),
       expect.stringContaining('glossary term "hoisting" does not exist'),
     ])
+  })
+
+  it("requires every <Term id> in the body to be in the glossary frontmatter", () => {
+    const files = fixtureFiles()
+    const useEffect = must(files.lessons[5])
+    files.lessons[5] = { ...useEffect, glossary: [] }
+    expect(errorsOf(files)).toEqual([
+      expect.stringContaining(
+        '<Term id="side-effect"> is used but "side-effect" is not in its glossary frontmatter'
+      ),
+    ])
+    files.lessons[5] = useEffect
+    expect(errorsOf(files)).toEqual([])
   })
 
   it("rejects a published lesson that refers to drafts, but lets a draft do it", () => {

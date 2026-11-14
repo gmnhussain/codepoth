@@ -160,6 +160,7 @@ Every content file is parsed with its Zod schema from `packages/content` at buil
 - Every track, topic and group folder has its `_meta.json`; a name is never both a group folder and a lesson file in one topic.
 - Every topic prerequisite (`@track/topic`) exists.
 - Every `<Term id>` in a lesson and every entry in its `glossary` frontmatter exists in `content/glossary/`.
+- Every `<Term id>` in a lesson body is also listed in its `glossary` frontmatter, because the glossary's "যে পাঠে আছে" list is built from the frontmatter.
 - Every lesson id in `prerequisites` exists.
 - No `published` or `updated` date is after the build date, taken in the site time zone (`site.timeZone`, Asia/Dhaka, where authors date their lessons), so a typo like 2027 cannot keep a lesson "new" for a year.
 - Every glossary entry's `track` exists.

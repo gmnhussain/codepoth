@@ -224,10 +224,17 @@ export function validateContent(
         )
       }
     }
-    const usedTerms = new Set([
-      ...lesson.glossary,
-      ...termIdsIn(lesson.content),
-    ])
+    const bodyTerms = new Set(termIdsIn(lesson.content))
+    // The glossary's "যে পাঠে আছে" list is built from the frontmatter, so a
+    // term used in the body but missing there would drop the lesson from it.
+    for (const id of bodyTerms) {
+      if (!lesson.glossary.includes(id)) {
+        errors.push(
+          `${where}: <Term id="${id}"> is used but "${id}" is not in its glossary frontmatter`
+        )
+      }
+    }
+    const usedTerms = new Set([...lesson.glossary, ...bodyTerms])
     for (const id of usedTerms) {
       const term = termById.get(id)
       if (term === undefined) {

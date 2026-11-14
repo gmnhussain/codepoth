@@ -87,6 +87,7 @@ quiz:
 ### Drafts
 
 - A lesson or glossary entry with `draft: true` is excluded from production builds. A production deploy (`VERCEL_ENV=production`) refuses `CONTENT_INCLUDE_DRAFTS=1` and fails the build, so drafts cannot reach readers through a mistaken setting. Local and preview builds include drafts when `CONTENT_INCLUDE_DRAFTS=1` is set; the variable is declared in the env schema and `.env.example`.
+- Every `<Term id>` in a lesson body must also be listed in the lesson's `glossary` frontmatter. The glossary's "যে পাঠে আছে" list is built from the frontmatter, so a term missing there would silently drop the lesson from the term's page.
 - A published lesson only references published content. The build fails if its `<Term id>`, `glossary` or `prerequisites` entry points to a draft. Every lesson id in `prerequisites` must exist.
 - `pnpm build` without `CONTENT_INCLUDE_DRAFTS` must pass when every lesson is a draft (as it is right after the seed content lands).
 - Completeness rules apply only to published lessons: `description`, `level`, `published`, `quiz` and the seven template blocks are required when `draft` is false. A draft may be an incomplete stub (`id`, `title` and `updated` only), so seed stubs need no invented descriptions, levels or quizzes.
