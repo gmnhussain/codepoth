@@ -59,6 +59,10 @@ quiz:
 
 - **"নতুন / হালনাগাদ".** A lesson is "নতুন" if `published` is within the last 30 days, else "হালনাগাদ" if `updated` is. "নতুন কী" lists the 5 lessons with the most recent `max(published, updated)`. Both are computed at build time, so they are only as fresh as the last build.
 
+### Track order
+
+`content/tracks/_meta.json` holds `{ "order": [...] }` with every track folder exactly once, the same order-array pattern as every other level. A track's number in the UI ("লাইন ১") is its position in this list, computed, never stored.
+
 ### Start routes
 
 `content/start-routes.json` holds Home's "where to start" cards. They are editorial content, not code:
@@ -82,7 +86,7 @@ quiz:
 
 ### Drafts
 
-- A lesson or glossary entry with `draft: true` is excluded from production builds. Local and preview builds include drafts when `CONTENT_INCLUDE_DRAFTS=1` is set; the variable is declared in the env schema and `.env.example`.
+- A lesson or glossary entry with `draft: true` is excluded from production builds. A production deploy (`VERCEL_ENV=production`) refuses `CONTENT_INCLUDE_DRAFTS=1` and fails the build, so drafts cannot reach readers through a mistaken setting. Local and preview builds include drafts when `CONTENT_INCLUDE_DRAFTS=1` is set; the variable is declared in the env schema and `.env.example`.
 - A published lesson only references published content. The build fails if its `<Term id>`, `glossary` or `prerequisites` entry points to a draft. Every lesson id in `prerequisites` must exist.
 - `pnpm build` without `CONTENT_INCLUDE_DRAFTS` must pass when every lesson is a draft (as it is right after the seed content lands).
 - Completeness rules apply only to published lessons: `published`, `quiz` and the seven template blocks are required when `draft` is false. A draft may be an incomplete stub (title, description and the other required fields only), so seed stubs need no invented quizzes.

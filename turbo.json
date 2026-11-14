@@ -9,7 +9,8 @@
     "build": {
       "dependsOn": ["^build", "^content:generate"],
       "inputs": ["$TURBO_DEFAULT$", ".env*", "$TURBO_ROOT$/content/**"],
-      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**"]
+      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**"],
+      "env": ["CONTENT_INCLUDE_DRAFTS", "VERCEL_ENV"]
     },
     "lint": {
       "dependsOn": ["^lint", "^content:generate", "content:generate"]
@@ -28,7 +29,8 @@
         "$TURBO_ROOT$/content/**",
         "$TURBO_ROOT$/packages/ui/src/styles/globals.css"
       ],
-      "outputs": []
+      "outputs": [],
+      "env": ["CONTENT_INCLUDE_DRAFTS", "VERCEL_ENV"]
     }
   }
 }

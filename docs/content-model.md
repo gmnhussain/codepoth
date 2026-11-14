@@ -19,6 +19,7 @@ content/
   _templates/
     lesson.mdx                # lesson template (see below)
   tracks/
+    _meta.json                # { "order": ["cs", "lang", "tools", "frontend", …] }: track order
     frontend/                 # Track
       _meta.json              # { "title", "titleEn", "color", "order": ["html-css", "a11y", "@lang/javascript", "react", "nextjs"] }
       react/                  # Topic
@@ -38,6 +39,7 @@ content/
 
 ## Rules
 
+- `tracks/_meta.json` lists every track folder exactly once. A track's number in the UI ("লাইন ৪") is its position in this list, computed, never stored.
 - A topic is stored once, inside its home track. Another track that passes through it lists it in `order` as a reference (`"@lang/javascript"`). A topic that appears in 2+ tracks is an interchange.
 - Every `order` array lists each child folder/file of its level exactly once, and nothing else (references excepted); the content-validation tests enforce it.
 - In every `_meta.json` (track, topic, group), `title` is the Bangla display title. Technical names stay in English ("React").
@@ -69,7 +71,8 @@ Every lesson has an `id` in frontmatter, e.g. `frontend.react.hooks.use-effect`.
 
 ## Drafts
 
-- `draft: true` on a lesson or glossary entry keeps it out of production builds. Local and preview builds include drafts when `CONTENT_INCLUDE_DRAFTS=1` is set.
+- `draft: true` on a lesson or glossary entry keeps it out of production builds. Local and preview builds include drafts when `CONTENT_INCLUDE_DRAFTS=1` is set: in `apps/web/.env.local` locally (see `apps/web/.env.example`), and as a Vercel environment variable for Preview only. Any value other than `0` or `1` fails the build, and so does `CONTENT_INCLUDE_DRAFTS=1` on a production deploy (`VERCEL_ENV=production`, set by Vercel), so a mistaken setting can never publish drafts (`packages/content/src/env.ts`).
+- Validation always runs over every file, drafts included; only the published graph leaves drafts out.
 - Content copied from the design reference starts as a draft and is published only after the author reviews it.
 - In a build without drafts, a topic with no published lessons has no page; the Map and Contents show it unlinked, marked as planned.
 - Details: [ADR-0009](decisions/ADR-0009-lesson-blocks-and-content-fields.md).
@@ -153,14 +156,24 @@ Every content file is parsed with its Zod schema from `packages/content` at buil
 
 - Track, topic, group and lesson file names are lower-case kebab-case (they become URL segments).
 - Lesson ids are unique; lesson file names are unique within a topic.
-- `order` arrays match the folders exactly; every `@track/topic` reference resolves.
+- `order` arrays match the folders exactly; every `@track/topic` reference resolves. A track lists its own topics by plain name, never as `@track/topic`.
+- Every track, topic and group folder has its `_meta.json`; a name is never both a group folder and a lesson file in one topic.
+- Every topic prerequisite (`@track/topic`) exists.
 - Every `<Term id>` in a lesson and every entry in its `glossary` frontmatter exists in `content/glossary/`.
 - Every lesson id in `prerequisites` exists.
+- No `published` or `updated` date is after the build date (UTC), so a typo like 2027 cannot keep a lesson "new" for a year.
+- Every glossary entry's `track` exists.
 - A published lesson only references published content: its `<Term id>`, `glossary` and `prerequisites` entries must not point to drafts. The build fails otherwise.
 - Every topic reference in `start-routes.json` resolves to an existing topic. A topic without published lessons is shown as planned, not rejected.
 - `pnpm build` without `CONTENT_INCLUDE_DRAFTS` must pass when every lesson is a draft.
 - Every track in `map.json` `lines` and every topic key in `topics` exists.
-- Every topic has coordinates in `map.json`. A missing one is a **warning** while developing (the topic is left off the map) and an **error** in CI (the content-validation test fails).
+- Every topic has coordinates in `map.json`, and every track has a line. A missing one is a **warning** in `next dev` (the topic or track is left off the map) and an **error** in the content-validation test, locally and in CI.
+
+The rules live in `packages/content/src/validate.ts`. `getContentGraph()` (`packages/content/src/content.ts`) runs them once per build and throws on any error, so every page that reads content fails the build on broken content; warnings are reported as Node.js warnings.
+
+## Derived data
+
+Computed at build time in `packages/content/src/graph.ts`, never written by hand: track numbers, topic and group entries in order, interchanges (topics on 2+ tracks), each lesson's URL and position in its topic and group, reading time per lesson, group and topic, previous/next lesson along the lesson's home track (flagging a new group or topic), the glossary reverse index (lessons per term), "new / updated" freshness and site counts (tracks, topics, lessons, quiz questions).
 
 ## Lesson template
 

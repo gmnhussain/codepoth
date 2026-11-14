@@ -24,6 +24,8 @@
     "vitest": "catalog:"
   },
   "exports": {
+    "./content": "./src/content.ts",
+    "./graph": "./src/graph.ts",
     "./paths": "./src/paths.ts",
     "./schemas/*": "./src/schemas/*.schema.ts",
     "./generated": {

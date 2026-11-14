@@ -17,6 +17,7 @@ import { mapSchema } from "./src/schemas/map.schema"
 import { startRoutesSchema } from "./src/schemas/start-routes.schema"
 import { topicMetaSchema } from "./src/schemas/topic-meta.schema"
 import { trackMetaSchema } from "./src/schemas/track-meta.schema"
+import { tracksOrderSchema } from "./src/schemas/tracks-order.schema"
 
 // Content Collections setup (ADR-0005). Paths are relative to this file;
 // the content lives in the repository's root `content/` folder. Every file
@@ -89,6 +90,14 @@ const glossary = defineCollection({
 
 // Optional until the content lands; the cross-file validation makes them
 // required (docs/content-model.md#validation).
+const tracksOrder = defineSingleton({
+  name: "tracksOrder",
+  filePath: `${TRACKS}/_meta.json`,
+  parser: "json",
+  schema: tracksOrderSchema,
+  optional: true,
+})
+
 const map = defineSingleton({
   name: "map",
   filePath: `${CONTENT_DIR}/map.json`,
@@ -99,6 +108,7 @@ const map = defineSingleton({
 
 const startRoutes = defineSingleton({
   name: "startRoutes",
+  typeName: "StartRoutes",
   filePath: `${CONTENT_DIR}/start-routes.json`,
   parser: "json",
   schema: startRoutesSchema,
@@ -106,5 +116,14 @@ const startRoutes = defineSingleton({
 })
 
 export default defineConfig({
-  content: [tracks, topics, groups, lessons, glossary, map, startRoutes],
+  content: [
+    tracksOrder,
+    tracks,
+    topics,
+    groups,
+    lessons,
+    glossary,
+    map,
+    startRoutes,
+  ],
 })
