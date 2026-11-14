@@ -1,6 +1,6 @@
 # Architecture decision records
 
-**Each hard-to-reverse decision is recorded once here, with its context and consequences, and is superseded rather than edited.**
+**Each hard-to-reverse decision is recorded once here, with its context and consequences, and is superseded rather than edited once it is merged into `main`.**
 
 One file per decision: `ADR-NNNN-<kebab-title>.md`. A record can still be edited until its branch is merged into `main`; after that, never edit it, supersede it with a new record ([conventions §4](../development/conventions.md#4-documentation)).
 
