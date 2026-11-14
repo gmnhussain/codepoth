@@ -9,6 +9,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "turbo typecheck",
+    "test": "turbo test",
     "prepare": "node scripts/setup-git-hooks.mjs",
     "test:commit-msg": "node --test scripts/commit-message.test.mjs"
   },

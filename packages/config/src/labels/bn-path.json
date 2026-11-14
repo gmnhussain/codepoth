@@ -1,0 +1,15 @@
+{
+  "terms": {
+    "track": "পথ",
+    "topic": "ধাপ",
+    "group": "গ্রুপ",
+    "lesson": "পাঠ",
+    "section": "অংশ",
+    "interchange": "সংযোগ"
+  },
+  "status": {
+    "done": "পড়া শেষ",
+    "inProgress": "পড়ছ",
+    "notStarted": "শুরু হয়নি"
+  }
+}

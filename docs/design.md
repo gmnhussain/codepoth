@@ -98,7 +98,7 @@ Sizes, radii and breakpoints use Tailwind's defaults; the design's pixel values 
 
 ## Contrast
 
-WCAG 2.2 AA, computed from the values in `globals.css`: text needs 4.5:1, while marks, control edges and focus indicators need 3:1 (SC 1.4.11). An automated Vitest check over the same pairs runs with the other `packages/config` tests.
+WCAG 2.2 AA, computed from the values in `globals.css`: text needs 4.5:1, while marks, control edges and focus indicators need 3:1 (SC 1.4.11). `packages/config/src/theme.test.ts` checks the same pairs from `globals.css`, so a colour change that breaks AA fails `pnpm test`.
 
 | Check      | Mode  | Token                         | background | card  | muted |
 | ---------- | ----- | ----------------------------- | ---------- | ----- | ----- |

@@ -59,4 +59,5 @@ Run from the repo root.
 - `pnpm format:check`: check formatting without writing
 - Add a shadcn component: `pnpm dlx shadcn@latest add <name> -c apps/web`
 - `pnpm test:commit-msg`: test the commit message rules
-- App tests and content validation: to be added
+- `pnpm test`: run every package's Vitest tests (unit, label sets, theme contrast)
+- Content validation and end-to-end tests: to be added

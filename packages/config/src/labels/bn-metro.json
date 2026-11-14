@@ -1,0 +1,15 @@
+{
+  "terms": {
+    "track": "লাইন",
+    "topic": "স্টেশন",
+    "group": "গ্রুপ",
+    "lesson": "পাঠ",
+    "section": "অংশ",
+    "interchange": "ইন্টারচেঞ্জ"
+  },
+  "status": {
+    "done": "পড়া শেষ",
+    "inProgress": "পড়ছ",
+    "notStarted": "শুরু হয়নি"
+  }
+}

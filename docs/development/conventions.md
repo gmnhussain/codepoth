@@ -62,6 +62,7 @@ Adapted from a larger SaaS engineering standard. Only rules that fit a static, c
 - apps → packages, never packages → apps. No app imports another app.
 - `packages/ui` stays business-free (no content or progress logic). `packages/content` owns content loading and schemas. `packages/config` owns site config and labels.
 - Workspace packages ship TypeScript source; `exports` maps **one subpath per file**, no catch-all barrel that drags everything into the browser bundle. Next.js compiles them with `transpilePackages`.
+- Source packages (`config`, `content`) extend `@workspace/typescript-config/source-package.json` (Bundler resolution) and use extensionless relative imports. Turbopack does not map a `.js` import to a `.ts` file, so NodeNext-style `./x.js` imports fail to build.
 - Path aliases: `@/*` inside an app, `@workspace/<package>` for packages. No long relative paths across features.
 
 ## 6. Tooling
@@ -179,7 +180,7 @@ File role suffixes: `.schema.ts` (Zod schemas), `.client.ts` (browser-only helpe
 | Content    | Vitest     | every lesson/meta/glossary file and `map.json` passes its schema; IDs unique; `@track/topic` references resolve; `<Term id>` and `glossary` entries exist; every topic has map coordinates (warning in dev, failing test in CI); label files have identical keys | `packages/content`, `packages/config` |
 | End-to-end | Playwright | critical journeys on a production build: read a lesson, mark done, quiz, dashboard export/import                                                                                                                                                                 | `e2e/` or `apps/web/e2e/`             |
 
-- Vitest: `globals: false`, `clearMocks` + `restoreMocks`.
+- Vitest: one `vitest.config.ts` per package, `globals: false`, `clearMocks` + `restoreMocks`. `pnpm test` runs every package's tests through Turborepo; a test that reads files outside its package lists them in the `test` task's `inputs` in `turbo.json`.
 - Test names are plain sentences.
 - Test pure logic at exact boundaries (empty, one, max, missing).
 - Playwright starts its own server on its own port; locate by role and label; expected UI text comes from the label files, never a copied string; a test fails on a console error.

@@ -2,7 +2,7 @@
 
 **What CodePoth is, which pages it has, how reader progress is stored and which stack builds it.**
 
-CodePoth (কোডপথ) is a free, public, reader-first Bangla learning site that takes a reader from zero to a complete full-stack developer. The author (Nazmul Hussain, an experienced developer) uses it as his own structured learning book, but every page is written for a public reader starting from zero.
+CodePoth (কোডপথ) is a free, public, reader-first Bangla learning site that takes a reader from zero to a complete full-stack developer. The author (G. M. Nazmul Hussain, an experienced developer) uses it as his own structured learning book, but every page is written for a public reader starting from zero.
 
 - Live URL (planned): https://codepoth.nazmulhussain.com
 - UI language: Bangla. Technical terms stay in English (React, useEffect, Docker…). Numbers in UI use Bangla digits.
@@ -47,7 +47,9 @@ Footer links stay inside the v1 pages: author → the author block on Home (`/#a
 
 - `packages/config/src/site.ts`: site name (Bangla + English), logo component/path, domain, author links (optional; a link without a value is not rendered). Also selects the active label set.
 - `packages/config/src/labels/*.json`: every UI string (nav, buttons, statuses, block titles, level names). Components read labels through one helper, e.g. `t("nav.roadmap")`. No Bangla UI string is hardcoded inside a component.
-- Label variants: `bn-metro.json` (লাইন/স্টেশন), `bn-path.json` (পথ/ধাপ).
+- Label variants: `bn-metro.json` (লাইন/স্টেশন), `bn-path.json` (পথ/ধাপ). Both have exactly the same keys and placeholders; a test enforces it, and a set with a missing key also fails typecheck.
+- `t(key, values?)` (`packages/config/src/t.ts`): keys are typed from `bn-metro.json`; `{name}` placeholders are filled from `values`, numbers are shown with Bangla digits, and a placeholder without a value throws.
+- Format helpers (`packages/config/src/format.ts`): `formatNumber` and `formatDate` use `Intl` with the `bn-BD` locale (Bangla digits and month names, e.g. "১১ নভেম্বর, ২০২৬"). Date-only content dates are formatted in UTC.
 
 ## Tech stack
 

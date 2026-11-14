@@ -16,6 +16,15 @@
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "test": {
+      "dependsOn": ["^test"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/content/**",
+        "$TURBO_ROOT$/packages/ui/src/styles/globals.css"
+      ],
+      "outputs": []
     }
   }
 }
