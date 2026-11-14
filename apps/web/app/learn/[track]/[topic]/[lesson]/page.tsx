@@ -5,8 +5,10 @@ import { t } from "@workspace/config/t"
 import { getContentGraph } from "@workspace/content/content"
 import { neighboursOf } from "@workspace/content/graph"
 import type { LessonRouteParams } from "@workspace/content/routes"
+import { lessonJsonLd } from "@workspace/content/json-ld"
 import { findLesson, lessonRouteParams } from "@workspace/content/routes"
 
+import { JsonLd } from "@/components/json-ld"
 import { LessonHeader } from "@/components/lesson/lesson-header"
 import { LessonNav } from "@/components/lesson/lesson-nav"
 import { LessonNavDrawer } from "@/components/lesson/lesson-nav-drawer"
@@ -59,6 +61,9 @@ export default async function LessonPage({ params }: LessonPageProps) {
 
   return (
     <div data-track-color={track?.color}>
+      {lessonJsonLd(graph, lesson, t("nav.roadmap")).map((data) => (
+        <JsonLd key={String(data["@type"])} data={data} />
+      ))}
       <div aria-hidden="true" className="h-1.5 bg-track-dot" />
       <div className="mx-auto flex max-w-7xl gap-10 px-4 py-10 sm:px-8">
         <aside className="hidden w-56 shrink-0 lg:block">

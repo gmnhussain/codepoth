@@ -4,18 +4,30 @@ import { ArrowRightIcon, HardDriveIcon } from "lucide-react"
 
 import { t } from "@workspace/config/t"
 import { getContentGraph } from "@workspace/content/content"
+import { isIndexableBuild } from "@workspace/content/env"
 import { homeStartLesson } from "@workspace/content/home"
 import { buttonVariants } from "@workspace/ui/components/button"
 
 import { Chip } from "@/components/chip"
 import { buildPageMetadata } from "@/lib/metadata"
+import { isIndexableRoute } from "@/lib/routes"
+
+const PATH = "/dashboard"
 
 export function generateMetadata(): Metadata {
-  return buildPageMetadata({
-    title: t("dashboard.title"),
-    description: t("dashboard.subtitle"),
-    path: "/dashboard",
-  })
+  return {
+    ...buildPageMetadata({
+      title: t("dashboard.title"),
+      description: t("dashboard.subtitle"),
+      path: PATH,
+    }),
+    // A personal page: never indexed, and left out of the sitemap. This
+    // replaces the layout's robots, so keep its nofollow in builds that are
+    // not indexable at all.
+    ...(isIndexableRoute(PATH)
+      ? {}
+      : { robots: { index: false, follow: isIndexableBuild(process.env) } }),
+  }
 }
 
 /**

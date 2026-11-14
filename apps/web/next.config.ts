@@ -34,6 +34,20 @@ const nextConfig: NextConfig = {
   headers() {
     return Promise.resolve([{ source: "/:path*", headers: SECURITY_HEADERS }])
   },
+  // Moved lessons: every `previousSlugs` entry is a permanent redirect to the
+  // lesson's current URL (ADR-0004, ADR-0006). Imported here, not at the top,
+  // so the config loads before content is generated; by the time Next asks
+  // for redirects, `content:generate` (build) or the plugin below (dev) has
+  // written it.
+  async redirects() {
+    const [{ allLessons }, { contentOptionsFrom }, { lessonRedirects }] =
+      await Promise.all([
+        import("@workspace/content/generated"),
+        import("@workspace/content/env"),
+        import("@workspace/content/redirects"),
+      ])
+    return lessonRedirects(allLessons, contentOptionsFrom(process.env))
+  },
 }
 
 // Content lives in packages/content (ADR-0005). The `content:generate` task

@@ -170,6 +170,7 @@ Every content file is parsed with its Zod schema from `packages/content` at buil
 - Every `<Term id>` in a lesson and every entry in its `glossary` frontmatter exists in `content/glossary/`.
 - Every `<Term id>` in a lesson body is also listed in its `glossary` frontmatter, because the glossary's "যে পাঠে আছে" list is built from the frontmatter.
 - Every lesson id in `prerequisites` exists.
+- A `previousSlugs` entry is neither the URL of a lesson in the build nor claimed by a second lesson; either would shadow a page or send readers to the wrong lesson. Checked when the redirects are built (`packages/content/src/redirects.ts`, called from `redirects()` in `next.config.ts`), so a conflict fails the build.
 - No `published` or `updated` date is after the build date, taken in the site time zone (`site.timeZone`, Asia/Dhaka, where authors date their lessons), so a typo like 2027 cannot keep a lesson "new" for a year.
 - Every glossary entry's `track` exists.
 - A published lesson only references published content: its `<Term id>`, `glossary` and `prerequisites` entries must not point to drafts. The build fails otherwise.

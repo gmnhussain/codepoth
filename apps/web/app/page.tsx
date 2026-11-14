@@ -16,6 +16,7 @@ import { site } from "@workspace/config/site"
 import { t } from "@workspace/config/t"
 import { getContentGraph } from "@workspace/content/content"
 import { homeStartLesson } from "@workspace/content/home"
+import { websiteJsonLd } from "@workspace/content/json-ld"
 import { buildRoadmap } from "@workspace/content/roadmap"
 import { roadmapTrackUrl } from "@workspace/content/routes"
 import { buttonVariants } from "@workspace/ui/components/button"
@@ -26,6 +27,7 @@ import { AuthorCard } from "@/components/home/author-card"
 import { RoadmapPreview } from "@/components/home/roadmap-preview"
 import { StartRouteCard } from "@/components/home/start-route-card"
 import { WhatsNew } from "@/components/home/whats-new"
+import { JsonLd } from "@/components/json-ld"
 import { buildPageMetadata } from "@/lib/metadata"
 
 export function generateMetadata(): Metadata {
@@ -90,6 +92,7 @@ export default function HomePage() {
 
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-22 px-4 pt-14 pb-22 sm:px-8">
+      <JsonLd data={websiteJsonLd(t("site.tagline"))} />
       <section aria-labelledby="hero-heading" className="flex flex-col gap-9">
         <div className="flex flex-col gap-12 lg:flex-row lg:items-center">
           <div className="flex min-w-0 flex-col gap-6 lg:flex-5">
