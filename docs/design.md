@@ -8,11 +8,18 @@ Tokens are CSS variables mapped onto the shadcn theme variables in `packages/ui`
 
 ## Fonts
 
-Loading rules (`next/font`, subsets, `swap`): [performance.md](development/performance.md#fonts).
+Loading rules (`next/font`, subsets, `swap`): [performance.md](development/performance.md#fonts). Loaded in `apps/web/app/layout.tsx`.
 
-- Anek Bangla — headings, 500–700
-- Hind Siliguri — body, 400–600, line-height 1.85
-- JetBrains Mono — code
+| Font           | Use                    | Loaded as                     | Utility        |
+| -------------- | ---------------------- | ----------------------------- | -------------- |
+| Anek Bangla    | headings (`h1`–`h4`)   | variable font, one file       | `font-heading` |
+| Hind Siliguri  | body, UI               | static, weights 400, 500, 600 | `font-sans`    |
+| JetBrains Mono | code, numbers in chips | variable font, Latin only     | `font-mono`    |
+
+- next/font exposes `--font-display`, `--font-body` and `--font-code`; `globals.css` maps them to `font-heading`, `font-sans` and `font-mono`. The names differ from the Tailwind theme variables so no variable refers to itself.
+- JetBrains Mono has no Bangla glyphs, so `font-mono` falls back to Hind Siliguri for Bangla text in code (comments, strings).
+- Anek Bangla and Hind Siliguri are preloaded (Bangla + Latin subsets, about 340 KB across 8 files measured on the first build); JetBrains Mono is not. Re-measure with Lighthouse when the pages exist.
+- Heading weights in use: 500–700. Body line height: `leading-reading` (1.85, see [Type scale](#type-scale)).
 
 ## Colors
 

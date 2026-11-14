@@ -1,14 +1,33 @@
-import { Geist_Mono, Inter } from "next/font/google"
+import { Anek_Bangla, Hind_Siliguri, JetBrains_Mono } from "next/font/google"
 
 import "@workspace/ui/globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { cn } from "@workspace/ui/lib/utils"
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
+// Fonts and weights: docs/design.md#fonts. Anek Bangla is variable, so it loads
+// as one file without a weight list (docs/development/performance.md#fonts).
+const displayFont = Anek_Bangla({
+  subsets: ["bengali", "latin"],
+  display: "swap",
+  variable: "--font-display",
+})
 
-const fontMono = Geist_Mono({
+// Hind Siliguri has no variable version, so each weight in use is listed.
+const bodyFont = Hind_Siliguri({
+  subsets: ["bengali", "latin"],
+  weight: ["400", "500", "600"],
+  display: "swap",
+  variable: "--font-body",
+})
+
+// No Bangla subset; Bangla characters in code fall back to the body font.
+// Not preloaded: code is rarely above the fold, and preloading would add
+// ~40 KB to every page.
+const codeFont = JetBrains_Mono({
   subsets: ["latin"],
-  variable: "--font-mono",
+  display: "swap",
+  preload: false,
+  variable: "--font-code",
 })
 
 export default function RootLayout({
@@ -18,13 +37,13 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="bn"
       suppressHydrationWarning
       className={cn(
-        "antialiased",
-        fontMono.variable,
-        "font-sans",
-        inter.variable
+        "font-sans antialiased",
+        displayFont.variable,
+        bodyFont.variable,
+        codeFont.variable
       )}
     >
       <body>
