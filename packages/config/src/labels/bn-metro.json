@@ -79,6 +79,26 @@
     "sectionCount": "লেখকের {n}টি অংশ",
     "tocCurrent": "এই পাঠে · {section}"
   },
+  "topic": {
+    "lessonCount": "{n}টি পাঠ",
+    "groupCount": "{n}টি গ্রুপ",
+    "totalHours": "মোট ~{n} ঘণ্টা",
+    "totalMinutes": "মোট ~{n} মিনিট",
+    "minutesShort": "{n} মি",
+    "minutesSr": ", {n} মিনিট",
+    "interchangeNote": "ইন্টারচেঞ্জ — এখান থেকে বদল করা যায়: {tracks}",
+    "startHeading": "এই স্টেশন শুরু করো",
+    "start": "শুরু করো",
+    "firstLesson": "প্রথম পাঠ: {lesson}",
+    "lessonsHeading": "পাঠসমূহ",
+    "groupSummary": "{groups}টি গ্রুপে {n}টি পাঠ — ক্রম ধরে পড়লে সবচেয়ে সহজ",
+    "groupKicker": "গ্রুপ {n}",
+    "prerequisites": "আগে যা জানা দরকার",
+    "prerequisitesHint": "এই স্টেশন শুরুর আগে এগুলো জানা থাকলে সহজ হবে।",
+    "after": "এরপর",
+    "afterHint": "এই লাইনে পরের স্টেশন।",
+    "planned": "পরিকল্পনায় আছে"
+  },
   "quiz": {
     "count": "{n}টি প্রশ্ন",
     "question": "প্রশ্ন {n}",

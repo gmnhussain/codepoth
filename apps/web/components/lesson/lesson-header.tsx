@@ -1,4 +1,5 @@
 import type { ReactNode } from "react"
+import Link from "next/link"
 
 import {
   formatDate,
@@ -7,7 +8,7 @@ import {
 } from "@workspace/config/format"
 import { t } from "@workspace/config/t"
 import type { ContentGraph, GraphLesson } from "@workspace/content/graph"
-import { topicPositionOn } from "@workspace/content/routes"
+import { groupAnchorOf, topicPositionOn } from "@workspace/content/routes"
 
 import { Chip } from "@/components/chip"
 
@@ -37,12 +38,21 @@ export function LessonHeader({
       ? undefined
       : topicPositionOn(graph, lesson.track, topic)
 
-  const crumbs = [
-    t("nav.roadmap"),
-    track?.titleEn,
-    topic?.title,
-    group?.title,
-  ].filter((crumb): crumb is string => crumb !== undefined)
+  // Topic and group link to the topic page; the roadmap link arrives with
+  // the roadmap page (conventions §2).
+  const crumbs: readonly { label: string; href?: string }[] = [
+    { label: t("nav.roadmap") },
+    ...(track === undefined ? [] : [{ label: track.titleEn }]),
+    ...(topic === undefined ? [] : [{ label: topic.title, href: topic.url }]),
+    ...(topic === undefined || group === undefined
+      ? []
+      : [
+          {
+            label: group.title,
+            href: `${topic.url}#${groupAnchorOf(group.slug)}`,
+          },
+        ]),
+  ]
 
   return (
     <header className="flex flex-col gap-5">
@@ -50,8 +60,17 @@ export function LessonHeader({
         <nav aria-label={t("lesson.breadcrumb")} className="min-w-0">
           <ol className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
             {crumbs.map((crumb) => (
-              <li key={crumb} className="flex items-center gap-2">
-                <span>{crumb}</span>
+              <li key={crumb.label} className="flex items-center gap-2">
+                {crumb.href === undefined ? (
+                  <span>{crumb.label}</span>
+                ) : (
+                  <Link
+                    href={crumb.href}
+                    className="underline decoration-foreground/30 underline-offset-4 hover:text-foreground"
+                  >
+                    {crumb.label}
+                  </Link>
+                )}
                 <span aria-hidden="true">/</span>
               </li>
             ))}

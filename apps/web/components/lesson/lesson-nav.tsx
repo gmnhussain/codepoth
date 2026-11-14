@@ -9,6 +9,8 @@ import type {
 } from "@workspace/content/graph"
 import { cn } from "@workspace/ui/lib/utils"
 
+import { TopicName } from "@/components/topic/topic-name"
+
 /**
  * 40px rows in the desktop column (mouse); 44px on touch screens and inside
  * the drawer (design.md#accessibility).
@@ -94,8 +96,8 @@ function TopicLessons({
 
 /**
  * The lesson's track as a vertical line of topics; the current topic opens
- * to its groups and lessons. Topics become links when topic pages exist; the
- * reader's done/total counts arrive with reader progress (Phase 3).
+ * to its groups and lessons. Topics link to their pages (planned topics are
+ * plain text); the reader's done/total counts arrive with reader progress.
  */
 export function LessonNav({
   graph,
@@ -125,7 +127,7 @@ export function LessonNav({
         <p className="font-heading text-lg font-semibold">{track.titleEn}</p>
         <p className="text-sm text-muted-foreground">{track.title}</p>
       </div>
-      <ol className="ms-1.5 flex flex-col gap-3 border-s-2 border-track-dot/40">
+      <ol className="ms-1.5 flex flex-col gap-1 border-s-2 border-track-dot/40">
         {track.topicKeys.map((key) => {
           const topic = graph.topicByKey.get(key)
           if (topic === undefined) return null
@@ -135,22 +137,26 @@ export function LessonNav({
               <span
                 aria-hidden="true"
                 className={cn(
-                  "absolute -start-1.5 top-2 size-2.5 rounded-full border-2 border-track-dot bg-background",
+                  "absolute -start-1.5 top-3.5 size-2.5 rounded-full border-2 border-track-dot bg-background",
                   isCurrent && "bg-track-dot",
                   topic.isInterchange && "ring-2 ring-foreground"
                 )}
               />
-              <span
+              <div
                 className={cn(
-                  "block text-sm leading-snug",
+                  TARGET_HEIGHT,
+                  "flex items-center text-sm leading-snug",
                   isCurrent ? "font-semibold" : "text-foreground/80"
                 )}
               >
-                {topic.title}
+                <TopicName
+                  topic={topic}
+                  className="flex flex-1 items-center self-stretch"
+                />
                 {topic.isInterchange ? (
                   <span className="sr-only"> {t("lesson.interchange")}</span>
                 ) : null}
-              </span>
+              </div>
               {isCurrent ? (
                 <TopicLessons graph={graph} topic={topic} current={lesson} />
               ) : null}

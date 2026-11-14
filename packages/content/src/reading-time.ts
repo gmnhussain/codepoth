@@ -39,3 +39,24 @@ export function readingMinutesOf(body: string): number {
   const minutes = words / WORDS_PER_MINUTE + codeLines / CODE_LINES_PER_MINUTE
   return Math.max(1, Math.ceil(minutes))
 }
+
+/** From this many minutes a total is shown in hours. */
+export const HOURS_FROM_MINUTES = 90
+
+/** Totals under an hour and a half are rounded to this many minutes. */
+const MINUTE_STEP = 5
+
+/**
+ * A total reading time as the design shows it: whole hours from 90 minutes,
+ * otherwise minutes rounded to 5 (never 0).
+ */
+export function roundedDuration(minutes: number): {
+  readonly unit: "hours" | "minutes"
+  readonly value: number
+} {
+  if (minutes >= HOURS_FROM_MINUTES) {
+    return { unit: "hours", value: Math.round(minutes / 60) }
+  }
+  const rounded = Math.round(minutes / MINUTE_STEP) * MINUTE_STEP
+  return { unit: "minutes", value: Math.max(MINUTE_STEP, rounded) }
+}

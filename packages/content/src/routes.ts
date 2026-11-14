@@ -7,9 +7,50 @@ export type LessonRouteParams = {
   readonly lesson: string
 }
 
+/** URL segments of a topic page: `/learn/[track]/[topic]` (ADR-0006). */
+export type TopicRouteParams = {
+  readonly track: string
+  readonly topic: string
+}
+
 /** Topic folder name from a topic key (`frontend/react` → `react`). */
 function topicSlugOf(topicKey: string): string {
   return topicKey.slice(topicKey.indexOf("/") + 1)
+}
+
+/** Params for every topic page: topics with at least one lesson in this build (ADR-0009). */
+export function topicRouteParams(graph: ContentGraph): TopicRouteParams[] {
+  return [...graph.topicByKey.values()]
+    .filter((topic) => topic.hasPage)
+    .map((topic) => ({ track: topic.track, topic: topic.slug }))
+}
+
+/** The topic at these URL segments if it has a page, or undefined. */
+export function findTopic(
+  graph: ContentGraph,
+  params: TopicRouteParams
+): GraphTopic | undefined {
+  const topic = graph.topicByKey.get(`${params.track}/${params.topic}`)
+  return topic?.hasPage === true ? topic : undefined
+}
+
+/** The topic after `topicKey` on a track, or undefined at the end of the line. */
+export function nextTopicOn(
+  graph: ContentGraph,
+  trackId: string,
+  topicKey: string
+): GraphTopic | undefined {
+  const keys =
+    graph.tracks.find((track) => track.id === trackId)?.topicKeys ?? []
+  const next = keys[keys.indexOf(topicKey) + 1]
+  return keys.includes(topicKey) && next !== undefined
+    ? graph.topicByKey.get(next)
+    : undefined
+}
+
+/** Id of a group's section on its topic page, the target of `#group-…` links. */
+export function groupAnchorOf(groupSlug: string): string {
+  return `group-${groupSlug}`
 }
 
 /** Params for every lesson page in this build (drafts only when included). */

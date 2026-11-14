@@ -1,6 +1,20 @@
 import { describe, expect, it } from "vitest"
 
-import { measureBody, readingMinutesOf } from "./reading-time"
+import { measureBody, readingMinutesOf, roundedDuration } from "./reading-time"
+
+describe("roundedDuration", () => {
+  it("rounds totals under 90 minutes to 5 minutes, never 0", () => {
+    expect(roundedDuration(1)).toEqual({ unit: "minutes", value: 5 })
+    expect(roundedDuration(12)).toEqual({ unit: "minutes", value: 10 })
+    expect(roundedDuration(13)).toEqual({ unit: "minutes", value: 15 })
+    expect(roundedDuration(89)).toEqual({ unit: "minutes", value: 90 })
+  })
+
+  it("switches to whole hours at 90 minutes", () => {
+    expect(roundedDuration(90)).toEqual({ unit: "hours", value: 2 })
+    expect(roundedDuration(150)).toEqual({ unit: "hours", value: 3 })
+  })
+})
 
 describe("measureBody", () => {
   it("counts prose words and non-empty code lines separately", () => {

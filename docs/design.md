@@ -198,6 +198,20 @@ The MDX components for lesson bodies live in `apps/web/components/mdx/` and are 
 - "এই পাঠে": the lesson's blocks with the author's `###` sections nested under them, numbered like the blocks, and prev/next. The current entry (`aria-current="location"`) follows the scroll position; a link into the closed deep dive opens it first.
 - The reader's done/total counts and the progress card arrive with reader progress.
 
+## Topic page
+
+`/learn/[track]/[topic]`, only for topics with a lesson in the build (ADR-0009), accent from the topic's home track.
+
+- Header: breadcrumb, the track strip (topics on a horizontal line, the current one larger; scrolls sideways on narrow screens), title, description, chips (track · line, position, lesson count, total time, group count) and, for an interchange, the other tracks.
+- "শুরু করো" card linking to the first lesson.
+- "পাঠসমূহ": each group as a section with id `group-{slug}` (the lesson breadcrumb's group links here), its description, lesson count and total time, then its lessons (number, title, minutes) as 48px rows.
+- "আগে যা জানা দরকার" (prerequisites) and "এরপর" (the next topic on the track) as cards.
+- Topic names are links everywhere; a planned topic (no published lesson) is plain text marked "পরিকল্পনায় আছে".
+- The track strip starts with the current topic centred (a small island sets the strip's `scrollLeft`; no `scrollIntoView`, no smooth scroll).
+- Numbered rows (here and in later lists such as Contents and the roadmap): the number is `aria-hidden` (the `<ol>` gives the order) and short units get a screen-reader form, so a row's name reads "JSX, ১ মিনিট", not "১JSX১ মি".
+- Totals are whole hours from 90 minutes, otherwise minutes rounded to 5 (`roundedDuration`).
+- The reader's state per lesson, "এখন পড়ছ" and the progress card arrive with reader progress.
+
 ## shadcn customisations
 
 Generated shadcn components (`packages/ui/src/components/`) are added with the CLI and not edited, except for the changes listed here. Re-apply them whenever a component is regenerated.
