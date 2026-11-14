@@ -28,6 +28,24 @@ describe("compileLesson", () => {
     expect(code).toContain('id: "প্রথম-অংশ"')
   })
 
+  it("lists the blocks a lesson has, in order", async () => {
+    const full = await compileLesson(ALL_BLOCKS.join("\n\n"), published)
+    expect(full.blocks).toEqual([
+      "summary",
+      "concept",
+      "example",
+      "mistakes",
+      "deep-dive",
+      "practice",
+      "quiz",
+    ])
+    const partial = await compileLesson(
+      [ALL_BLOCKS[0], ALL_BLOCKS[2]].join("\n\n"),
+      draft
+    )
+    expect(partial.blocks).toEqual(["summary", "example"])
+  })
+
   it("highlights fenced code with a file name, and leaves inline code plain", async () => {
     const { code } = await compileLesson(
       ALL_BLOCKS.join("\n\n").replace("ধারণা।", "ধারণা `x`।"),
@@ -50,6 +68,7 @@ describe("compileLesson", () => {
   it("accepts an empty draft stub", async () => {
     await expect(compileLesson("", draft)).resolves.toEqual({
       code: expect.any(String) as string,
+      blocks: [],
       sections: [],
     })
   })

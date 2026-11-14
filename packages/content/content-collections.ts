@@ -76,10 +76,16 @@ const lessons = defineCollection({
   schema: lessonDocumentSchema,
   transform: async (lesson) => {
     const location = parseLessonPath(tracksPath(lesson._meta.filePath))
-    const { code, sections } = await compileLesson(lesson.content, {
+    const { code, blocks, sections } = await compileLesson(lesson.content, {
       isPublished: !lesson.draft,
     })
-    return { ...lesson, location, mdx: code, sections: [...sections] }
+    return {
+      ...lesson,
+      location,
+      mdx: code,
+      blocks: [...blocks],
+      sections: [...sections],
+    }
   },
 })
 

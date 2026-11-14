@@ -70,7 +70,14 @@
     "prevGroup": "আগের গ্রুপ: {group}",
     "nextGroup": "পরের গ্রুপ: {group}",
     "prevTopic": "আগের স্টেশন: {topic}",
-    "nextTopic": "পরের স্টেশন: {topic}"
+    "nextTopic": "পরের স্টেশন: {topic}",
+    "trackNav": "{track} লাইনের স্টেশন",
+    "openTrackNav": "স্টেশন তালিকা",
+    "interchange": "ইন্টারচেঞ্জ",
+    "interchangeNote": "{topic} একটা ইন্টারচেঞ্জ — এখান থেকে {tracks} লাইনে বদল করা যায়।",
+    "inThisLesson": "এই পাঠে",
+    "sectionCount": "লেখকের {n}টি অংশ",
+    "tocCurrent": "এই পাঠে · {section}"
   },
   "quiz": {
     "count": "{n}টি প্রশ্ন",

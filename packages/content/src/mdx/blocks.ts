@@ -109,6 +109,7 @@ export function remarkLessonBlocks({
 
     if (problems.length > 0) file.fail(problems.join("; "))
     file.data.sections = sections
+    file.data.blocks = seen
   }
 }
 

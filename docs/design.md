@@ -184,6 +184,20 @@ The MDX components for lesson bodies live in `apps/web/components/mdx/` and are 
   - `<Quiz />`: one fieldset per question whose options are buttons, not radios, so arrow keys never answer by accident: Tab moves between options, Enter or Space answers. An answered question locks (`aria-disabled`, so focus stays) and shows ✓/✗, the explanation in a live region, the score and "আবার চেষ্টা করো". `backtick` spans in quiz text show as inline code. The score is not saved yet (reader progress).
   - `<Term>`'s trigger has no `aria-label`: its visible text is its name (WCAG 2.5.3).
 
+## Lesson page
+
+`/learn/[track]/[topic]/[lesson]` (`apps/web/app/learn/…/page.tsx`), accent from the lesson's home track.
+
+| Width        | Left: track navigation                                               | Right: "এই পাঠে"                           |
+| ------------ | -------------------------------------------------------------------- | ------------------------------------------ |
+| `xl` and up  | Sticky column                                                        | Sticky column, follows the scroll position |
+| `lg` to `xl` | Sticky column                                                        | Collapsible bar above the summary          |
+| Below `lg`   | Drawer (`AppSheetContent`, left) from a button beside the breadcrumb | Collapsible bar above the summary          |
+
+- Track navigation: the track's topics on a vertical line in the track colour; interchange topics have a ring. The current topic opens to its groups (`<details>`, current group open) or loose lessons; the current lesson is marked (`aria-current="page"`). A note explains an interchange. The nav sets its own `data-track-color`, because the drawer renders outside the page wrapper.
+- "এই পাঠে": the lesson's blocks with the author's `###` sections nested under them, numbered like the blocks, and prev/next. The current entry (`aria-current="location"`) follows the scroll position; a link into the closed deep dive opens it first.
+- The reader's done/total counts and the progress card arrive with reader progress.
+
 ## shadcn customisations
 
 Generated shadcn components (`packages/ui/src/components/`) are added with the CLI and not edited, except for the changes listed here. Re-apply them whenever a component is regenerated.

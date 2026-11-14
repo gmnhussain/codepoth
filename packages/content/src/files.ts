@@ -1,3 +1,4 @@
+import type { LessonBlockId } from "./mdx/block-list"
 import type { LessonSection } from "./mdx/blocks"
 import type { LessonLocation, MetaLocation } from "./paths"
 import type { GlossaryTerm } from "./schemas/glossary-term.schema"
@@ -18,6 +19,8 @@ export type LessonFile = LessonFrontmatter & {
   readonly location: LessonLocation
   /** Compiled MDX function body (src/mdx/compile.ts). */
   readonly mdx: string
+  /** The template blocks the lesson has, in order (a draft may have none). */
+  readonly blocks: readonly LessonBlockId[]
   /** Author sections (`###`) and the block each sits in. */
   readonly sections: readonly LessonSection[]
 }

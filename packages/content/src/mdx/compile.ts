@@ -2,6 +2,7 @@ import { compile } from "@mdx-js/mdx"
 import rehypePrettyCode from "rehype-pretty-code"
 import remarkGfm from "remark-gfm"
 
+import type { LessonBlockId } from "./block-list"
 import type { LessonSection } from "./blocks"
 import { remarkLessonBlocks } from "./blocks"
 
@@ -27,9 +28,10 @@ const prettyCodeOptions = {
   defaultLang: { block: "plaintext", inline: "plaintext" },
 }
 
-/** A compiled lesson body and its author sections. */
+/** A compiled lesson body, the blocks it has (in order) and its author sections. */
 export type CompiledLesson = {
   readonly code: string
+  readonly blocks: readonly LessonBlockId[]
   readonly sections: readonly LessonSection[]
 }
 
@@ -44,7 +46,8 @@ export async function compileLesson(
     rehypePlugins: [[rehypePrettyCode, prettyCodeOptions]],
   })
   const sections = file.data.sections as readonly LessonSection[] | undefined
-  return { code: String(file), sections: sections ?? [] }
+  const blocks = file.data.blocks as readonly LessonBlockId[] | undefined
+  return { code: String(file), blocks: blocks ?? [], sections: sections ?? [] }
 }
 
 /** Compiles a glossary definition (plain MDX, no template blocks). */

@@ -1,6 +1,20 @@
 import { describe, expect, it } from "vitest"
 
-import { formatDate, formatNumber, formatTwoDigits, formatYear } from "./format"
+import {
+  formatDate,
+  formatList,
+  formatNumber,
+  formatTwoDigits,
+  formatYear,
+} from "./format"
+
+describe("formatList", () => {
+  it("joins one, two and three names as Bangla prose", () => {
+    expect(formatList(["Frontend"])).toBe("Frontend")
+    expect(formatList(["Frontend", "Mobile"])).toBe("Frontend এবং Mobile")
+    expect(formatList(["A", "B", "C"])).toBe("A, B এবং C")
+  })
+})
 
 describe("formatNumber", () => {
   it("uses Bangla digits", () => {

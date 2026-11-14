@@ -6,6 +6,8 @@ import { NEXT_SECTION_NUMBER } from "@workspace/content/blocks"
 import type { ContentGraph, Neighbour } from "@workspace/content/graph"
 import { neighboursOf } from "@workspace/content/graph"
 
+import { PAGER_HEADING_ID } from "@/components/lesson/toc-items"
+
 /** "পরের গ্রুপ: Hooks" or "আগের স্টেশন: React" when the neighbour starts a new group or topic. */
 function boundaryNote(
   graph: ContentGraph,
@@ -78,10 +80,13 @@ export function LessonPager({
   const { previous, next } = neighboursOf(graph, lessonId)
   if (previous === undefined && next === undefined) return null
   return (
-    <section aria-labelledby="next-heading" className="flex flex-col gap-5">
+    <section
+      aria-labelledby={PAGER_HEADING_ID}
+      className="flex scroll-mt-24 flex-col gap-5"
+    >
       <h2
-        id="next-heading"
-        className="flex items-center gap-3 text-3xl font-semibold"
+        id={PAGER_HEADING_ID}
+        className="flex scroll-mt-24 items-center gap-3 text-3xl font-semibold"
       >
         <span
           aria-hidden="true"

@@ -1,3 +1,5 @@
+import type { ReactNode } from "react"
+
 import {
   formatDate,
   formatNumber,
@@ -17,9 +19,12 @@ import { Chip } from "@/components/chip"
 export function LessonHeader({
   graph,
   lesson,
+  navTrigger,
 }: {
   readonly graph: ContentGraph
   readonly lesson: GraphLesson
+  /** The track-navigation drawer button, shown beside the breadcrumb below `lg`. */
+  readonly navTrigger?: ReactNode
 }) {
   const track = graph.tracks.find((item) => item.id === lesson.track)
   const topic = graph.topicByKey.get(lesson.topicKey)
@@ -41,19 +46,22 @@ export function LessonHeader({
 
   return (
     <header className="flex flex-col gap-5">
-      <nav aria-label={t("lesson.breadcrumb")}>
-        <ol className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
-          {crumbs.map((crumb) => (
-            <li key={crumb} className="flex items-center gap-2">
-              <span>{crumb}</span>
-              <span aria-hidden="true">/</span>
+      <div className="flex items-start justify-between gap-3">
+        <nav aria-label={t("lesson.breadcrumb")} className="min-w-0">
+          <ol className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
+            {crumbs.map((crumb) => (
+              <li key={crumb} className="flex items-center gap-2">
+                <span>{crumb}</span>
+                <span aria-hidden="true">/</span>
+              </li>
+            ))}
+            <li aria-current="page" className="text-foreground">
+              {lesson.title}
             </li>
-          ))}
-          <li aria-current="page" className="text-foreground">
-            {lesson.title}
-          </li>
-        </ol>
-      </nav>
+          </ol>
+        </nav>
+        {navTrigger}
+      </div>
 
       <div className="flex flex-wrap gap-2">
         {track === undefined ? null : (

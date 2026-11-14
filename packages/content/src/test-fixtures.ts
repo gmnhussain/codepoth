@@ -44,6 +44,7 @@ export function lesson(input: LessonInput): LessonFile {
     quiz: QUIZ,
     content: "কয়েকটা শব্দ।",
     mdx: "",
+    blocks: [],
     sections: [],
     ...input,
   }

@@ -32,6 +32,13 @@ export function formatNumber(value: number): string {
   return numberFormat.format(value)
 }
 
+const listFormat = new Intl.ListFormat(UI_LOCALE, { type: "conjunction" })
+
+/** Joins names as Bangla prose, e.g. `["Frontend", "Mobile"]` → `"Frontend এবং Mobile"`. */
+export function formatList(items: readonly string[]): string {
+  return listFormat.format(items)
+}
+
 /** Formats a number with at least two Bangla digits, e.g. `1` → `"০১"` (block numbers). */
 export function formatTwoDigits(value: number): string {
   return twoDigitFormat.format(value)
