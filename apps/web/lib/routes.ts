@@ -16,6 +16,7 @@ export const NAV_ROUTES = [
   { href: "/roadmap", labelKey: "nav.roadmap" },
   { href: "/contents", labelKey: "nav.contents" },
   { href: "/glossary", labelKey: "nav.glossary" },
+  { href: "/dashboard", labelKey: "nav.dashboard" },
 ] as const satisfies readonly NavRoute[]
 
 /** Whether `pathname` is `href` or a page below it ("/" matches only itself). */

@@ -260,6 +260,10 @@ The MDX components for lesson bodies live in `apps/web/components/mdx/` and are 
 - Author block (`#author`): name, bio and initials from `site.author`; only the profile links that are set render.
 - The resume card ("যেখানে থেমেছিলে") arrives with reader progress.
 
+## Dashboard page
+
+`/dashboard` in its first-visit state (D-32, D-40): title, subtitle, a "এখনো কিছু সেভ হয়নি" chip, and an empty-state card (a line with only the first station reached, a welcome, and what will collect here). "প্রথম পাঠ শুরু করো" goes to the same lesson as Home's "শুরু করো" (`homeStartLesson`) and is left out while nothing is published, when "রোডম্যাপ দেখো" becomes the main button. Progress, quiz results, bookmarks, the reading heatmap and export/import (with the empty state's import link) arrive with reader progress.
+
 ## shadcn customisations
 
 Generated shadcn components (`packages/ui/src/components/`) are added with the CLI and not edited, except for the changes listed here. Re-apply them whenever a component is regenerated.
