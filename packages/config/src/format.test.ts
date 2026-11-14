@@ -37,4 +37,9 @@ describe("formatYear", () => {
   it("shows the year in Bangla digits without grouping", () => {
     expect(formatYear(new Date("2026-11-14T12:00:00Z"))).toBe("২০২৬")
   })
+
+  it("takes the year in the site time zone", () => {
+    // 2027-01-01 01:00 in Dhaka
+    expect(formatYear(new Date("2026-12-31T19:00:00Z"))).toBe("২০২৭")
+  })
 })

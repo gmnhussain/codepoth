@@ -26,7 +26,8 @@
     "./t": "./src/t.ts",
     "./format": "./src/format.ts",
     "./track-colors": "./src/track-colors.ts",
-    "./logo": "./src/logo.tsx"
+    "./logo": "./src/logo.tsx",
+    "./today": "./src/today.ts"
   },
   "peerDependencies": {
     "react": "catalog:"

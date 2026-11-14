@@ -161,7 +161,7 @@ Every content file is parsed with its Zod schema from `packages/content` at buil
 - Every topic prerequisite (`@track/topic`) exists.
 - Every `<Term id>` in a lesson and every entry in its `glossary` frontmatter exists in `content/glossary/`.
 - Every lesson id in `prerequisites` exists.
-- No `published` or `updated` date is after the build date (UTC), so a typo like 2027 cannot keep a lesson "new" for a year.
+- No `published` or `updated` date is after the build date, taken in the site time zone (`site.timeZone`, Asia/Dhaka, where authors date their lessons), so a typo like 2027 cannot keep a lesson "new" for a year.
 - Every glossary entry's `track` exists.
 - A published lesson only references published content: its `<Term id>`, `glossary` and `prerequisites` entries must not point to drafts. The build fails otherwise.
 - Every topic reference in `start-routes.json` resolves to an existing topic. A topic without published lessons is shown as planned, not rejected.

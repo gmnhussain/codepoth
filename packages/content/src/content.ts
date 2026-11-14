@@ -8,6 +8,8 @@ import {
   startRoutes,
   tracksOrder,
 } from "../.content-collections/generated"
+import { siteToday } from "@workspace/config/today"
+
 import { contentOptionsFrom } from "./env"
 import type { ContentFiles } from "./files"
 import type { ContentGraph } from "./graph"
@@ -36,8 +38,8 @@ export function getContentGraph(
   now: () => Date = () => new Date()
 ): ContentGraph {
   if (cachedGraph !== undefined) return cachedGraph
-  // The build date in UTC, the time zone of the Vercel build machines.
-  const today = now().toISOString().slice(0, 10)
+  // The build date in the site time zone, where authors date their lessons.
+  const today = siteToday(now())
   const { graph, warnings } = loadContent(
     contentFiles,
     contentOptionsFrom(process.env),

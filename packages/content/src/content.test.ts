@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest"
 
+import { siteToday } from "@workspace/config/today"
+
 import { contentFiles } from "./content"
 import { buildContentGraph } from "./graph"
 import { validateContent } from "./validate"
@@ -7,7 +9,7 @@ import { validateContent } from "./validate"
 // Content validation over the real content/ folder (conventions §14). Runs on
 // the output of `content:generate`, which turbo runs first. Warnings fail here
 // too, so a topic missing from the map fails locally and in CI.
-const today = new Date().toISOString().slice(0, 10)
+const today = siteToday()
 
 describe("content/", () => {
   it("passes every cross-file rule with no warnings", () => {

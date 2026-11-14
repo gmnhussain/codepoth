@@ -6,6 +6,8 @@
 export const site = {
   name: { bn: "কোডপথ", en: "CodePoth" },
   url: "https://codepoth.nazmulhussain.com",
+  /** Time zone authors date content in; the build date is taken in it. */
+  timeZone: "Asia/Dhaka",
   author: {
     name: { bn: "জি. এম. নাজমুল হুসাইন", en: "G. M. Nazmul Hussain" },
     links: {

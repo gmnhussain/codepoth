@@ -1,3 +1,5 @@
+import { site } from "./site"
+
 /** Locale for every number and date shown in the UI: Bangla digits and month names. */
 export const UI_LOCALE = "bn-BD"
 
@@ -12,9 +14,10 @@ const dateFormat = new Intl.DateTimeFormat(UI_LOCALE, {
   timeZone: "UTC",
 })
 
+// An instant (e.g. the build time) belongs to the year of the site time zone.
 const yearFormat = new Intl.DateTimeFormat(UI_LOCALE, {
   year: "numeric",
-  timeZone: "UTC",
+  timeZone: site.timeZone,
 })
 
 const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/
@@ -39,7 +42,7 @@ export function formatDate(isoDate: string): string {
   return dateFormat.format(date)
 }
 
-/** Formats the year of a date without digit grouping, e.g. `"২০২৬"`. */
+/** Formats the year of an instant in the site time zone, without grouping, e.g. `"২০২৬"`. */
 export function formatYear(date: Date): string {
   return yearFormat.format(date)
 }

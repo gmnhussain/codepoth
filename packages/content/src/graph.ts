@@ -376,7 +376,7 @@ export const FRESH_DAYS = 30
 
 /**
  * "new" if published in the last `FRESH_DAYS` days, else "updated" if updated
- * in them. `today` is YYYY-MM-DD; at build time it is the build date.
+ * in them. `today` is YYYY-MM-DD: the build date from `siteToday()`.
  */
 export function freshnessOf(
   lesson: Pick<GraphLesson, "published" | "updated">,
