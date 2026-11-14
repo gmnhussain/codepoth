@@ -1,0 +1,5 @@
+{
+  "title": "Documentation",
+  "description": "README, ADR আর কোড কমেন্ট — ভবিষ্যতের পাঠকের জন্য চিঠি।",
+  "order": ["readme", "adr"]
+}

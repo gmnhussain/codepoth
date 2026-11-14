@@ -1,0 +1,5 @@
+{
+  "title": "Secrets Management",
+  "description": "API key আর password কোডে না রেখে নিরাপদে চালানো।",
+  "order": ["environment-variable", "secret-manager"]
+}

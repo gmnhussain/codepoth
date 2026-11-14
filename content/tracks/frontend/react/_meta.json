@@ -1,0 +1,6 @@
+{
+  "title": "React",
+  "description": "Component দিয়ে UI ভাগ করে বানানো, state দিয়ে তা জীবন্ত রাখা, আর Hooks দিয়ে বাইরের দুনিয়ার সাথে কাজ।",
+  "order": ["basics", "hooks", "advanced"],
+  "prerequisites": ["@lang/javascript", "@frontend/html-css"]
+}

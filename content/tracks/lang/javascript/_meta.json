@@ -1,0 +1,5 @@
+{
+  "title": "JavaScript",
+  "description": "Closure, Promise আর Event Loop — ওয়েবের মূল ভাষার ভেতরের কলকবজা।",
+  "order": ["variables", "function-scope", "closure", "promise-async-await"]
+}

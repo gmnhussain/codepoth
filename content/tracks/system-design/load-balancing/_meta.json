@@ -1,0 +1,5 @@
+{
+  "title": "Load Balancing",
+  "description": "অনেক সার্ভারে ট্রাফিক ভাগ করার কৌশল।",
+  "order": ["load-balancer", "round-robin-least-connections"]
+}

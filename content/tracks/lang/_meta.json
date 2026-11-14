@@ -1,0 +1,6 @@
+{
+  "title": "প্রোগ্রামিং ভাষা",
+  "titleEn": "Languages",
+  "color": "orange",
+  "order": ["c", "javascript", "typescript", "python", "go", "rust"]
+}

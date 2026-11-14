@@ -1,0 +1,13 @@
+{
+  "title": "সার্ভারের দুনিয়া",
+  "titleEn": "Backend",
+  "color": "green",
+  "order": [
+    "@cs/http",
+    "nodejs",
+    "auth",
+    "sql",
+    "api-design",
+    "background-jobs"
+  ]
+}

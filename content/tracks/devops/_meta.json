@@ -1,0 +1,14 @@
+{
+  "title": "ডিপ্লয় ও অপারেশন",
+  "titleEn": "DevOps",
+  "color": "blue",
+  "order": [
+    "@tools/linux",
+    "docker",
+    "secrets-management",
+    "ci-cd",
+    "kubernetes",
+    "cloud",
+    "observability"
+  ]
+}

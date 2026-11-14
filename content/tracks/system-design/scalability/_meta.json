@@ -1,0 +1,5 @@
+{
+  "title": "Scalability",
+  "description": "Vertical বনাম Horizontal scaling আর bottleneck খোঁজা।",
+  "order": ["vertical-horizontal", "bottleneck"]
+}

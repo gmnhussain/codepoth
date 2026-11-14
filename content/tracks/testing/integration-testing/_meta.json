@@ -1,0 +1,5 @@
+{
+  "title": "Integration Testing",
+  "description": "কয়েকটা অংশ একসাথে ঠিকঠাক কাজ করছে কিনা যাচাই।",
+  "order": ["integration-test", "database"]
+}

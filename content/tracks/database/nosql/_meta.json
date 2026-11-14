@@ -1,0 +1,5 @@
+{
+  "title": "NoSQL",
+  "description": "Document, Key-Value আর কখন SQL ছেড়ে এদিকে আসবে।",
+  "order": ["document-database", "key-value-store", "sql-nosql"]
+}

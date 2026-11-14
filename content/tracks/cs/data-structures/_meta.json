@@ -1,0 +1,5 @@
+{
+  "title": "Data Structures",
+  "description": "Array, Linked List, Stack, Queue, Hash Map আর Tree — কখন কোনটা বেছে নেবে।",
+  "order": ["array-string", "linked-list", "stack-queue", "hash-map"]
+}

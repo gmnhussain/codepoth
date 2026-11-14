@@ -1,0 +1,6 @@
+{
+  "title": "ডেটা রাখা ও খোঁজা",
+  "titleEn": "Database",
+  "color": "teal",
+  "order": ["@backend/sql", "indexing", "caching", "nosql", "vector-db"]
+}

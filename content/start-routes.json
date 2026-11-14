@@ -1,0 +1,22 @@
+{
+  "routes": [
+    {
+      "level": "শুরুর ধাপ",
+      "title": "একদম নতুন",
+      "description": "আগে কখনো কোড লেখোনি? HTML & CSS দিয়ে প্রথম ওয়েবপেজ বানাও, পাশাপাশি CS Fundamentals থেকে কম্পিউটার কীভাবে ভাবে সেটা জেনে নাও।",
+      "steps": ["@frontend/html-css", "@cs/binary-logic", "@lang/javascript"]
+    },
+    {
+      "level": "মাঝের ধাপ",
+      "title": "কিছুটা জানি",
+      "description": "Variable, loop, function চেনো? JavaScript-এর গভীর অংশগুলো ঝালিয়ে নিয়ে সরাসরি React-এ চলে যাও, তারপর Backend।",
+      "steps": ["@lang/javascript", "@frontend/react", "@backend/nodejs"]
+    },
+    {
+      "level": "অভিজ্ঞদের জন্য",
+      "title": "অভিজ্ঞ",
+      "description": "ক্রম মানার দরকার নেই — যেখান থেকে খুশি শুরু করো। প্রতিটা পাঠের “গভীরে যাও” অংশে internals, trade-off আর edge case পাবে।",
+      "steps": [{ "label": "নিজের পছন্দে" }, { "label": "“গভীরে যাও”" }]
+    }
+  ]
+}

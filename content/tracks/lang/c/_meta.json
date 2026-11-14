@@ -1,0 +1,5 @@
+{
+  "title": "C",
+  "description": "Pointer আর Memory হাতে-কলমে বোঝার জন্য সবচেয়ে কাছের ভাষা।",
+  "order": ["first-program", "pointer", "memory-stack-heap"]
+}

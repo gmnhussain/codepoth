@@ -1,0 +1,11 @@
+{
+  "title": "নিরাপদ কোড",
+  "titleEn": "Security",
+  "color": "purple",
+  "order": [
+    "@backend/auth",
+    "owasp-top-10",
+    "encryption",
+    "@devops/secrets-management"
+  ]
+}

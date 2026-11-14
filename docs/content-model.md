@@ -47,7 +47,7 @@ content/
 - Topic `_meta.json`: `description` is required. Optional `start: true` marks a beginner entry topic (map flag and filter). Optional `titleEn` is used where an English name is needed.
 - Group `_meta.json`: `description` is required.
 - Groups are optional. Small topics have lessons directly. Never nest deeper than Track → Topic → Group → Lesson.
-- Sections are the lesson's own `##`/`###` headings. They are not files. The right-side TOC is generated from them, nested under the lesson block they belong to.
+- Sections are the lesson's own `###` headings inside a block. Each block renders its own `h2`, so author headings start at `###`. They are not files. The right-side TOC is generated from them, nested under the lesson block they belong to.
 - Small sub-topics (e.g. var/let/const) are Sections in one lesson. A sub-topic becomes its own Lesson only if it needs its own code, quiz, or > ~5 min of reading.
 
 ## URLs and keys
@@ -83,10 +83,10 @@ Every lesson has an `id` in frontmatter, e.g. `frontend.react.hooks.use-effect`.
 ---
 id: frontend.react.hooks.use-effect
 title: useEffect ও Side Effects
-description: Render-এর পরে বাইরের দুনিয়ার সাথে কাজ করার জায়গা।
+description: Render-এর পরে বাইরের দুনিয়ার সাথে কাজ করার জায়গা। # required unless draft: true
 published: 2026-11-12 # required unless draft: true
 updated: 2026-11-12
-level: beginner # beginner | intermediate | advanced
+level: beginner # beginner | intermediate | advanced; required unless draft: true
 draft: false # optional, default false
 glossary: [side-effect, race-condition]
 prerequisites: [frontend.react.hooks.use-state]
@@ -112,7 +112,7 @@ quiz: # 3–5 questions; required unless draft: true
 
 - Reading time is computed at build time, not written by hand: prose words ÷ a Bangla words-per-minute constant + code lines ÷ 10 per minute, rounded up, at least 1 minute.
 - "নতুন / হালনাগাদ" tags and the "নতুন কী" list are computed at build time from `published` and `updated` (30-day window), so they are as fresh as the last build.
-- Completeness rules apply only to published lessons (`draft` false): `published` and `quiz` are required, and so are the seven template blocks. A draft may be an incomplete stub. `updated` is never before `published`.
+- Completeness rules apply only to published lessons (`draft` false): `description`, `level`, `published` and `quiz` are required, and so are the seven template blocks. A draft may be an incomplete stub. `updated` is never before `published`.
 - Each quiz question has 2–4 options, a valid `answer` index and an `explanation`.
 
 ## Glossary entries
@@ -148,7 +148,7 @@ The MDX body is the definition, optionally followed by a code example. The lesso
 
 ## Start routes
 
-`content/start-routes.json` holds Home's "where to start" cards: `{ "routes": [{ "level", "title", "description", "steps": ["@track/topic" | { "label" }] }] }`. The list sits under `routes` because Content Collections needs an object at the root of a JSON file. Every topic reference must resolve to an existing topic. A step whose topic has no published lesson renders like the Map: unlinked, marked as planned; it is not a build error. Home's main "start" button goes to the first published lesson along the routes (in route and step order); if no lesson is published yet, it links to `/roadmap`.
+`content/start-routes.json` holds Home's "where to start" cards: `{ "routes": [{ "level", "title", "description", "steps": ["@track/topic" | { "label" }] }] }`. The list sits under `routes` because Content Collections needs an object at the root of a JSON file. Free labels are content, so they never use display terms such as লাইন/স্টেশন, which depend on the label set ([ADR-0003](decisions/ADR-0003-neutral-names-config-labels.md)). Every topic reference must resolve to an existing topic. A step whose topic has no published lesson renders like the Map: unlinked, marked as planned; it is not a build error. Home's main "start" button goes to the first published lesson along the routes (in route and step order); if no lesson is published yet, it links to `/roadmap`.
 
 ## Validation
 
@@ -182,7 +182,7 @@ Every lesson follows `content/_templates/lesson.mdx`. Each block is an MDX compo
 | #   | Block                               | Component    | Notes                                                                |
 | --- | ----------------------------------- | ------------ | -------------------------------------------------------------------- |
 | 1   | Summary (এক নজরে / TL;DR)           | `<Summary>`  | 3 bullets; no block number                                           |
-| 2   | Concept (ধারণা)                     | `<Concept>`  | prose, author sections (`##`), diagrams                              |
+| 2   | Concept (ধারণা)                     | `<Concept>`  | prose, author sections (`###`), diagrams                             |
 | 3   | Code (কোডে দেখি)                    | `<Example>`  | runnable, realistic example                                          |
 | 4   | Common mistakes (সাধারণ ভুল)        | `<Mistakes>` | neutral tone ("অনেকেই প্রথমে…")                                      |
 | 5   | Deep dive (গভীরে যাও)               | `<DeepDive>` | collapsible, closed by default, for experienced readers              |

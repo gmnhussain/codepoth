@@ -1,0 +1,15 @@
+---
+term: "Closure"
+termBn: "ক্লোজার"
+track: lang
+draft: true
+---
+
+যে ফাংশন তার জন্মের জায়গার variable মনে রাখে — বাইরের ফাংশন শেষ হয়ে যাওয়ার পরেও।
+
+```js
+function counter() {
+  let n = 0
+  return () => ++n // n মনে থাকে
+}
+```

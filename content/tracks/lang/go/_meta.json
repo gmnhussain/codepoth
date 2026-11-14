@@ -1,0 +1,5 @@
+{
+  "title": "Go",
+  "description": "সহজ syntax আর Goroutine দিয়ে concurrency।",
+  "order": ["go-syntax", "goroutine-channel", "error-handling"]
+}

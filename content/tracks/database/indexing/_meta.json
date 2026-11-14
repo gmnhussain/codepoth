@@ -1,0 +1,5 @@
+{
+  "title": "Indexing",
+  "description": "Index কীভাবে query দ্রুত করে, আর কখন উল্টো ধীর করে।",
+  "order": ["index", "explain-query", "when-index-hurts"]
+}

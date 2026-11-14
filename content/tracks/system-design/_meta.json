@@ -1,0 +1,13 @@
+{
+  "title": "বড় সিস্টেমের নকশা",
+  "titleEn": "System Design",
+  "color": "brown",
+  "order": [
+    "scalability",
+    "@backend/api-design",
+    "load-balancing",
+    "@database/caching",
+    "message-queues",
+    "distributed-systems"
+  ]
+}

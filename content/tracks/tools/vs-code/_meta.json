@@ -1,0 +1,5 @@
+{
+  "title": "VS Code",
+  "description": "Shortcut, Debugger আর Extension দিয়ে এডিটরকে নিজের মতো করা।",
+  "order": ["shortcut", "debugger"]
+}

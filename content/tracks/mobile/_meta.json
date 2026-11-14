@@ -1,0 +1,6 @@
+{
+  "title": "মোবাইল অ্যাপ",
+  "titleEn": "Mobile",
+  "color": "lime",
+  "order": ["@frontend/react", "react-native", "app-publishing"]
+}

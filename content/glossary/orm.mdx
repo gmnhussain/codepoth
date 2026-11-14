@@ -1,0 +1,14 @@
+---
+term: "ORM"
+termBn: "অবজেক্ট-রিলেশনাল ম্যাপিং"
+track: database
+draft: true
+---
+
+Database-এর table-কে কোডের object হিসেবে ব্যবহার করার লাইব্রেরি, যাতে সরাসরি SQL কম লিখতে হয়।
+
+```js
+const user = await db.user.findUnique({
+  where: { id: 42 },
+})
+```

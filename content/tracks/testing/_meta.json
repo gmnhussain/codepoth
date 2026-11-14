@@ -1,0 +1,12 @@
+{
+  "title": "কোডে আস্থা",
+  "titleEn": "Testing",
+  "color": "magenta",
+  "order": [
+    "@practices/unit-testing",
+    "integration-testing",
+    "e2e-testing",
+    "tdd",
+    "@devops/ci-cd"
+  ]
+}

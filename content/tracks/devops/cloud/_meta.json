@@ -1,0 +1,5 @@
+{
+  "title": "Cloud",
+  "description": "Compute, Storage আর Network — ভাড়া করা কম্পিউটারের দুনিয়া।",
+  "order": ["compute", "storage", "network"]
+}

@@ -1,0 +1,14 @@
+---
+term: "Side effect"
+termBn: "সাইড ইফেক্ট, পার্শ্বপ্রতিক্রিয়া"
+track: frontend
+draft: true
+---
+
+Render-এর হিসাবের বাইরে যে কাজ বাইরের কিছুকে বদলায় বা তার ওপর নির্ভর করে — যেমন network request, timer, সরাসরি DOM বদলানো বা localStorage-এ লেখা।
+
+```jsx
+useEffect(() => {
+  document.title = name
+}, [name])
+```

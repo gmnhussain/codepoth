@@ -1,0 +1,5 @@
+{
+  "title": "Embeddings",
+  "description": "লেখাকে সংখ্যায় রূপ দিয়ে অর্থের দূরত্ব মাপা।",
+  "order": ["embedding", "measuring-distance"]
+}

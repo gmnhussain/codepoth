@@ -1,0 +1,312 @@
+{
+  "width": 1400,
+  "height": 880,
+  "lines": {
+    "cs": "560,80 560,360",
+    "lang": "160,240 960,240",
+    "tools": "120,440 360,440 520,600",
+    "frontend": "400,100 400,440",
+    "backend": "560,360 1120,360",
+    "database": "880,360 880,440 960,520 1240,520",
+    "security": "760,360 760,600",
+    "testing": "240,720 760,720 880,600",
+    "devops": "520,600 1300,600",
+    "system-design": "1000,280 1000,780",
+    "ai": "640,240 720,160 1300,160",
+    "mobile": "140,360 400,360",
+    "practices": "240,440 240,820",
+    "soft-skills": "240,820 900,820"
+  },
+  "topics": {
+    "cs/binary-logic": {
+      "x": 560,
+      "y": 80,
+      "label": "right"
+    },
+    "cs/data-structures": {
+      "x": 560,
+      "y": 160,
+      "label": "right"
+    },
+    "cs/algorithms": {
+      "x": 560,
+      "y": 300,
+      "label": "right"
+    },
+    "cs/http": {
+      "x": 560,
+      "y": 360,
+      "label": "bottom"
+    },
+    "lang/c": {
+      "x": 160,
+      "y": 240,
+      "label": "top"
+    },
+    "lang/javascript": {
+      "x": 400,
+      "y": 240,
+      "label": "left"
+    },
+    "lang/typescript": {
+      "x": 480,
+      "y": 240,
+      "label": "top"
+    },
+    "lang/python": {
+      "x": 640,
+      "y": 240,
+      "label": "bottom"
+    },
+    "lang/go": {
+      "x": 800,
+      "y": 240,
+      "label": "top"
+    },
+    "lang/rust": {
+      "x": 960,
+      "y": 240,
+      "label": "top"
+    },
+    "tools/terminal": {
+      "x": 120,
+      "y": 440,
+      "label": "bottom"
+    },
+    "tools/git": {
+      "x": 240,
+      "y": 440,
+      "label": "left"
+    },
+    "tools/vs-code": {
+      "x": 330,
+      "y": 440,
+      "label": "bottom"
+    },
+    "tools/npm": {
+      "x": 440,
+      "y": 520,
+      "label": "right"
+    },
+    "tools/linux": {
+      "x": 520,
+      "y": 600,
+      "label": "bottom"
+    },
+    "frontend/html-css": {
+      "x": 400,
+      "y": 100,
+      "label": "right"
+    },
+    "frontend/a11y": {
+      "x": 400,
+      "y": 170,
+      "label": "right"
+    },
+    "frontend/react": {
+      "x": 400,
+      "y": 360,
+      "label": "right"
+    },
+    "frontend/nextjs": {
+      "x": 400,
+      "y": 440,
+      "label": "right"
+    },
+    "mobile/react-native": {
+      "x": 280,
+      "y": 360,
+      "label": "bottom"
+    },
+    "mobile/app-publishing": {
+      "x": 140,
+      "y": 360,
+      "label": "bottom"
+    },
+    "backend/nodejs": {
+      "x": 660,
+      "y": 360,
+      "label": "top"
+    },
+    "backend/auth": {
+      "x": 760,
+      "y": 360,
+      "label": "top"
+    },
+    "backend/sql": {
+      "x": 880,
+      "y": 360,
+      "label": "top"
+    },
+    "backend/api-design": {
+      "x": 1000,
+      "y": 360,
+      "label": "top-right"
+    },
+    "backend/background-jobs": {
+      "x": 1120,
+      "y": 360,
+      "label": "bottom"
+    },
+    "database/indexing": {
+      "x": 880,
+      "y": 440,
+      "label": "right"
+    },
+    "database/caching": {
+      "x": 1000,
+      "y": 520,
+      "label": "top-right"
+    },
+    "database/nosql": {
+      "x": 1120,
+      "y": 520,
+      "label": "bottom"
+    },
+    "database/vector-db": {
+      "x": 1240,
+      "y": 520,
+      "label": "bottom"
+    },
+    "security/owasp-top-10": {
+      "x": 760,
+      "y": 440,
+      "label": "left"
+    },
+    "security/encryption": {
+      "x": 760,
+      "y": 520,
+      "label": "left"
+    },
+    "devops/secrets-management": {
+      "x": 760,
+      "y": 600,
+      "label": "bottom"
+    },
+    "practices/unit-testing": {
+      "x": 240,
+      "y": 720,
+      "label": "left"
+    },
+    "testing/integration-testing": {
+      "x": 420,
+      "y": 720,
+      "label": "top"
+    },
+    "testing/e2e-testing": {
+      "x": 580,
+      "y": 720,
+      "label": "top"
+    },
+    "testing/tdd": {
+      "x": 700,
+      "y": 720,
+      "label": "top"
+    },
+    "devops/ci-cd": {
+      "x": 880,
+      "y": 600,
+      "label": "top"
+    },
+    "devops/docker": {
+      "x": 640,
+      "y": 600,
+      "label": "bottom"
+    },
+    "devops/kubernetes": {
+      "x": 1100,
+      "y": 600,
+      "label": "bottom"
+    },
+    "devops/cloud": {
+      "x": 1220,
+      "y": 600,
+      "label": "top"
+    },
+    "devops/observability": {
+      "x": 1300,
+      "y": 600,
+      "label": "bottom"
+    },
+    "system-design/scalability": {
+      "x": 1000,
+      "y": 280,
+      "label": "right"
+    },
+    "system-design/load-balancing": {
+      "x": 1000,
+      "y": 440,
+      "label": "right"
+    },
+    "system-design/message-queues": {
+      "x": 1000,
+      "y": 680,
+      "label": "right"
+    },
+    "system-design/distributed-systems": {
+      "x": 1000,
+      "y": 780,
+      "label": "right"
+    },
+    "ai/llm-api": {
+      "x": 780,
+      "y": 160,
+      "label": "top"
+    },
+    "ai/prompt-engineering": {
+      "x": 920,
+      "y": 160,
+      "label": "top"
+    },
+    "ai/embeddings": {
+      "x": 1060,
+      "y": 160,
+      "label": "top"
+    },
+    "ai/rag": {
+      "x": 1180,
+      "y": 160,
+      "label": "top"
+    },
+    "ai/agents": {
+      "x": 1300,
+      "y": 160,
+      "label": "top"
+    },
+    "practices/code-review": {
+      "x": 240,
+      "y": 540,
+      "label": "right"
+    },
+    "practices/refactoring": {
+      "x": 240,
+      "y": 630,
+      "label": "right"
+    },
+    "practices/documentation": {
+      "x": 240,
+      "y": 820,
+      "label": "bottom"
+    },
+    "soft-skills/communication": {
+      "x": 400,
+      "y": 820,
+      "label": "bottom"
+    },
+    "soft-skills/teamwork": {
+      "x": 560,
+      "y": 820,
+      "label": "bottom"
+    },
+    "soft-skills/estimation": {
+      "x": 720,
+      "y": 820,
+      "label": "bottom"
+    },
+    "soft-skills/career-planning": {
+      "x": 900,
+      "y": 820,
+      "label": "bottom"
+    }
+  }
+}

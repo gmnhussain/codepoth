@@ -1,0 +1,148 @@
+---
+id: frontend.react.hooks.use-effect
+title: useEffect ও Side Effects
+description: Component render হয়ে যাওয়ার পরে বাইরের দুনিয়ার সাথে কাজ করার জায়গা — data আনা, timer চালানো, subscription খোলা। এই পাঠে দেখবে কখন সেটা চলে, কখন আবার চলে, আর কীভাবে আগের কাজ গুছিয়ে রাখতে হয়।
+updated: 2026-11-11
+level: beginner
+draft: true
+glossary: [hook, race-condition, side-effect]
+prerequisites: [frontend.react.hooks.use-state]
+quiz:
+  - question: useEffect(fn, []) কখন চলে?
+    options:
+      - প্রতিটা render-এর পরে
+      - শুধু প্রথমবার mount হওয়ার পরে
+      - render শুরু হওয়ার আগেই
+      - কখনোই না — এটা ভুল syntax
+    answer: 1
+    explanation: খালি array মানে কোনো dependency নেই, তাই প্রথম render-এর পরে একবারই চলে। Development-এ StrictMode ইচ্ছা করে দুবার চালায় — cleanup ঠিক আছে কিনা যাচাই করতে।
+  - question: Cleanup ফাংশন কখন চলে?
+    options:
+      - শুধু component সরিয়ে ফেলার সময়
+      - পরের effect চলার আগে, আর unmount-এর সময়
+      - প্রতিটা render শুরু হওয়ার আগে
+      - শুধু error হলে
+    answer: 1
+    explanation: Dependency বদলালে React আগে পুরনো effect-এর cleanup চালায়, তারপর নতুন effect। Component সরে গেলেও একবার চলে।
+  - question: নিচের কোনটা infinite loop ঘটাবে?
+    options:
+      - "useEffect(() => setCount(count + 1), [count])"
+      - "useEffect(() => setCount(1), [])"
+      - "useEffect(() => console.log(count), [count])"
+      - "useEffect(() => { document.title = name }, [name])"
+    answer: 0
+    explanation: count বদলায় → effect চলে → আবার count বদলায় → আবার effect। Effect নিজেই নিজের dependency বদলাচ্ছে।
+---
+
+<Summary>
+
+- **useEffect** চলে render-এর **পরে** — UI স্ক্রিনে আঁকা শেষ হলে বাইরের কাজগুলো এখানে হয়।
+- **Dependency array** ঠিক করে কখন আবার চলবে: `[]` একবার, `[id]` id বদলালে, না দিলে প্রতিবার।
+- Effect থেকে যে ফাংশন **return** হয়, সেটা **cleanup** — পরের effect-এর আগে আর unmount-এর সময় চলে।
+
+</Summary>
+
+<Concept>
+
+React-এর মূল কাজ হলো state থেকে UI হিসাব করা — একই input দিলে একই output। কিন্তু একটা আসল অ্যাপের অনেক কাজ এই হিসাবের বাইরে পড়ে: সার্ভার থেকে data আনা, `document.title` বদলানো, WebSocket খোলা। এ ধরনের কাজকে বলে <Term id="side-effect">side effect</Term>।
+
+Render-এর মাঝখানেই এসব করলে প্রতিবার render-এ নতুন request যাবে, আর React-এর হিসাবও এলোমেলো হয়ে যাবে। তাই নিয়মটা সহজ: আগে স্ক্রিনে আঁকো, তারপর effect চালাও।
+
+<Steps>
+
+1. **Render** — JSX হিসাব হয়
+2. **Commit** — DOM-এ বসে, স্ক্রিনে দেখা যায়
+3. **Effect** — fetch, timer, subscription
+4. **Cleanup** — পরের effect বা unmount-এর আগে
+
+</Steps>
+
+### Dependency array-এর তিন রূপ
+
+- `useEffect(fn)` — প্রতিটা render-এর পরে। বেশিরভাগ ক্ষেত্রে এটা দরকার হয় না।
+- `useEffect(fn, [])` — শুধু প্রথম mount-এর পরে, একবার।
+- `useEffect(fn, [a, b])` — a বা b বদলালে আবার চলে।
+
+</Concept>
+
+<Example>
+
+একটা ইউজার প্রোফাইল component। `userId` বদলালে নতুন data আসবে, আর আগের অসমাপ্ত request বাতিল হবে।
+
+```jsx title="UserProfile.jsx"
+import { useEffect, useState } from "react"
+
+function UserProfile({ userId }) {
+  const [user, setUser] = useState(null)
+
+  useEffect(() => {
+    const controller = new AbortController()
+
+    fetch(`/api/users/${userId}`, { signal: controller.signal })
+      .then((res) => res.json())
+      .then(setUser)
+      .catch(() => {})
+
+    // cleanup: userId বদলালে আগের request বাতিল হবে
+    return () => controller.abort()
+  }, [userId]) // userId বদলালেই effect আবার চলবে
+
+  if (!user) return <p>লোড হচ্ছে…</p>
+  return <h2>{user.name}</h2>
+}
+```
+
+</Example>
+
+<Mistakes>
+
+নতুনরা useEffect নিয়ে সবচেয়ে বেশি যে তিনটা জায়গায় আটকায়।
+
+1. **খালি array, অথচ ভেতরে userId** — অনেকেই প্রথমে dependency array খালি রেখে দেয়। তখন effect একবারই চলে — prop বদলালেও পুরনো data দেখায়। সহজ নিয়ম: effect-এর ভেতরে যা পড়া হয়, সব dependency-তে যাবে। ESLint-এর `exhaustive-deps` নিয়মটা চালু রাখলে এটা নিজেই ধরা পড়ে।
+2. **Effect-এ setState, dependency-তে সেই state** — State বদলায় → effect চলে → আবার state বদলায়। ফলাফল infinite loop, ট্যাব জমে যায়। প্রায়ই দেখা যায় এটা আসলে effect-ই না — render-এর সময় সরাসরি হিসাব করে ফেললেই চলে।
+3. **Cleanup ছাড়া fetch** — দ্রুত দুটো প্রোফাইলে ক্লিক করলে ধীর পুরনো response পরে এসে নতুনটাকে মুছে দিতে পারে — একে বলে <Term id="race-condition">race condition</Term>। `AbortController` দিয়ে cleanup-এ আগের request বাতিল করাই সমাধান।
+
+</Mistakes>
+
+<DeepDive hint="Internals, edge case আর performance — প্রথমবার পড়ার সময় এড়িয়ে গেলেও চলবে।">
+
+### useEffect বনাম useLayoutEffect
+
+useEffect চলে browser স্ক্রিন আঁকার **পরে**, তাই UI আটকায় না। useLayoutEffect চলে DOM বদলের পরে কিন্তু আঁকার **আগে** — কোনো element-এর মাপ নিয়ে সাথে সাথে position ঠিক করতে হলে (tooltip, popover) সেটা লাগে। অকারণে ব্যবহার করলে প্রতিটা frame দেরি হয়।
+
+### Dependency তুলনা হয় `Object.is` দিয়ে
+
+Render-এর ভেতরে বানানো object বা function প্রতিবার নতুন reference পায়, তাই effect প্রতিবারই চলে — দেখতে একই হলেও।
+
+```jsx
+// প্রতি render-এ নতুন object → effect প্রতিবার চলে
+const options = { userId }
+useEffect(() => {
+  connect(options)
+}, [options])
+
+// সমাধান: primitive dependency
+useEffect(() => {
+  connect({ userId })
+}, [userId])
+```
+
+### StrictMode-এ দুবার চলা
+
+Development-এ React ইচ্ছা করে mount → cleanup → mount করে। এটা bug না — cleanup ঠিকমতো লেখা আছে কিনা যাচাইয়ের পরীক্ষা। Production build-এ একবারই চলে।
+
+### Performance: সব কাজ effect না
+
+Effect-এর ভেতরে setState মানে অন্তত একটা বাড়তি render। অন্য state থেকে হিসাব করা যায় এমন মান render-এর সময়ই বের করো, দরকার হলে `useMemo`। বড় অ্যাপে data fetching-এর জন্য framework বা React Query-র মতো library caching আর race condition দুটোই সামলায়।
+
+</DeepDive>
+
+<Practice>
+
+- **বাগ খোঁজা:** আমাকে useEffect ব্যবহার করা ৫টা ছোট React component দাও, প্রতিটায় একটা করে লুকানো bug থাকবে। আমি নিজে খুঁজে বের করার পরে তবেই উত্তর দেখাবে।
+- **ধাপে ধাপে বানানো:** একটা search box বানাতে চাই যেখানে debounce আর cleanup দুটোই লাগবে। সরাসরি সমাধান দিও না — প্রতিটা ধাপে একটা করে hint দাও।
+- **কোড রিভিউ:** আমার এই component-টা review করো: কোন dependency বাদ পড়েছে, কোথায় race condition হতে পারে, আর কোন effect আসলে দরকারই নেই — কারণসহ বলো।
+
+</Practice>
+
+<Quiz />

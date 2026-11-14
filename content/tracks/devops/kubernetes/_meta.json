@@ -1,0 +1,5 @@
+{
+  "title": "Kubernetes",
+  "description": "Pod, Deployment আর Service দিয়ে container সামলানো।",
+  "order": ["pod-deployment", "service-ingress", "config-scaling"]
+}

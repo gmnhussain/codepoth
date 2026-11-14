@@ -1,0 +1,5 @@
+{
+  "title": "RAG",
+  "description": "নিজের ডকুমেন্ট খুঁজে এনে model-কে প্রসঙ্গ দেওয়া।",
+  "order": ["rag", "chunking", "verifying-answers"]
+}

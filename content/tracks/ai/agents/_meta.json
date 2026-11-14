@@ -1,0 +1,5 @@
+{
+  "title": "Agents",
+  "description": "Tool use আর loop — model যখন নিজে ধাপে ধাপে কাজ করে।",
+  "order": ["tool-use", "agent-loop", "safety-limits"]
+}

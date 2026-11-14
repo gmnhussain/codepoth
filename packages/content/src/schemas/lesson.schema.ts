@@ -39,11 +39,13 @@ export const quizQuestionSchema = z
 const lessonFields = z.strictObject({
   id: lessonIdSchema,
   title: textSchema,
-  description: textSchema,
+  /** Required unless `draft` is true (ADR-0009). */
+  description: textSchema.optional(),
   /** Required unless `draft` is true (ADR-0009). */
   published: dateSchema.optional(),
   updated: dateSchema,
-  level: z.enum(LEVELS),
+  /** Required unless `draft` is true (ADR-0009). */
+  level: z.enum(LEVELS).optional(),
   draft: z.boolean().default(false),
   /** Glossary entry ids (file names in `content/glossary/`). */
   glossary: z.array(slugSchema).default([]),
@@ -72,7 +74,12 @@ function checkLesson(
 ): void {
   // Completeness rules apply to published lessons only; a draft may be a stub.
   if (!lesson.draft) {
-    for (const field of ["published", "quiz"] as const) {
+    for (const field of [
+      "description",
+      "level",
+      "published",
+      "quiz",
+    ] as const) {
       if (lesson[field] === undefined) {
         ctx.addIssue({
           code: "custom",

@@ -1,0 +1,5 @@
+{
+  "title": "টিমওয়ার্ক",
+  "description": "Pair programming, দায়িত্ব ভাগ আর মতভেদ সামলানো।",
+  "order": ["pair-programming", "handling-disagreement"]
+}

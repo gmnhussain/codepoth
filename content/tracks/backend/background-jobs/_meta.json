@@ -1,0 +1,5 @@
+{
+  "title": "Background Jobs",
+  "description": "Queue আর Worker দিয়ে ধীর কাজ পেছনে সরানো।",
+  "order": ["queue", "worker-retry"]
+}

@@ -1,0 +1,15 @@
+---
+term: "Middleware"
+termBn: "মিডলওয়্যার"
+track: backend
+draft: true
+---
+
+Request আর শেষ handler-এর মাঝখানে বসা ফাংশন। Log রাখা, লগইন যাচাই বা body পার্স করার মতো কাজ সেরে next() দিয়ে পরের জনকে দেয়।
+
+```js
+app.use((req, res, next) => {
+  console.log(req.method, req.url)
+  next()
+})
+```

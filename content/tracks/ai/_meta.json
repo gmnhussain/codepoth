@@ -1,0 +1,13 @@
+{
+  "title": "AI দিয়ে প্রোডাক্ট",
+  "titleEn": "AI Engineering",
+  "color": "iris",
+  "order": [
+    "@lang/python",
+    "llm-api",
+    "prompt-engineering",
+    "embeddings",
+    "rag",
+    "agents"
+  ]
+}

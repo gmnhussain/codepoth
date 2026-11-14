@@ -1,0 +1,10 @@
+{
+  "title": "SQL",
+  "description": "SELECT থেকে JOIN, GROUP BY আর Subquery।",
+  "order": [
+    "select-where",
+    "join-inner-left-right",
+    "group-by-aggregate",
+    "subquery"
+  ]
+}

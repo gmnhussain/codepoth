@@ -1,0 +1,5 @@
+{
+  "title": "Prompt Engineering",
+  "description": "পরিষ্কার নির্দেশ, উদাহরণ আর structured output।",
+  "order": ["clear-instructions", "few-shot", "structured-output"]
+}

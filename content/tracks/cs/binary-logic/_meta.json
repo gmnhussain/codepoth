@@ -1,0 +1,6 @@
+{
+  "title": "Binary & Logic",
+  "description": "বিট, বাইট আর বুলিয়ান লজিক — কম্পিউটার আসলে কীভাবে হিসাব করে।",
+  "start": true,
+  "order": ["bits-bytes", "binary-hex", "boolean-logic-gate"]
+}

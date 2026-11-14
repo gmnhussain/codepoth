@@ -1,0 +1,5 @@
+{
+  "title": "Rust",
+  "description": "Ownership আর Borrowing — memory-safe systems programming।",
+  "order": ["ownership", "borrowing-lifetime", "result-option"]
+}

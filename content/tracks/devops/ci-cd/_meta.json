@@ -1,0 +1,5 @@
+{
+  "title": "CI/CD",
+  "description": "প্রতিটা push-এ টেস্ট, build আর deploy — নিজে নিজেই।",
+  "order": ["ci", "github-actions-pipeline", "deploy"]
+}

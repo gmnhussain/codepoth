@@ -58,9 +58,15 @@ describe("lessonFrontmatterSchema", () => {
     ).toBe(true)
   })
 
-  it("accepts a draft stub without published or quiz", () => {
-    const stub = without(without(lesson, "published"), "quiz")
+  it("accepts a draft stub with only id, title and updated", () => {
+    const stub = {
+      id: lesson.id,
+      title: lesson.title,
+      updated: lesson.updated,
+    }
     expect(issuePaths(lessonFrontmatterSchema.safeParse(stub))).toEqual([
+      "description",
+      "level",
       "published",
       "quiz",
     ])

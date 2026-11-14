@@ -1,0 +1,5 @@
+{
+  "title": "Vector DB",
+  "description": "Embedding জমা রাখা আর similarity search।",
+  "order": ["vector", "similarity-search"]
+}

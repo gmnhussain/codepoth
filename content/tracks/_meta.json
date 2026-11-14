@@ -1,0 +1,18 @@
+{
+  "order": [
+    "cs",
+    "lang",
+    "tools",
+    "frontend",
+    "backend",
+    "database",
+    "security",
+    "testing",
+    "devops",
+    "system-design",
+    "ai",
+    "mobile",
+    "practices",
+    "soft-skills"
+  ]
+}

@@ -1,0 +1,5 @@
+{
+  "title": "Python",
+  "description": "স্ক্রিপ্টিং, ডেটা আর AI — এক ভাষায় অনেক দরজা।",
+  "order": ["python", "list-dict-comprehension", "module"]
+}

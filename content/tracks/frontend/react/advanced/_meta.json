@@ -1,0 +1,5 @@
+{
+  "title": "Advanced",
+  "description": "বড় অ্যাপে গতি ধরে রাখা আর ধীরে আসা data সুন্দরভাবে সামলানো।",
+  "order": ["performance", "suspense"]
+}

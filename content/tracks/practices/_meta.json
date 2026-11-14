@@ -1,0 +1,12 @@
+{
+  "title": "ভালো ইঞ্জিনিয়ারিং অভ্যাস",
+  "titleEn": "Engineering Practices",
+  "color": "ink",
+  "order": [
+    "@tools/git",
+    "code-review",
+    "refactoring",
+    "unit-testing",
+    "documentation"
+  ]
+}

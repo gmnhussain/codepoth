@@ -1,0 +1,93 @@
+---
+# Copy this file into tracks/<track>/<topic>/[<group>/]<lesson>.mdx and add the
+# file name to the parent _meta.json "order". Rules: docs/content-model.md,
+# style: docs/writing-guide.md. Remove every comment before publishing.
+id: track.topic.group.lesson # permanent once published (draft: false); never change it after that
+title: পাঠের শিরোনাম
+description: এক-দুই বাক্যে পাঠটা কী শেখায়।
+published: 2026-01-01 # date of first publication; required unless draft: true
+updated: 2026-01-01 # never before published
+level: beginner # beginner | intermediate | advanced
+draft: true # set to false (or remove) when the lesson is reviewed and ready
+glossary: [] # glossary ids (file names in content/glossary) this lesson uses
+prerequisites: [] # lesson ids to read first
+quiz: # 3–5 questions; 2–4 options each; answer is the 0-based index of the right option
+  - question: একটা সাধারণ প্রশ্ন?
+    options: [প্রথম বিকল্প, দ্বিতীয় বিকল্প, তৃতীয় বিকল্প]
+    answer: 1
+    explanation: সঠিক উত্তরটা কেন সঠিক, এক-দুই বাক্যে।
+  - question: নিচের কোড কী দেখাবে?
+    code: | # optional code shown with the question
+      console.log(typeof null);
+    options: ['"null"', '"object"', '"undefined"']
+    answer: 1
+    explanation: JavaScript-এর একটা পুরনো ভুল — typeof null হলো "object"।
+  - question: তৃতীয় প্রশ্ন?
+    options: [হ্যাঁ, না]
+    answer: 0
+    explanation: প্রতিটা প্রশ্নের ব্যাখ্যা লাগবে।
+---
+
+{/* 1. Summary: exactly three bullets. No block number. */}
+
+<Summary>
+
+- প্রথম মূল কথা।
+- দ্বিতীয় মূল কথা।
+- তৃতীয় মূল কথা।
+
+</Summary>
+
+{/* 2. Concept: prose, diagrams. Author sections are ### headings (each block renders its own h2); they appear in the TOC under this block. */}
+
+<Concept>
+
+ধারণাটা শূন্য থেকে ব্যাখ্যা করো। নতুন term প্রথমবার এলে glossary-তে লিংক করো: <Term id="glossary-id">term</Term>।
+
+### লেখকের একটা অংশ
+
+ছোট অনুচ্ছেদ, একটা ধারণা।
+
+</Concept>
+
+{/* 3. Code: a runnable, realistic example. title= shows the file name. */}
+
+<Example>
+
+উদাহরণটা কী দেখাবে, এক বাক্যে।
+
+```js title="example.js"
+// চালানো যায় এমন বাস্তব উদাহরণ
+```
+
+</Example>
+
+{/* 4. Common mistakes: neutral tone ("অনেকেই প্রথমে…"), never first person. */}
+
+<Mistakes>
+
+1. **ভুলটার নাম** — অনেকেই প্রথমে … কেন ভুল, আর ঠিক উপায়টা কী।
+
+</Mistakes>
+
+{/* 5. Deep dive: closed by default, for experienced readers. hint is one line. */}
+
+<DeepDive hint="Internals, edge case আর performance — প্রথমবার পড়ার সময় এড়িয়ে গেলেও চলবে।">
+
+### গভীরের একটা অংশ
+
+Internals, trade-off বা edge case।
+
+</DeepDive>
+
+{/* 6. Practice with AI: 2–3 prompts that make the AI a tutor, not an answer machine. */}
+
+<Practice>
+
+- **ধরন:** AI-কে এমনভাবে বলো যেন সে প্রশ্ন করে আর hint দেয়, সরাসরি উত্তর না দেয়।
+
+</Practice>
+
+{/* 7. Quiz: renders the frontmatter quiz. Prev/next lesson is generated. */}
+
+<Quiz />

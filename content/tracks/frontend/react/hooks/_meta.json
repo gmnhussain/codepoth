@@ -1,0 +1,12 @@
+{
+  "title": "Hooks",
+  "description": "State, effect, context আর ref — function component-কে জীবন্ত করার টুলবক্স।",
+  "order": [
+    "hooks-intro",
+    "use-state",
+    "use-effect",
+    "use-context",
+    "use-ref",
+    "custom-hooks"
+  ]
+}

@@ -1,0 +1,5 @@
+{
+  "title": "TypeScript",
+  "description": "Type দিয়ে JavaScript-এর ভুল রান করার আগেই ধরা।",
+  "order": ["type", "interface-type-alias", "generics"]
+}

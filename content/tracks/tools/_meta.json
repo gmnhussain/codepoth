@@ -1,0 +1,6 @@
+{
+  "title": "রোজকার টুলস",
+  "titleEn": "Tools",
+  "color": "amber",
+  "order": ["terminal", "git", "vs-code", "npm", "linux"]
+}

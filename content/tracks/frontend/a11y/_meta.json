@@ -1,0 +1,6 @@
+{
+  "title": "Accessibility",
+  "description": "সবাই যেন তোমার সাইট ব্যবহার করতে পারে — কিবোর্ড, স্ক্রিন রিডার বা কম দৃষ্টিশক্তি নিয়েও।",
+  "order": ["why-a11y", "semantic-html", "keyboard-screen-reader"],
+  "prerequisites": ["@frontend/html-css"]
+}

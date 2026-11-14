@@ -1,0 +1,12 @@
+{
+  "title": "মানুষের সাথে কাজ",
+  "titleEn": "Soft Skills",
+  "color": "pink",
+  "order": [
+    "@practices/documentation",
+    "communication",
+    "teamwork",
+    "estimation",
+    "career-planning"
+  ]
+}

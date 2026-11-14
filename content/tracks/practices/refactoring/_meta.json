@@ -1,0 +1,5 @@
+{
+  "title": "Refactoring",
+  "description": "আচরণ না বদলে কোডের গঠন পরিষ্কার করা।",
+  "order": ["code-smell", "refactor"]
+}

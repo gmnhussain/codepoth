@@ -1,0 +1,5 @@
+{
+  "title": "Distributed Systems",
+  "description": "CAP theorem, consistency আর নেটওয়ার্ক যখন ভেঙে পড়ে।",
+  "order": ["cap-theorem", "consistency", "failure"]
+}

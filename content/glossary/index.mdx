@@ -1,0 +1,13 @@
+---
+term: "Index"
+termBn: "ইনডেক্স, সূচি"
+track: database
+draft: true
+---
+
+Database-এর বইয়ের সূচির মতো আলাদা একটা গঠন, যাতে পুরো table না ঘেঁটেই দ্রুত সারি খুঁজে পাওয়া যায়। বিনিময়ে লেখা একটু ধীর হয়।
+
+```sql
+CREATE INDEX idx_users_email
+  ON users (email);
+```

@@ -1,0 +1,156 @@
+---
+id: lang.javascript.variables
+title: "Variables: var, let ও const"
+description: প্রোগ্রামে মান মনে রাখার জন্য নাম দেওয়া বাক্স হলো variable। JavaScript-এ তিনভাবে variable বানানো যায় — কোনটা কখন ব্যবহার করবে, আর কেন var এড়িয়ে চলা ভালো, এই পাঠে সেটাই।
+updated: 2026-11-09
+level: beginner
+draft: true
+quiz:
+  - question: কোনটায় একবার মান দেওয়ার পরে নতুন মান assign করা যায় না?
+    options: [var, let, const, তিনটাতেই যায়]
+    answer: 2
+    explanation: const-এ একবার মান দেওয়ার পরে আবার assign করলে TypeError। তবে const object-এর ভেতরের property বদলানো যায়।
+  - question: নিচের কোড কী দেখাবে?
+    code: |
+      console.log(x);
+      var x = 5;
+    options: ["5", undefined, ReferenceError, "null"]
+    answer: 1
+    explanation: var hoist হয়ে শুরুতেই undefined দিয়ে বসে যায়, মান 5 আসে পরের line-এ। let হলে এখানে ReferenceError (TDZ) হতো।
+  - question: নিচের কোড চালালে কী হবে?
+    code: |
+      const user = { name: 'Rina' };
+      user.name = 'Mina';
+    options:
+      - ঠিকঠাক চলবে, name বদলে Mina হবে
+      - TypeError
+      - SyntaxError
+      - কিছুই বদলাবে না
+    answer: 0
+    explanation: const শুধু user-কে নতুন object-এ assign করা আটকায়। একই object-এর property বদলানো চলে।
+---
+
+<Summary>
+
+- ডিফল্ট হিসেবে **const** — মান একবার দিলে আর বদলাবে না, কোড পড়তেও সহজ।
+- মান পরে বদলাতে হলে **let** — শুধু যে block-এ লেখা, সেখানেই থাকে।
+- **var** পুরনো নিয়ম — function scope আর hoisting-এর কারণে অবাক করা bug দেয়; নতুন কোডে এড়িয়ে চলো।
+
+</Summary>
+
+<Concept>
+
+Variable হলো নাম দেওয়া একটা বাক্স, যেখানে প্রোগ্রাম কোনো মান মনে রাখে — একটা সংখ্যা, একটা লেখা বা একটা object। JavaScript-এ বাক্স বানানোর তিনটা উপায় আছে, আর তাদের পার্থক্য মূলত তিন জায়গায়: বাক্সটা কোথা থেকে দেখা যায় (scope), একই নামে আবার বানানো যায় কিনা, আর ভেতরের মান বদলানো যায় কিনা।
+
+### `var` — পুরনো নিয়ম
+
+২০১৫-র আগের JavaScript-এ এটাই একমাত্র উপায় ছিল। var পুরো function জুড়ে দেখা যায় — `if` বা `for`-এর block মানে না — আর একই নামে বারবার declare করলেও কোনো error দেয় না।
+
+```js
+var count = 1
+var count = 2 // আবার declare — কোনো error নেই
+if (true) {
+  var inside = "দেখা যায়"
+}
+console.log(inside) // 'দেখা যায়' — block মানে না
+```
+
+### `let` — যে মান বদলাবে
+
+let শুধু তার block-এর ভেতরে (দুটো `{ }`-এর মাঝে) থাকে। মান যতবার খুশি বদলানো যায়, কিন্তু একই block-এ একই নামে দ্বিতীয়বার declare করা যায় না। loop-এর counter বা পরে বদলাবে এমন মানের জন্য এটা।
+
+```js
+let score = 10
+score = 15 // মান বদলানো যায়
+if (true) {
+  let temp = 1
+}
+console.log(temp) // ReferenceError — block-এর বাইরে নেই
+```
+
+### `const` — ডিফল্ট পছন্দ
+
+const-ও block scope মানে, তবে একবার মান দেওয়ার পরে নতুন মান assign করা যায় না। মনে রেখো: এটা variable-টাকে আটকায়, ভেতরের object-কে নয় — object-এর property বদলানো যায়।
+
+```js
+const PI = 3.1416
+PI = 3 // TypeError: নতুন মান দেওয়া যায় না
+const user = { name: "Rina" }
+user.name = "Mina" // চলবে — object-এর ভেতরটা বদলানো যায়
+```
+
+### তুলনা: কখন কোনটা
+
+| বৈশিষ্ট্য  | var                       | let                                        | const             |
+| ---------- | ------------------------- | ------------------------------------------ | ----------------- |
+| Scope      | function                  | block                                      | block             |
+| Re-declare | হ্যাঁ                     | না                                         | না                |
+| Re-assign  | হ্যাঁ                     | হ্যাঁ                                      | না                |
+| Hoisting   | হ্যাঁ, শুরুতে `undefined` | হ্যাঁ, কিন্তু TDZ — আগে ব্যবহার করলে error | হ্যাঁ, কিন্তু TDZ |
+
+ছোট নিয়ম: সবসময় **const** দিয়ে শুরু করো; মান বদলাতে হলে তখন **let**; আর **var** শুধু পুরনো কোড পড়ার সময় চিনতে পারলেই যথেষ্ট।
+
+</Concept>
+
+<Example>
+
+একই loop, শুধু `var` আর `let`-এর পার্থক্য। setTimeout কাজটা পরে চালায় — ততক্ষণে loop শেষ।
+
+```js title="variables.js"
+for (var i = 0; i < 3; i++) {
+  setTimeout(() => console.log(i), 0)
+}
+// 3, 3, 3 — পুরো function-এ একটাই i
+
+for (let j = 0; j < 3; j++) {
+  setTimeout(() => console.log(j), 0)
+}
+// 0, 1, 2 — প্রতিবার নতুন j (block scope)
+```
+
+</Example>
+
+<Mistakes>
+
+variable নিয়ে নতুনদের সবচেয়ে চেনা তিনটা ভুল।
+
+1. **const মানে “কিছুই বদলাবে না” ভাবা** — অনেকেই ভাবে const দিলে object বা array পুরোপুরি জমে যায়। আসলে শুধু নতুন মান assign করা আটকায় — `user.name` বা `list.push()` ঠিকই চলে।
+2. **declare করার আগেই let ব্যবহার** — var হলে সেখানে চুপচাপ `undefined` আসে, কিন্তু let/const হলে ReferenceError। declaration থেকে শুরু করে সেই line পর্যন্ত জায়গাটাকে বলে Temporal Dead Zone (TDZ)।
+3. **loop-এ var** — উপরের কোডের মতো — callback-গুলো পরে চললে সবাই একই শেষ মান দেখে। loop-এ সবসময় let।
+
+</Mistakes>
+
+<DeepDive hint="Hoisting, TDZ, global scope আর Object.freeze — প্রথমবার পড়ার সময় এড়িয়ে গেলেও চলবে।">
+
+### Hoisting আসলে কী
+
+কোড চালানোর আগে JavaScript engine প্রতিটা scope-এর সব declaration একবার পড়ে নেয়। var-কে সাথে সাথে `undefined` দিয়ে বসিয়ে দেয়; let আর const-এর নামও জানে, কিন্তু declaration-এর line না আসা পর্যন্ত TDZ-এ আটকে রাখে।
+
+### Global scope-এ var
+
+Browser-এ সবচেয়ে বাইরের স্তরে লেখা var সরাসরি `window`-এর property হয়ে যায় (`window.count`), let/const হয় না। অন্য script-এর একই নামের সাথে সংঘর্ষ এড়াতে এটাও var না দেওয়ার কারণ।
+
+### সত্যিকারের অপরিবর্তনীয়তা
+
+const object-এর ভেতর আটকাতে চাইলে `Object.freeze` — তবে সেটা shallow, ভেতরের nested object বদলানো যায়।
+
+```js
+const cfg = Object.freeze({ debug: false })
+cfg.debug = true // চুপচাপ উপেক্ষা (strict mode-এ TypeError)
+```
+
+### Performance
+
+var, let আর const-এর গতির পার্থক্য আধুনিক engine-এ নগণ্য। বেছে নাও কোনটা পড়তে স্পষ্ট আর কম ভুলের সুযোগ দেয় — সাধারণত const।
+
+</DeepDive>
+
+<Practice>
+
+- **ব্যাখ্যা যাচাই:** আমি var, let আর const-এর পার্থক্য নিজের ভাষায় লিখছি — তুমি ভুল বা অসম্পূর্ণ জায়গাগুলো ধরিয়ে দাও, কিন্তু ঠিক উত্তরটা সরাসরি লিখে দিও না।
+- **অনুমান করো:** hoisting আর TDZ নিয়ে ৫টা ছোট কোড দাও। প্রতিটার output আমি আগে অনুমান করব, তারপর তুমি ব্যাখ্যা দেবে কেন এমন হলো।
+- **রিফ্যাক্টর:** একটা পুরনো, var-ভর্তি ফাংশন দাও। আমি সেটা let/const-এ বদলাব, তুমি review করে বলবে কোথায় const দেওয়া উচিত ছিল আর কেন।
+
+</Practice>
+
+<Quiz />

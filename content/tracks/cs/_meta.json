@@ -1,0 +1,6 @@
+{
+  "title": "কম্পিউটার বিজ্ঞানের ভিত",
+  "titleEn": "CS Fundamentals",
+  "color": "red",
+  "order": ["binary-logic", "data-structures", "algorithms", "http"]
+}
