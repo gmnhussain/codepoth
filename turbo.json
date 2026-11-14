@@ -2,23 +2,27 @@
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
   "tasks": {
+    "content:generate": {
+      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/content/**"],
+      "outputs": [".content-collections/generated/**"]
+    },
     "build": {
-      "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "dependsOn": ["^build", "^content:generate"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*", "$TURBO_ROOT$/content/**"],
       "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**"]
     },
     "lint": {
-      "dependsOn": ["^lint"]
+      "dependsOn": ["^lint", "^content:generate", "content:generate"]
     },
     "typecheck": {
-      "dependsOn": ["^typecheck"]
+      "dependsOn": ["^typecheck", "^content:generate", "content:generate"]
     },
     "dev": {
       "cache": false,
       "persistent": true
     },
     "test": {
-      "dependsOn": ["^test"],
+      "dependsOn": ["^test", "^content:generate", "content:generate"],
       "inputs": [
         "$TURBO_DEFAULT$",
         "$TURBO_ROOT$/content/**",

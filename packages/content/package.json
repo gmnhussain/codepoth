@@ -4,15 +4,18 @@
   "type": "module",
   "private": true,
   "scripts": {
+    "content:generate": "content-collections build",
     "lint": "eslint --max-warnings 0",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
   },
   "dependencies": {
+    "@content-collections/core": "catalog:",
     "@workspace/config": "workspace:*",
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@content-collections/cli": "^0.1.9",
     "@types/node": "catalog:",
     "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
@@ -22,6 +25,10 @@
   },
   "exports": {
     "./paths": "./src/paths.ts",
-    "./schemas/*": "./src/schemas/*.schema.ts"
+    "./schemas/*": "./src/schemas/*.schema.ts",
+    "./generated": {
+      "types": "./.content-collections/generated/index.d.ts",
+      "default": "./.content-collections/generated/index.js"
+    }
   }
 }

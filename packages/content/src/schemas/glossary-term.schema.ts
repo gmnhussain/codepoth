@@ -16,5 +16,10 @@ export const glossaryTermSchema = z.strictObject({
   draft: z.boolean().default(false),
 })
 
+/** A glossary file as the content layer reads it: frontmatter plus the MDX body. */
+export const glossaryDocumentSchema = glossaryTermSchema.extend({
+  content: z.string(),
+})
+
 /** Validated glossary frontmatter. */
 export type GlossaryTerm = z.infer<typeof glossaryTermSchema>

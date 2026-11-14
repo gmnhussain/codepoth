@@ -64,14 +64,16 @@ quiz:
 `content/start-routes.json` holds Home's "where to start" cards. They are editorial content, not code:
 
 ```json
-[
-  {
-    "level": "…",
-    "title": "…",
-    "description": "…",
-    "steps": ["@frontend/html-css", "@cs/binary-logic", { "label": "…" }]
-  }
-]
+{
+  "routes": [
+    {
+      "level": "…",
+      "title": "…",
+      "description": "…",
+      "steps": ["@frontend/html-css", "@cs/binary-logic", { "label": "…" }]
+    }
+  ]
+}
 ```
 
 - A step is a topic reference or a free label. Every reference must resolve.

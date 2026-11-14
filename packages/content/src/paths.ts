@@ -14,8 +14,11 @@ export const LEARN_PREFIX = "/learn"
 const LESSON_EXTENSION = ".mdx"
 const META_FILE = "_meta.json"
 
+// Type aliases, not interfaces: Content Collections only accepts transform
+// results it can prove serializable, and interfaces have no index signature.
+
 /** Where a lesson file sits. `group` is absent for a lesson directly in its topic. */
-export interface LessonLocation {
+export type LessonLocation = {
   readonly track: string
   readonly topic: string
   readonly group?: string
@@ -34,7 +37,7 @@ export type MetaLocation =
     }
 
 /** A topic named in an `order` array or a route: its track, folder and key. */
-export interface ResolvedTopicRef {
+export type ResolvedTopicRef = {
   readonly track: string
   readonly topic: string
   readonly key: string
@@ -113,6 +116,18 @@ export function parseMetaPath(path: string): MetaLocation {
       break
   }
   throw new Error(`_meta.json is too deep: "${path}"`)
+}
+
+/** Throws unless `path` is `<id>.mdx` with a kebab-case id; returns the id. */
+export function glossaryIdOf(path: string): string {
+  const segments = segmentsOf(path)
+  const file = segments.at(-1) ?? ""
+  if (segments.length !== 1 || !file.endsWith(LESSON_EXTENSION)) {
+    throw new Error(`Not a glossary entry path: "${path}"`)
+  }
+  const id = file.slice(0, -LESSON_EXTENSION.length)
+  assertSlugs(path, [id])
+  return id
 }
 
 /** Path key of a topic: `track/topic`. */

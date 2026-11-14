@@ -253,15 +253,18 @@ describe("startRoutesSchema", () => {
         steps: ["@frontend/html-css", { label: "যেকোনো লাইন" }],
       },
     ]
-    expect(startRoutesSchema.safeParse(routes).success).toBe(true)
+    expect(startRoutesSchema.safeParse({ routes }).success).toBe(true)
   })
 
   it("rejects a plain topic name as a step and an empty list", () => {
     expect(
-      startRoutesSchema.safeParse([
-        { level: "a", title: "b", description: "c", steps: ["react"] },
-      ]).success
+      startRoutesSchema.safeParse({
+        routes: [
+          { level: "a", title: "b", description: "c", steps: ["react"] },
+        ],
+      }).success
     ).toBe(false)
+    expect(startRoutesSchema.safeParse({ routes: [] }).success).toBe(false)
     expect(startRoutesSchema.safeParse([]).success).toBe(false)
   })
 })

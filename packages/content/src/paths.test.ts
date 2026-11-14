@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest"
 
 import {
+  glossaryIdOf,
   lessonUrl,
   parseLessonPath,
   parseMetaPath,
@@ -89,6 +90,18 @@ describe("parseMetaPath", () => {
     ).toThrow("too deep")
     expect(() => parseMetaPath("tracks/frontend/meta.json")).toThrow()
     expect(() => parseMetaPath("tracks/_meta.json")).toThrow()
+  })
+})
+
+describe("glossaryIdOf", () => {
+  it("takes the id from the file name", () => {
+    expect(glossaryIdOf("side-effect.mdx")).toBe("side-effect")
+  })
+
+  it("rejects a non-kebab-case name, a folder and a non-mdx file", () => {
+    expect(() => glossaryIdOf("Side_Effect.mdx")).toThrow("kebab-case")
+    expect(() => glossaryIdOf("react/side-effect.mdx")).toThrow()
+    expect(() => glossaryIdOf("side-effect.md")).toThrow()
   })
 })
 

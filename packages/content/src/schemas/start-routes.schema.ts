@@ -8,17 +8,23 @@ export const startRouteStepSchema = z.union([
   z.strictObject({ label: textSchema }),
 ])
 
-/** `content/start-routes.json`: Home's "where to start" cards (ADR-0009). */
-export const startRoutesSchema = z
-  .array(
-    z.strictObject({
-      level: textSchema,
-      title: textSchema,
-      description: textSchema,
-      steps: z.array(startRouteStepSchema).min(1),
-    })
-  )
-  .min(1)
+/**
+ * `content/start-routes.json`: Home's "where to start" cards (ADR-0009).
+ * The list sits under `routes` because Content Collections needs an object
+ * at the root of a JSON file.
+ */
+export const startRoutesSchema = z.strictObject({
+  routes: z
+    .array(
+      z.strictObject({
+        level: textSchema,
+        title: textSchema,
+        description: textSchema,
+        steps: z.array(startRouteStepSchema).min(1),
+      })
+    )
+    .min(1),
+})
 
 /** Validated start routes. */
 export type StartRoutes = z.infer<typeof startRoutesSchema>

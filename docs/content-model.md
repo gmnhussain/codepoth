@@ -4,7 +4,7 @@
 
 Folder structure is the single source of truth. Never hardcode lists of tracks/topics/lessons in code.
 
-The Zod schemas in `packages/content` are the authoritative definition of every shape below. This document explains them; if the two disagree, the schema wins and this file should be fixed. Content is loaded with Content Collections ([ADR-0005](decisions/ADR-0005-content-layer.md)).
+The Zod schemas in `packages/content` are the authoritative definition of every shape below. This document explains them; if the two disagree, the schema wins and this file should be fixed. Content is loaded with Content Collections ([ADR-0005](decisions/ADR-0005-content-layer.md)): `packages/content/content-collections.ts` defines one collection per file type, `pnpm --filter @workspace/content content:generate` (turbo task `content:generate`) writes the typed data to `packages/content/.content-collections/generated/` (git-ignored), and apps import it from `@workspace/content/generated`. A file that fails its schema or path rules stops the `content:generate` step, and with it the build.
 
 ## Hierarchy
 
@@ -145,7 +145,7 @@ The MDX body is the definition, optionally followed by a code example. The lesso
 
 ## Start routes
 
-`content/start-routes.json` holds Home's "where to start" cards: `[{ "level", "title", "description", "steps": ["@track/topic" | { "label" }] }]`. Every topic reference must resolve to an existing topic. A step whose topic has no published lesson renders like the Map: unlinked, marked as planned; it is not a build error. Home's main "start" button goes to the first published lesson along the routes (in route and step order); if no lesson is published yet, it links to `/roadmap`.
+`content/start-routes.json` holds Home's "where to start" cards: `{ "routes": [{ "level", "title", "description", "steps": ["@track/topic" | { "label" }] }] }`. The list sits under `routes` because Content Collections needs an object at the root of a JSON file. Every topic reference must resolve to an existing topic. A step whose topic has no published lesson renders like the Map: unlinked, marked as planned; it is not a build error. Home's main "start" button goes to the first published lesson along the routes (in route and step order); if no lesson is published yet, it links to `/roadmap`.
 
 ## Validation
 

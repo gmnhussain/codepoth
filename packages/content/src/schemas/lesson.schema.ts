@@ -35,61 +35,70 @@ export const quizQuestionSchema = z
     message: "answer must be an index into options",
   })
 
-/** Lesson frontmatter (docs/content-model.md#lesson-frontmatter). */
-export const lessonFrontmatterSchema = z
-  .strictObject({
-    id: lessonIdSchema,
-    title: textSchema,
-    description: textSchema,
-    /** Required unless `draft` is true (ADR-0009). */
-    published: dateSchema.optional(),
-    updated: dateSchema,
-    level: z.enum(LEVELS),
-    draft: z.boolean().default(false),
-    /** Glossary entry ids (file names in `content/glossary/`). */
-    glossary: z.array(slugSchema).default([]),
-    /** Lesson ids to read first. */
-    prerequisites: z.array(lessonIdSchema).default([]),
-    /** Old URL paths after a move; each becomes a permanent redirect. */
-    previousSlugs: z
-      .array(
-        z
-          .string()
-          .regex(
-            PREVIOUS_SLUG,
-            "An old lesson URL is /learn/track/topic/lesson"
-          )
-      )
-      .default([]),
-    /** Required unless `draft` is true (ADR-0009). */
-    quiz: z
-      .array(quizQuestionSchema)
-      .min(QUIZ_QUESTIONS.min)
-      .max(QUIZ_QUESTIONS.max)
-      .optional(),
-  })
-  .superRefine((lesson, ctx) => {
-    // Completeness rules apply to published lessons only; a draft may be a stub.
-    if (!lesson.draft) {
-      for (const field of ["published", "quiz"] as const) {
-        if (lesson[field] === undefined) {
-          ctx.addIssue({
-            code: "custom",
-            path: [field],
-            message: `${field} is required unless the lesson is a draft`,
-          })
-        }
+/** Lesson frontmatter fields, before the cross-field rules. */
+const lessonFields = z.strictObject({
+  id: lessonIdSchema,
+  title: textSchema,
+  description: textSchema,
+  /** Required unless `draft` is true (ADR-0009). */
+  published: dateSchema.optional(),
+  updated: dateSchema,
+  level: z.enum(LEVELS),
+  draft: z.boolean().default(false),
+  /** Glossary entry ids (file names in `content/glossary/`). */
+  glossary: z.array(slugSchema).default([]),
+  /** Lesson ids to read first. */
+  prerequisites: z.array(lessonIdSchema).default([]),
+  /** Old URL paths after a move; each becomes a permanent redirect. */
+  previousSlugs: z
+    .array(
+      z
+        .string()
+        .regex(PREVIOUS_SLUG, "An old lesson URL is /learn/track/topic/lesson")
+    )
+    .default([]),
+  /** Required unless `draft` is true (ADR-0009). */
+  quiz: z
+    .array(quizQuestionSchema)
+    .min(QUIZ_QUESTIONS.min)
+    .max(QUIZ_QUESTIONS.max)
+    .optional(),
+})
+
+/** Rules across fields (ADR-0009). */
+function checkLesson(
+  lesson: z.infer<typeof lessonFields>,
+  ctx: z.core.$RefinementCtx
+): void {
+  // Completeness rules apply to published lessons only; a draft may be a stub.
+  if (!lesson.draft) {
+    for (const field of ["published", "quiz"] as const) {
+      if (lesson[field] === undefined) {
+        ctx.addIssue({
+          code: "custom",
+          path: [field],
+          message: `${field} is required unless the lesson is a draft`,
+        })
       }
     }
-    // YYYY-MM-DD strings sort in date order.
-    if (lesson.published !== undefined && lesson.updated < lesson.published) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["updated"],
-        message: "updated cannot be before published",
-      })
-    }
-  })
+  }
+  // YYYY-MM-DD strings sort in date order.
+  if (lesson.published !== undefined && lesson.updated < lesson.published) {
+    ctx.addIssue({
+      code: "custom",
+      path: ["updated"],
+      message: "updated cannot be before published",
+    })
+  }
+}
+
+/** Lesson frontmatter (docs/content-model.md#lesson-frontmatter). */
+export const lessonFrontmatterSchema = lessonFields.superRefine(checkLesson)
+
+/** A lesson file as the content layer reads it: frontmatter plus the MDX body. */
+export const lessonDocumentSchema = lessonFields
+  .extend({ content: z.string() })
+  .superRefine(checkLesson)
 
 /** Validated lesson frontmatter. */
 export type LessonFrontmatter = z.infer<typeof lessonFrontmatterSchema>

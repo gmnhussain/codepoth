@@ -47,3 +47,6 @@ next-env.d.ts
 
 # reference material (local only, not part of the project)
 reference/
+
+# content-collections output
+.content-collections

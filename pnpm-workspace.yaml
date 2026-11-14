@@ -4,6 +4,7 @@ packages:
 
 # Versions shared by two or more workspace packages. Reference them as "catalog:".
 catalog:
+  "@content-collections/core": ^0.15.3
   "@tailwindcss/postcss": ^4
   "@types/node": ^24
   "@types/react": ^19
