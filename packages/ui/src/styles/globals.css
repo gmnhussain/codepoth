@@ -40,6 +40,11 @@
   --color-card: var(--card);
   --color-foreground: var(--foreground);
   --color-background: var(--background);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-track: var(--track);
+  --color-track-dot: var(--track-dot);
+  --leading-reading: 1.85;
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -50,73 +55,168 @@
   --font-sans: var(--font-sans);
 }
 
+/* Design palette mapped onto the shadcn slots (ADR-0008, docs/design.md#colors). */
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
+  --background: #faf8f3;
+  --foreground: #1c1a17;
+  --card: #ffffff;
+  --card-foreground: #1c1a17;
+  --popover: #ffffff;
+  --popover-foreground: #1c1a17;
+  --primary: #1c1a17;
+  --primary-foreground: #faf8f3;
+  --secondary: #f1ede3;
+  --secondary-foreground: #1c1a17;
+  --muted: #f1ede3;
+  --muted-foreground: #69645a;
+  --accent: #f1ede3;
+  --accent-foreground: #1c1a17;
+  --destructive: #b4322c;
+  --border: #e7e1d4;
+  /* Darker than the design's line2 so control edges reach 3:1 (WCAG 1.4.11). */
+  --input: #8c877b;
+  --ring: #1c1a17;
+  --success: #1e7a4c;
+  --warning: #9a5b00;
+  --chart-1: var(--track-indigo);
+  --chart-2: var(--track-green-dot);
+  --chart-3: var(--track-amber-dot);
+  --chart-4: var(--track-magenta);
+  --chart-5: var(--track-teal-dot);
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar: #ffffff;
+  --sidebar-foreground: #1c1a17;
+  --sidebar-primary: #1c1a17;
+  --sidebar-primary-foreground: #faf8f3;
+  --sidebar-accent: #f1ede3;
+  --sidebar-accent-foreground: #1c1a17;
+  --sidebar-border: #e7e1d4;
+  --sidebar-ring: #1c1a17;
+
+  /* Fallback accent outside any data-track-color element. */
+  --track: var(--foreground);
+  --track-dot: var(--foreground);
+
+  /* Track palette, named by hue. A -dot variant exists only where the mark
+     colour differs: in light mode it is darkened to reach 3:1 on background
+     and card (WCAG 1.4.11). */
+  --track-red: #e5484d;
+  --track-orange: #f76b15;
+  --track-orange-dot: #ec6614;
+  --track-amber: #ffb224;
+  --track-amber-dot: #bf8200;
+  --track-indigo: #3e63dd;
+  --track-green: #30a46c;
+  --track-green-dot: #2fa26a;
+  --track-teal: #12a594;
+  --track-teal-dot: #11a090;
+  --track-purple: #8e4ec6;
+  --track-magenta: #d6409f;
+  --track-blue: #0090ff;
+  --track-brown: #a18072;
+  --track-iris: #5b5bd6;
+  --track-lime: #8cc63f;
+  --track-lime-dot: #699d22;
+  --track-ink: var(--foreground);
+  --track-pink: #ff8dcc;
+  --track-pink-dot: #e063a8;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --background: #131210;
+  --foreground: #f2eee6;
+  --card: #1b1a17;
+  --card-foreground: #f2eee6;
+  --popover: #1b1a17;
+  --popover-foreground: #f2eee6;
+  --primary: #f2eee6;
+  --primary-foreground: #131210;
+  --secondary: #24221e;
+  --secondary-foreground: #f2eee6;
+  --muted: #24221e;
+  --muted-foreground: #a49e91;
+  --accent: #24221e;
+  --accent-foreground: #f2eee6;
+  --destructive: #ff8a80;
+  --border: #2c2a25;
+  --input: #6f6d68;
+  --ring: #f2eee6;
+  --success: #5bd08f;
+  --warning: #ffc46b;
+  --sidebar: #1b1a17;
+  --sidebar-foreground: #f2eee6;
+  --sidebar-primary: #f2eee6;
+  --sidebar-primary-foreground: #131210;
+  --sidebar-accent: #24221e;
+  --sidebar-accent-foreground: #f2eee6;
+  --sidebar-border: #2c2a25;
+  --sidebar-ring: #f2eee6;
+
+  /* Every track colour reaches 3:1 on the dark surfaces as it is. */
+  --track-orange-dot: var(--track-orange);
+  --track-amber-dot: var(--track-amber);
+  --track-green-dot: var(--track-green);
+  --track-teal-dot: var(--track-teal);
+  --track-lime-dot: var(--track-lime);
+  --track-pink-dot: var(--track-pink);
+}
+
+/* Accent of an element and its children: data-track-color="<hue>" (ADR-0008). */
+[data-track-color="red"] {
+  --track: var(--track-red);
+  --track-dot: var(--track-red);
+}
+[data-track-color="orange"] {
+  --track: var(--track-orange);
+  --track-dot: var(--track-orange-dot);
+}
+[data-track-color="amber"] {
+  --track: var(--track-amber);
+  --track-dot: var(--track-amber-dot);
+}
+[data-track-color="indigo"] {
+  --track: var(--track-indigo);
+  --track-dot: var(--track-indigo);
+}
+[data-track-color="green"] {
+  --track: var(--track-green);
+  --track-dot: var(--track-green-dot);
+}
+[data-track-color="teal"] {
+  --track: var(--track-teal);
+  --track-dot: var(--track-teal-dot);
+}
+[data-track-color="purple"] {
+  --track: var(--track-purple);
+  --track-dot: var(--track-purple);
+}
+[data-track-color="magenta"] {
+  --track: var(--track-magenta);
+  --track-dot: var(--track-magenta);
+}
+[data-track-color="blue"] {
+  --track: var(--track-blue);
+  --track-dot: var(--track-blue);
+}
+[data-track-color="brown"] {
+  --track: var(--track-brown);
+  --track-dot: var(--track-brown);
+}
+[data-track-color="iris"] {
+  --track: var(--track-iris);
+  --track-dot: var(--track-iris);
+}
+[data-track-color="lime"] {
+  --track: var(--track-lime);
+  --track-dot: var(--track-lime-dot);
+}
+[data-track-color="ink"] {
+  --track: var(--track-ink);
+  --track-dot: var(--track-ink);
+}
+[data-track-color="pink"] {
+  --track: var(--track-pink);
+  --track-dot: var(--track-pink-dot);
 }
 
 @layer base {
@@ -124,7 +224,13 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background leading-reading text-foreground;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply leading-snug;
   }
   button:not(:disabled),
   [role="button"]:not(:disabled) {

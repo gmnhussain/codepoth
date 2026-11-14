@@ -32,9 +32,9 @@ The design palette is mapped onto the existing shadcn variables in `packages/ui/
 
 ### Track colours
 
-- Colours are named by hue, not by track: red, orange, amber, indigo, green, teal, purple, magenta, blue, brown, iris, lime, ink, pink. Each hue is a `--track-<hue>` variable. Only the hues whose small-dot colour differs in light mode (amber, lime, pink) also get `--track-<hue>-dot`.
+- Colours are named by hue, not by track: red, orange, amber, indigo, green, teal, purple, magenta, blue, brown, iris, lime, ink, pink. Each hue is a `--track-<hue>` variable. Hues that fall below 3:1 on background or card in light mode (orange, amber, green, teal, lime, pink) also get a darker `--track-<hue>-dot`; in dark mode it equals the hue.
 - A track's `_meta.json` stores the hue (`"color": "indigo"`). The list of hues is a tuple in `packages/config`; a test keeps it in sync with `globals.css`.
-- A page or element gets its accent from a `data-track-color="<hue>"` attribute, which sets `--track` and `--track-dot`. Components use `bg-track`, `border-track`, `bg-track-dot` and opacity modifiers such as `bg-track/10`. No inline styles.
+- A page or element gets its accent from a `data-track-color="<hue>"` attribute, which sets `--track` and `--track-dot`. Every mark that carries meaning (dots, map lines, progress fills, rings) uses `track-dot`. `track` is used only for low-opacity tints such as `bg-track/10`. No inline styles.
 - Track colours are never used for text, because several of them fail AA contrast as text.
 
 ### Type scale

@@ -53,7 +53,7 @@ Adapted from a larger SaaS engineering standard. Only rules that fit a static, c
 - Open each doc with one bold summary sentence. Rules as bullets, mappings as tables, flows in Mermaid.
 - Relative links between docs. Each fact has one home; other docs link to it.
 - Unknowns are written as `> **Open question:** …` and never implemented as a guess.
-- Hard-to-reverse choices get an ADR in `docs/decisions/` (Context, Decision, Alternatives considered, Consequences). Never edit an accepted ADR; supersede it.
+- Hard-to-reverse choices get an ADR in `docs/decisions/` (Context, Decision, Alternatives considered, Consequences). An ADR may be edited while the branch that adds it is not yet merged into `main`. Once merged, it is never edited; a new ADR supersedes it.
 - When you add an environment variable: add it to the env schema, `.env.example` (with a comment) and the docs in the same change.
 - `AGENTS.md`/`CLAUDE.md` stay short and point to docs; they never paste long docs or code.
 
