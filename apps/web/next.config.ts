@@ -2,7 +2,11 @@ import { createContentCollectionPlugin } from "@content-collections/next"
 import type { NextConfig } from "next"
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["@workspace/ui"],
+  transpilePackages: [
+    "@workspace/ui",
+    "@workspace/config",
+    "@workspace/content",
+  ],
 }
 
 // Content lives in packages/content (ADR-0005). The `content:generate` task builds it

@@ -1,8 +1,15 @@
+import type { Metadata } from "next"
 import { Anek_Bangla, Hind_Siliguri, JetBrains_Mono } from "next/font/google"
 
 import "@workspace/ui/globals.css"
-import { ThemeProvider } from "@/components/theme-provider"
+import { site } from "@workspace/config/site"
+import { t } from "@workspace/config/t"
 import { cn } from "@workspace/ui/lib/utils"
+
+import { SiteFooter } from "@/components/site-footer"
+import { SiteHeader } from "@/components/site-header"
+import { SkipLink } from "@/components/skip-link"
+import { ThemeProvider } from "@/components/theme-provider"
 
 // Fonts and weights: docs/design.md#fonts. Anek Bangla is variable, so it loads
 // as one file without a weight list (docs/development/performance.md#fonts).
@@ -30,6 +37,16 @@ const codeFont = JetBrains_Mono({
   variable: "--font-code",
 })
 
+const MAIN_CONTENT_ID = "main"
+
+export const metadata: Metadata = {
+  metadataBase: new URL(site.url),
+  title: { default: site.name.bn, template: `%s · ${site.name.bn}` },
+  description: t("site.tagline"),
+  applicationName: site.name.bn,
+  openGraph: { siteName: site.name.bn, locale: "bn_BD", type: "website" },
+}
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -46,8 +63,15 @@ export default function RootLayout({
         codeFont.variable
       )}
     >
-      <body>
-        <ThemeProvider>{children}</ThemeProvider>
+      <body className="flex min-h-svh flex-col">
+        <ThemeProvider>
+          <SkipLink targetId={MAIN_CONTENT_ID} />
+          <SiteHeader />
+          <main id={MAIN_CONTENT_ID} tabIndex={-1} className="flex-1">
+            {children}
+          </main>
+          <SiteFooter />
+        </ThemeProvider>
       </body>
     </html>
   )

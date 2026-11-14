@@ -169,13 +169,14 @@ WCAG 2.2 AA, computed from the values in `globals.css`: text needs 4.5:1, while 
 
 Generated shadcn components (`packages/ui/src/components/`) are added with the CLI and not edited, except for the changes listed here. Re-apply them whenever a component is regenerated.
 
-| Component    | Change                                                                                                                                                                                                  | Why                                                                                                    |
-| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| `button.tsx` | Size map: `default` `h-11 px-5`, `lg` `h-12 px-6`, `icon` `size-11`, `icon-lg` `size-12`; `xs`, `sm`, `icon-xs` and `icon-sm` keep their size on a mouse and grow to 44px on touch (`pointer-coarse:`). | 44px touch targets ([Accessibility](#accessibility), [ADR-0008](decisions/ADR-0008-design-tokens.md)). |
+| Component    | Change                                                                                                                                                                                                  | Why                                                                                                                                                            |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `button.tsx` | Outline variant: `bg-card` fill and `hover:bg-muted` instead of `bg-input/30` / `hover:bg-input/50`.                                                                                                    | `--input` is darker than the design's line2 (3:1 control edges), so the generated fill turned grey; the design's outline buttons are white with a thin border. |
+| `button.tsx` | Size map: `default` `h-11 px-5`, `lg` `h-12 px-6`, `icon` `size-11`, `icon-lg` `size-12`; `xs`, `sm`, `icon-xs` and `icon-sm` keep their size on a mouse and grow to 44px on touch (`pointer-coarse:`). | 44px touch targets ([Accessibility](#accessibility), [ADR-0008](decisions/ADR-0008-design-tokens.md)).                                                         |
 
 Used as generated, with these notes:
 
-- `sheet.tsx`: its built-in close button has an English "Close" label and its overlay uses `bg-black/80`. Pass `showCloseButton={false}` and render a `SheetClose` with a label from `t()` instead; the overlay colour is left as generated.
+- `sheet.tsx`: its built-in close button has an English "Close" label and its overlay uses `bg-black/80` (kept: a scrim carries no text). Every sheet uses `AppSheetContent` (`apps/web/components/app-sheet.tsx`) instead of `SheetContent`: it turns the built-in button off, adds a close button labelled through `t()`, and turns the slide off for reduced motion. The overlay fade is turned off for reduced motion in `globals.css`, since the wrapper cannot reach it.
 - The CLI (`pnpm dlx shadcn@latest add <name> -c apps/web`) also adds `cn` to `apps/web/package.json`. The components live in `packages/ui`, which already depends on it, so revert that line.
 
 ## Style

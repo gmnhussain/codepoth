@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { formatDate, formatNumber } from "./format"
+import { formatDate, formatNumber, formatYear } from "./format"
 
 describe("formatNumber", () => {
   it("uses Bangla digits", () => {
@@ -30,5 +30,11 @@ describe("formatDate", () => {
 
   it("rejects a date that does not exist", () => {
     expect(() => formatDate("2026-02-30")).toThrow(RangeError)
+  })
+})
+
+describe("formatYear", () => {
+  it("shows the year in Bangla digits without grouping", () => {
+    expect(formatYear(new Date("2026-11-14T12:00:00Z"))).toBe("২০২৬")
   })
 })

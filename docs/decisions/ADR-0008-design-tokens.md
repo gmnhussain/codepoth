@@ -62,7 +62,7 @@ The design's sizes snap to Tailwind's default scale:
 
 ### Touch targets
 
-The generated shadcn `Button` sizes are edited, the one documented change to a generated component: `default` becomes `h-11 px-5`, `lg` `h-12 px-6`, `icon` `size-11` and `icon-lg` `size-12`; `xs`, `sm`, `icon-xs` and `icon-sm` grow to 44px on coarse pointers (`pointer-coarse:`). The edit is listed in [design.md](../design.md) and has to be kept when the component is regenerated.
+The generated shadcn `Button` sizes are edited, the one documented change to a generated component: `default` becomes `h-11 px-5`, `lg` `h-12 px-6`, `icon` `size-11` and `icon-lg` `size-12`; `xs`, `sm`, `icon-xs` and `icon-sm` grow to 44px on coarse pointers (`pointer-coarse:`). The outline variant is edited too: it fills with `bg-card` (hover `bg-muted`) instead of `bg-input/30`, because the darker `--input` made that fill grey. Both edits are listed in [design.md](../design.md) and have to be kept when the component is regenerated.
 
 ## Alternatives considered
 

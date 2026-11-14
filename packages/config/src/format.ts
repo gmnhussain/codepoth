@@ -12,6 +12,11 @@ const dateFormat = new Intl.DateTimeFormat(UI_LOCALE, {
   timeZone: "UTC",
 })
 
+const yearFormat = new Intl.DateTimeFormat(UI_LOCALE, {
+  year: "numeric",
+  timeZone: "UTC",
+})
+
 const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/
 
 /** Formats a number with Bangla digits, e.g. `1234` → `"১,২৩৪"`. */
@@ -32,4 +37,9 @@ export function formatDate(isoDate: string): string {
     throw new RangeError(`Not a valid calendar date: "${isoDate}"`)
   }
   return dateFormat.format(date)
+}
+
+/** Formats the year of a date without digit grouping, e.g. `"২০২৬"`. */
+export function formatYear(date: Date): string {
+  return yearFormat.format(date)
 }

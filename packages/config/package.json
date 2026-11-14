@@ -13,6 +13,7 @@
   },
   "devDependencies": {
     "@types/node": "catalog:",
+    "@types/react": "catalog:",
     "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
     "eslint": "catalog:",
@@ -24,6 +25,10 @@
     "./labels": "./src/labels.ts",
     "./t": "./src/t.ts",
     "./format": "./src/format.ts",
-    "./track-colors": "./src/track-colors.ts"
+    "./track-colors": "./src/track-colors.ts",
+    "./logo": "./src/logo.tsx"
+  },
+  "peerDependencies": {
+    "react": "catalog:"
   }
 }

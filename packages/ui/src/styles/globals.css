@@ -6,6 +6,8 @@
 @source "../../../apps/**/*.{ts,tsx}";
 @source "../../../components/**/*.{ts,tsx}";
 @source "../**/*.{ts,tsx}";
+/* packages/config holds the logo (docs/spec.md#config). */
+@source "../../../config/src/**/*.{ts,tsx}";
 
 @theme inline {
   /* next/font sets --font-body, --font-display and --font-code on <html>
@@ -234,6 +236,13 @@
   h3,
   h4 {
     @apply font-heading leading-snug;
+  }
+  /* The generated sheet overlay is out of reach of the app's sheet wrapper,
+     so its fade is turned off here for reduced motion (docs/design.md). */
+  @media (prefers-reduced-motion: reduce) {
+    [data-slot="sheet-overlay"] {
+      transition: none;
+    }
   }
   button:not(:disabled),
   [role="button"]:not(:disabled) {
