@@ -26,7 +26,7 @@ Every route is pre-rendered ([ADR-0004](../decisions/ADR-0004-vercel-ssg-not-sta
 
 ## Loaded only when needed
 
-- Search: the page carries only the header button and the shortcut listener. The dialog's code is its own chunk, fetched when the button is hovered or focused or the dialog first opens; Pagefind (`/pagefind/pagefind.js`, its worker, WASM and index) is fetched only once the dialog opens, through `import(/* webpackIgnore: true */ …)`, never bundled ([ADR-0015](../decisions/ADR-0015-site-search-with-pagefind.md)). Sizes: [Site search](#site-search-2026-11-15).
+- Search: the page carries only the header button and the shortcut listener. The dialog's code is its own chunk, fetched once the page has loaded and is idle (`requestIdleCallback` after `load`, at most 2 s), or earlier when the button is hovered or focused or search opens, so a reader who types right after ⌘K keeps every character; Pagefind (`/pagefind/pagefind.js`, its worker, WASM and index) is fetched only once the dialog opens, through `import(/* webpackIgnore: true */ …)`, never bundled ([ADR-0015](../decisions/ADR-0015-site-search-with-pagefind.md)). Sizes: [Site search](#site-search-2026-11-15).
 - Giscus comments load when the comments area scrolls into view (IntersectionObserver).
 - `<DeepDive>` is a native `<details>` element and needs no JavaScript.
 
@@ -142,16 +142,19 @@ Pagefind search ([ADR-0015](../decisions/ADR-0015-site-search-with-pagefind.md))
 
 The 2 KB on every page is the header's search button, the ⌘K / Ctrl+K listener and the platform check for the shortcut box. Nothing of the dialog or of Pagefind is in it.
 
+The fix that keeps keys typed right after ⌘K (the idle prefetch of the dialog's chunk and a synchronous open, [ADR-0015](../decisions/ADR-0015-site-search-with-pagefind.md#what-loads-in-the-browser-and-when)) adds 0.1–0.2 KB to every route, measured the same way: Home 221.2 KB, lesson 244.3 KB, topic 224.1 KB, Map 230.8 KB, Contents 225.4 KB, Glossary 222.7 KB, Dashboard 230.8 KB, About 218.5 KB.
+
 ### What opening search downloads
 
 Bytes over the wire (`encodedDataLength`, page and Pagefind's worker), cold cache, drafts index of 230 pages:
 
-| When                          | Transfer | What                                                                                                                                           |
-| ----------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| Page load                     | 0        | No search request.                                                                                                                             |
-| Dialog opens                  | 87.9 KB  | dialog chunk 4.4 KB, `pagefind.js` 13.3 KB, worker 0.6 KB, entry 0.7 KB, index metadata 1.9 KB, WASM 67.0 KB (already compressed by Pagefind). |
-| First query (`React`)         | 34.4 KB  | one index chunk 24.2 KB and a fragment per shown result (0.7–3.7 KB each).                                                                     |
-| Next query (`ফাংশনের return`) | 2.7 KB   | one fragment; the index chunk is already loaded.                                                                                               |
+| When                          | Transfer | What                                                                                                                                    |
+| ----------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| Page load                     | 0        | No search request.                                                                                                                      |
+| Idle after load               | 4.4 KB   | the dialog's chunk only: 50–140 ms after `load` on a fast connection, about 1.0–1.3 s after `load` on Slow 3G. No `/pagefind/` request. |
+| Dialog opens                  | 83.5 KB  | `pagefind.js` 13.3 KB, worker 0.6 KB, entry 0.7 KB, index metadata 1.9 KB, WASM 67.0 KB (already compressed by Pagefind).               |
+| First query (`React`)         | 34.4 KB  | one index chunk 24.2 KB and a fragment per shown result (0.7–3.7 KB each).                                                              |
+| Next query (`ফাংশনের return`) | 2.7 KB   | one fragment; the index chunk is already loaded.                                                                                        |
 
 - Result links do not prefetch their pages (`prefetch={false}`): with prefetching, the first query also fetched 25.8 KB of lesson data the reader had not chosen (fixed in `d18475f`).
 - On disk the bundle is about 0.9 MB, mostly fragments (one per page) and Pagefind's unused UI files; a reader only downloads what the table shows.

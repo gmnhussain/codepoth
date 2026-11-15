@@ -77,6 +77,14 @@ Before another word, every form now finds all of the base's rows: `ফাংশ�
 - A row shows the track's dot, the title, where it sits (track · topic) and its kind; terms have no track in the index and show a neutral dot.
 - Known limit, ranking: `React` ranks the React Native lesson and topic above the React topic. It is not tuned now: nearly every lesson is still a short draft, and Pagefind's ranking depends on page length, so weights set today would be tuned to stubs. Revisit it once real lessons are published.
 
+### What loads in the browser, and when
+
+- With the page: only the header's search button, the ⌘K / Ctrl+K listener and the platform check for the shortcut box.
+- After the page has loaded and is idle (`requestIdleCallback` after the `load` event, at most 2 s; a plain 2 s timer where it is missing), or earlier when the button is hovered or focused or search opens: the dialog's own chunk (3.9 KB gzip). Once it is here, the dialog is rendered closed, which renders and fetches nothing.
+- When search opens: Pagefind (`pagefind.js`, its worker, the WASM and the index), never before, and never bundled.
+- Opening runs as one synchronous update (`flushSync`) once the dialog's code is here, so the field exists and has focus before the next key event: a reader who types right after ⌘K or a click keeps every character. Keys are not held back and replayed, which would break Bangla input methods such as Avro.
+- Measured on a fresh page view (cold cache), ⌘K or a click followed at once by "react": every character kept once the chunk has arrived, 50–140 ms after `load` on a fast connection and about 1.0–1.3 s after `load` on Slow 3G (400 ms latency). Opening before that still loses what is typed until the dialog appears; closing that window would mean putting the dialog's field in every page's First Load JS.
+
 ### Not verified
 
 Whether Vercel's Next.js builder collects files written to `public/` after `next build` has finished. `next start` serves them locally, but no Next.js or Vercel document found says when the builder reads `public/`. On the first preview deploy, check the build log for the line `search index: N of M pages` and request `/pagefind/pagefind.js`. If the file is missing, the fallback is to build the records from content before `next build` (`addCustomRecord`), recorded in a new ADR that supersedes this part.
@@ -88,6 +96,8 @@ Whether Vercel's Next.js builder collects files written to `public/` after `next
 - **Records built from the MDX source before the build:** the search would see source, not what the reader sees (rendered components, glossary popovers, quiz text), and it would duplicate rendering logic. Kept as the fallback for Vercel.
 - **Pagefind 1.6, whose `data-pagefind-title` makes any element with an id a sub-result:** it was 14 days old when this was decided; moving the id to the term's heading gives the same result with 1.5.
 - **Indexing whole pages including navigation:** every page would match every track and topic name in the header and menus.
+- **Buffering keys typed before the dialog appears and replaying them into the field:** it breaks input methods that compose Bangla from several key presses (Avro and others).
+- **The dialog in every page's First Load JS:** no wait at all on the first open, for about 4 KB gzip on every page; the idle prefetch leaves only the first moments after load.
 
 ## Consequences
 
