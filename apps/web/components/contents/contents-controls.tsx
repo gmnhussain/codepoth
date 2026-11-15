@@ -41,12 +41,22 @@ const CONTAINERS = [
   "[data-filter-track]",
 ] as const
 
-/** Opens the track section a `#track-…` link points at (jump links, "পাঠগুলো … →"). */
+/**
+ * Opens the track a `#track-…` link points at (jump links, "পাঠগুলো … →").
+ * The target sits inside the track's `<details>`, which browsers with
+ * "ancestor details revealing" open themselves (even without JavaScript).
+ * This is the fallback for browsers that do not: it runs everywhere, does
+ * nothing when the track is already open, and otherwise opens it and
+ * scrolls, since the hidden target could not be scrolled to.
+ */
 function openHashTarget() {
   const id = decodeURIComponent(window.location.hash.slice(1))
   if (id === "") return
-  const details = document.getElementById(id)?.querySelector("details")
-  if (details instanceof HTMLDetailsElement) details.open = true
+  const target = document.getElementById(id)
+  const details = target?.closest("details")
+  if (!(details instanceof HTMLDetailsElement) || details.open) return
+  details.open = true
+  target?.scrollIntoView()
 }
 
 /**
@@ -133,7 +143,8 @@ export function ContentsControls({
     for (const element of details) element.open = true
   }, [query, status, progress, rootId])
 
-  // Open a #track-… target on load and on in-page links.
+  // Open a #track-… target on load and on in-page links. In a browser that
+  // already revealed it, the track is open and this does nothing.
   useEffect(() => {
     openHashTarget()
     window.addEventListener("hashchange", openHashTarget)

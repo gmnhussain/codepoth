@@ -35,11 +35,10 @@ export function TrackSection({
 
   return (
     <section
-      id={anchor}
       aria-labelledby={`${anchor}-heading`}
       data-filter-track=""
       data-track-color={track.color}
-      className="scroll-mt-24 rounded-2xl border bg-card"
+      className="relative rounded-2xl border bg-card"
     >
       <details open={defaultOpen} className="group/track">
         <summary
@@ -73,6 +72,19 @@ export function TrackSection({
             className="size-5 shrink-0 text-muted-foreground group-open/track:rotate-180"
           />
         </summary>
+        {/* The #track-… target. It sits in the details' content, not the
+            summary, so a browser that reveals hidden fragment targets
+            ("ancestor details revealing") opens the track itself, even
+            without JavaScript. Placed at the card's top, so the card lands
+            where the scroll margin puts it. Browsers without that behaviour
+            get the island's fallback (contents-controls.tsx). A cold load
+            with JavaScript on still shifts: Chrome paints a frame scrolled to
+            the still-closed track before parsing ends (performance.md). */}
+        <span
+          id={anchor}
+          aria-hidden="true"
+          className="absolute inset-x-0 top-0 scroll-mt-24"
+        />
         <div className="border-t px-5 pt-3 pb-4">
           <ol className="ms-2 flex flex-col gap-2 border-s-4 border-track-dot/50">
             {track.topicKeys.map((key, index) => {

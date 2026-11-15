@@ -50,6 +50,13 @@ Core Web Vitals at the 75th percentile, on mobile:
 - `@next/bundle-analyzer` to inspect client bundles when a page's JavaScript grows (planned).
 - Turborepo remote cache on Vercel to keep builds fast.
 
+### Known layout shift
+
+- **Page:** `/contents#track-…` (a link to a closed track, e.g. `/contents#track-frontend`), measured 2026-11-15 in headless Chrome on a local production build.
+- **CLS:** cold load (browser cache cleared) with JavaScript on: 0.36 at 1280px, 0.62 at 768px. Warm load: 0. JavaScript off: 0. Loads without a hash: 0.
+- **Cause:** the track's `#track-…` target sits inside its closed `<details>`, and Chrome opens it itself ("ancestor details revealing") once parsing ends. On a cold load with JavaScript on, Chrome first paints a frame already scrolled to the still-closed track, with the closed tracks below it in view; opening the track then pushes them down. Without JavaScript, parsing ends before the first paint, so that frame does not exist. Opening the track from the island instead (the earlier behaviour) measured the same.
+- **Status:** left for a performance trace in Phase 5, to find what triggers the early paint.
+
 ## Baseline (2026-11-15, end of Phase 2)
 
 Lighthouse 13.6.0, default mobile profile (simulated slow 4G and 4× CPU throttling), against a local production build with drafts (`next start`, commit `ed3ed97`); median of 3 runs per page.
