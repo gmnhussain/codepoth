@@ -31,10 +31,9 @@ export function generateMetadata(): Metadata {
 }
 
 /**
- * The reader's dashboard in its first-visit state (D-32, D-40): nothing is
- * saved yet, so it invites the first lesson. Progress, quiz results,
- * bookmarks, the reading heatmap and export/import arrive with reader
- * progress (Phase 3).
+ * The reader's dashboard in its first-visit state: nothing is saved yet, so
+ * it invites the first lesson. Progress, quiz results, bookmarks, the
+ * reading heatmap and export/import arrive with reader progress (ADR-0014).
  */
 export default function DashboardPage() {
   const startLesson = homeStartLesson(getContentGraph())

@@ -2,7 +2,7 @@ import type { JsonLdData } from "@workspace/content/json-ld"
 import { serializeJsonLd } from "@workspace/content/json-ld"
 
 /**
- * Structured data as `<script type="application/ld+json">` (D-37). The only
+ * Structured data as `<script type="application/ld+json">` (conventions §12). The only
  * place the app writes raw HTML: `serializeJsonLd` escapes `<`, `>` and `&`,
  * so content such as `</script>` cannot leave the script element (tested in
  * packages/content).

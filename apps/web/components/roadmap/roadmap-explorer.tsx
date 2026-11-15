@@ -25,7 +25,7 @@ import { useT } from "@/lib/labels-context"
 import { useMediaQuery } from "@/lib/use-media-query"
 import { useUrlParam, writeUrlParams } from "@/lib/url-state"
 
-/** Zoom steps (D-35: 50–120 %); the map opens at 80 %. */
+/** Zoom steps, 50–120 % (design.md, Roadmap page); the map opens at 80 %. */
 const ZOOMS = [0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.2] as const
 const DEFAULT_ZOOM = 3
 /** Padding around the drawing inside the scroll box (px-10 pt-28). */

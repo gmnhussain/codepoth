@@ -8,7 +8,7 @@ export type SitemapEntry = {
 }
 
 /**
- * Topic and lesson pages for the sitemap (D-37). Only published lessons are
+ * Topic and lesson pages for the sitemap (conventions §12). Only published lessons are
  * listed, and only topics with one, even if this graph includes drafts; a
  * topic's date is its newest lesson's.
  */

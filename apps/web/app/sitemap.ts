@@ -11,7 +11,7 @@ import { NAV_ROUTES } from "@/lib/routes"
 /**
  * The sitemap, only in an indexable build (a production deploy without
  * drafts); any other build answers 404, and robots.txt does not mention it
- * (D-37). It lists the indexable header pages, About when published, topics
+ * (conventions §12). It lists the indexable header pages, About when published, topics
  * with a published lesson and published lessons — never a draft or
  * /dashboard.
  */
