@@ -100,3 +100,23 @@ The same 9 files load on all three pages, 379.4 KB in all (transfer size, from L
 - They do not delay LCP: every `@font-face` uses `font-display: swap` with a metric-matched fallback (`next/font`), Lighthouse's font-display check passes, and in these runs every font had finished (94–147 ms) before the first paint (205–228 ms observed), where LCP equals FCP. The LCP element is text: Home's heading, the lesson's description, the Map's summary.
 - JetBrains Mono is not preloaded but loads on all three pages, because each shows some monospace text (track numbers, lesson numbers, code). On a slow connection that is 40 KB fetched after the CSS.
 - The largest single file is Anek Bangla's Bangla subset (152.8 KB, the variable font). It is the first candidate if font bytes ever need to shrink.
+
+## With reader progress (2026-11-15, end of Phase 3)
+
+Same setup as the Phase 2 baseline (Lighthouse 13.6.0, default mobile profile, local production build with drafts, median of 3 runs), at commit `4bcd381`, with saved progress in the browser: three lessons done, two in progress, a bookmark, a quiz attempt and a last-read lesson at a saved section. Lighthouse ran against a Chrome that already held this progress, with `--disable-storage-reset`; Home's request for `/lessons.json` in the runs shows the progress was read.
+
+| Page                  | Performance | LCP    | CLS | TBT    | Accessibility | Best practices | SEO  |
+| --------------------- | ----------- | ------ | --- | ------ | ------------- | -------------- | ---- |
+| Home                  | 100         | 0.72 s | 0   | 52 ms  | 100           | 100            | 66\* |
+| Lesson (`use-effect`) | 100         | 0.77 s | 0   | 59 ms  | 100           | 100            | 66\* |
+| Map (`/roadmap`)      | 100         | 0.81 s | 0   | 75 ms  | 100           | 100            | 66\* |
+| Topic (React)         | 100         | 0.70 s | 0   | 46 ms  | 100           | 100            | 66\* |
+| Dashboard             | 98          | 0.65 s | 0   | 176 ms | 100           | 100            | 66\* |
+
+\* As in the Phase 2 baseline: the only failing SEO audit is `is-crawlable`, because a build with drafts is `noindex` on purpose.
+
+- Every page that shows progress stays at CLS 0 with saved progress: marks and counts change in place, and blocks that depend on the reader have reserved slots ([ADR-0014](../decisions/ADR-0014-reader-progress-implementation.md)). Checks in the browser also measured CLS 0 at 375, 768 and 1280 px in both themes on every page.
+- The Dashboard has the most to render on the client (every section is drawn from the progress), so its TBT is the highest (112–213 ms across the three runs); it is a reader's page, visited after reading.
+- A first run found one accessibility failure, fixed in `4bcd381`: the Dashboard's "মোট অগ্রগতি" heading had been rendered through Base UI's `ProgressLabel`, which sets `role="presentation"`.
+- First Load JS per route (gzip, without `noModule` scripts): Home 179.9 KB, lesson 203.0 KB, topic 182.8 KB, Map 189.7 KB, Contents 184.2 KB, Glossary 181.5 KB, Dashboard 189.2 KB, About 177.3 KB. Against the Phase 2 numbers above, a page gains about 2–8 KB for its progress islands and the store; Zod is not in any of them (it loads in its own chunk after hydration). Home's resume data and the import/export code load only when used.
+- The known layout shift on `/contents#track-…` cold loads (above) is unchanged by reader progress.

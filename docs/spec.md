@@ -42,6 +42,7 @@ Footer links stay inside the v1 pages: author → the author block on Home (`/#a
 - Lesson states: done (`doneAt` present) / in progress (entry without `doneAt`) / not started (no entry). Topic, group and track states are derived from their lessons.
 - Dashboard ("আমার অগ্রগতি"/"ড্যাশবোর্ড") supports export to JSON, import (merge or replace) and clear-all with confirmation.
 - Never send progress anywhere. Footer says: কোনো ট্র্যাকিং নেই · অগ্রগতি শুধু তোমার ব্রাউজারে.
+- How it is built (the store, the lazily loaded validator, no layout shift, Home's `/lessons.json`): [ADR-0014](decisions/ADR-0014-reader-progress-implementation.md). What each page shows: [design.md](design.md). Measurements with saved progress: [performance.md](development/performance.md#with-reader-progress-2026-11-15-end-of-phase-3).
 
 ## Config
 
