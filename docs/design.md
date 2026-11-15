@@ -266,7 +266,7 @@ The MDX components for lesson bodies live in `apps/web/components/mdx/` and are 
 
 ## About page
 
-`/about` (no design reference; laid out like the other text pages, `max-w-3xl`): the H1, lead and "হালনাগাদ" date from `content/pages/about.mdx`, the author block (Home's `AuthorCard`), then the MDX prose (`about-components.tsx`), where `<Privacy>` renders the `#privacy` card the footer links to. The footer's "সাইট" column shows "সম্পর্কে" (`/about`) and "প্রাইভেসি" (`/about#privacy`) only when the build shows the page (ADR-0012).
+`/about` (no design reference; laid out like the other text pages, `max-w-3xl`): the H1, lead and "হালনাগাদ" date from `content/pages/about.mdx`, the author block (Home's `AuthorCard`), then the MDX prose (`about-components.tsx`, which spreads the paragraphs, lists, links and inline code lessons use from `mdx/prose-components.tsx`), where `<Privacy>` renders the `#privacy` card the footer links to. The footer's "সাইট" column shows "সম্পর্কে" (`/about`) and "প্রাইভেসি" (`/about#privacy`) only when the build shows the page (ADR-0012).
 
 ## shadcn customisations
 

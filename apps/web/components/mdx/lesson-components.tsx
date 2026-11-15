@@ -11,7 +11,7 @@ import type { QuizQuestion } from "@/components/mdx/quiz"
 import { QuizBlock } from "@/components/mdx/quiz-block"
 import { Term } from "@/components/mdx/term"
 import { Practice } from "@/components/mdx/practice"
-import { ProseList } from "@/components/mdx/prose-list"
+import { proseComponents } from "@/components/mdx/prose-components"
 import { Steps } from "@/components/mdx/steps"
 import { Summary } from "@/components/mdx/summary"
 
@@ -24,17 +24,9 @@ const PROSE =
 
 type Children = { readonly children?: ReactNode }
 
-/** Inline `code` is plain text on a muted chip; block code is handled by rehype-pretty-code. */
-function Code({ className, ...props }: ComponentProps<"code">) {
-  const isBlock = Object.hasOwn(props, "data-language")
-  if (isBlock) return <code className={className} {...props} />
-  return (
-    <code className="rounded-md bg-muted px-1.5 py-0.5 font-mono" {...props} />
-  )
-}
-
 /** Server-rendered MDX components for lesson bodies (blocks and prose). */
 export const lessonServerComponents = {
+  ...proseComponents,
   Summary,
   Concept: ({ children }: Children) => (
     <BlockSection block="concept" className={PROSE}>
@@ -57,17 +49,6 @@ export const lessonServerComponents = {
       {...props}
     />
   ),
-  p: (props: ComponentProps<"p">) => (
-    <p className="text-lg leading-reading" {...props} />
-  ),
-  ul: ProseList,
-  a: (props: ComponentProps<"a">) => (
-    <a
-      className="font-medium underline decoration-foreground/30 underline-offset-4 hover:decoration-foreground"
-      {...props}
-    />
-  ),
-  code: Code,
   figure: CodeFigure,
   figcaption: CodeCaption,
   pre: CodePre,
