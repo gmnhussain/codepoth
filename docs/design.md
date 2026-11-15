@@ -230,7 +230,12 @@ The MDX components for lesson bodies live in `apps/web/components/mdx/` and are 
 - Each track: number badge, name (the `h2`), subtitle with topic and lesson counts, then its topics on a line in the track colour: topic link (`h3`), position, lesson count, an interchange chip, then its groups (`h4` in a `<details>`) or lessons. A topic whose home is another track shows "পাঠগুলো {track} লাইনে →" instead of lessons, linking to `#track-{id}`.
 - Lesson numbers are track.topic.lesson (`৪.৪.৩`), `aria-hidden`, and hidden below `sm`.
 - "লাইনে যাও" (from `lg`): plain `<a href="#track-…">` links, so `hashchange` fires and the island opens the target track. In-page links that must open a `<details>` use `<a>`, not `next/link`, which changes the hash without that event.
-- The reader's progress (status filters, done counts, "এখন পড়ছ", "এখানে থেমেছিলে") arrives with reader progress.
+- Reader progress ([ADR-0014](decisions/ADR-0014-reader-progress-implementation.md)), with no layout shift:
+  - Status filter before the search: "সব / বাকি / পড়া শেষ" toggle buttons (`aria-pressed`, fixed labels) with each count in a box as wide as the total. "বাকি" is every lesson not done. It lives in `?status=todo|done` like the search's `?q=` (no parameter: all), combines with the search, uses the same hide/open/restore logic, and "ছাঁকনি মুছে দাও" in the empty state clears both. Pure helpers in `lib/progress/status-filter.ts`.
+  - Header: a fourth stat, "তুমি পড়েছ" (lessons done), in a box as wide as the total.
+  - Each track's summary: "{done}/{total} পড়া" with a thin bar in the track colour, at a fixed width; the jump links show "d/t".
+  - Groups: "এখন পড়ছ" on the group holding the topic's lesson to continue with, "গ্রুপ শেষ" when finished, and "d/t" instead of the lesson count.
+  - Lessons: the state mark (named by its state) before the number, and "এখানে থেমেছিলে" on the last-read lesson (screen-reader only below `sm`).
 
 ## Roadmap page
 

@@ -13,6 +13,8 @@ import { cn } from "@workspace/ui/lib/utils"
 
 import { LessonItems } from "@/components/contents/lesson-items"
 import { SUMMARY_ROW } from "@/components/contents/summary-class"
+import { ProgressCount } from "@/components/lesson/progress-count"
+import { GroupStatus } from "@/components/topic/group-status"
 import { TopicName } from "@/components/topic/topic-name"
 
 /** A topic name as a 44px target. */
@@ -134,9 +136,11 @@ export function TopicItem({
                 <h4 className="flex-1 font-heading font-semibold">
                   {group.title}
                 </h4>
-                <span className="text-sm text-muted-foreground">
-                  {t("topic.lessonCount", { n: group.lessonIds.length })}
-                </span>
+                <GroupStatus
+                  lessonIds={group.lessonIds}
+                  topicLessonIds={topic.lessonIds}
+                />
+                <ProgressCount lessonIds={group.lessonIds} />
               </summary>
               <div className="px-1 pb-2">
                 <LessonItems

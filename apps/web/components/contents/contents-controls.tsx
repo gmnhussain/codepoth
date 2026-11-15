@@ -7,15 +7,32 @@ import {
   SearchIcon,
 } from "lucide-react"
 
+import { formatNumber } from "@workspace/config/format"
 import { matchesQuery } from "@workspace/content/search"
 import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
 
 import { useT } from "@/lib/labels-context"
+import {
+  STATUS_FILTERS,
+  passesStatus,
+  statusCounts,
+  statusFilterOf,
+} from "@/lib/progress/status-filter"
+import type { StatusFilter } from "@/lib/progress/status-filter"
+import { useProgress } from "@/lib/progress-store.client"
 import { useUrlParam, writeUrlParams } from "@/lib/url-state"
 
 /** The search query's URL parameter: /contents?q=… */
 const QUERY_PARAM = "q"
+/** The status filter's URL parameter: /contents?status=todo|done (none: all). */
+const STATUS_PARAM = "status"
+
+const FILTER_LABEL = {
+  all: "contents.filterAll",
+  todo: "contents.filterTodo",
+  done: "contents.filterDone",
+} as const satisfies Record<StatusFilter, `contents.${string}`>
 
 const LESSON = "[data-lesson-search]"
 const CONTAINERS = [
@@ -33,28 +50,43 @@ function openHashTarget() {
 }
 
 /**
- * Search, open-all/close-all and hash handling for the contents page. The
- * list itself is server-rendered (track-section.tsx); this island only sets
- * `hidden` and `open` on it, so the page works without JS as plain
- * `<details>`. The query lives only in the URL (`?q=`).
+ * Search, the status filter (সব / বাকি / পড়া শেষ), open-all/close-all and
+ * hash handling for the contents page. The list itself is server-rendered
+ * (track-section.tsx); this island only sets `hidden` and `open` on it, so
+ * the page works without JS as plain `<details>`. Query and filter live only
+ * in the URL (`?q=`, `?status=`); the filter reads the reader's progress.
  */
 export function ContentsControls({
   rootId,
-  searchTexts,
+  lessons,
 }: {
   readonly rootId: string
-  /** Every lesson's searchable text, the same as its `data-lesson-search`. */
-  readonly searchTexts: readonly string[]
+  /** Every lesson's id and searchable text (its `data-lesson-*` values). */
+  readonly lessons: readonly {
+    readonly id: string
+    readonly searchText: string
+  }[]
 }) {
   const t = useT(["contents"])
   const inputId = useId()
   const inputRef = useRef<HTMLInputElement>(null)
+  const progress = useProgress()
   const query = useUrlParam(QUERY_PARAM)
-  const isFiltering = query.trim() !== ""
+  const status = statusFilterOf(useUrlParam(STATUS_PARAM))
+  const hasQuery = query.trim() !== ""
+  const isFiltering = hasQuery || status !== "all"
+  const counts = statusCounts(
+    progress,
+    lessons.map((lesson) => lesson.id)
+  )
   const matched = isFiltering
-    ? searchTexts.filter((text) => matchesQuery(text, query)).length
+    ? lessons.filter(
+        (lesson) =>
+          (!hasQuery || matchesQuery(lesson.searchText, query)) &&
+          passesStatus(progress, lesson.id, status)
+      ).length
     : undefined
-  // Open state before a search, restored when the query is cleared.
+  // Open state before filtering, restored when query and filter are cleared.
   const savedOpen = useRef<Map<HTMLDetailsElement, boolean> | undefined>(
     undefined
   )
@@ -64,8 +96,9 @@ export function ContentsControls({
     const root = document.getElementById(rootId)
     if (root === null) return
     const details = [...root.querySelectorAll("details")]
+    const isQuery = query.trim() !== ""
 
-    if (query.trim() === "") {
+    if (!isQuery && status === "all") {
       for (const element of root.querySelectorAll<HTMLElement>("[hidden]")) {
         element.hidden = false
       }
@@ -80,7 +113,10 @@ export function ContentsControls({
       details.map((element) => [element, element.open])
     )
     for (const lesson of root.querySelectorAll<HTMLElement>(LESSON)) {
-      lesson.hidden = !matchesQuery(lesson.dataset.lessonSearch ?? "", query)
+      lesson.hidden = !(
+        (!isQuery || matchesQuery(lesson.dataset.lessonSearch ?? "", query)) &&
+        passesStatus(progress, lesson.dataset.lessonId ?? "", status)
+      )
     }
     for (const element of root.querySelectorAll<HTMLElement>(
       "[data-filter-referenced]"
@@ -95,7 +131,7 @@ export function ContentsControls({
       }
     }
     for (const element of details) element.open = true
-  }, [query, rootId])
+  }, [query, status, progress, rootId])
 
   // Open a #track-… target on load and on in-page links.
   useEffect(() => {
@@ -115,6 +151,39 @@ export function ContentsControls({
   return (
     <div className="flex flex-col gap-3">
       <div className="flex flex-wrap items-center gap-3 rounded-2xl border bg-card p-3">
+        <div
+          role="group"
+          aria-label={t("contents.filterLabel")}
+          className="flex flex-wrap gap-2"
+        >
+          {STATUS_FILTERS.map((filter) => (
+            <Button
+              key={filter}
+              variant={status === filter ? "default" : "outline"}
+              aria-pressed={status === filter}
+              onClick={() => {
+                writeUrlParams({
+                  [STATUS_PARAM]: filter === "all" ? undefined : filter,
+                })
+              }}
+            >
+              {t(FILTER_LABEL[filter])}
+              {/* The count sits in a box as wide as the largest it can be,
+                  so it never changes the button's width (ADR-0014). */}
+              <span className="grid justify-items-start text-xs tabular-nums opacity-80">
+                <span
+                  aria-hidden="true"
+                  className="invisible col-start-1 row-start-1"
+                >
+                  {formatNumber(lessons.length)}
+                </span>
+                <span className="col-start-1 row-start-1">
+                  {formatNumber(counts[filter])}
+                </span>
+              </span>
+            </Button>
+          ))}
+        </div>
         <div className="relative flex min-w-64 flex-1 items-center">
           <SearchIcon
             aria-hidden="true"
@@ -177,11 +246,14 @@ export function ContentsControls({
           <Button
             variant="outline"
             onClick={() => {
-              writeUrlParams({ [QUERY_PARAM]: undefined })
+              writeUrlParams({
+                [QUERY_PARAM]: undefined,
+                [STATUS_PARAM]: undefined,
+              })
               inputRef.current?.focus()
             }}
           >
-            {t("contents.clearSearch")}
+            {t("contents.clearFilters")}
           </Button>
         </div>
       ) : null}

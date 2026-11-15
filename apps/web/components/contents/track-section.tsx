@@ -12,6 +12,7 @@ import { cn } from "@workspace/ui/lib/utils"
 
 import { SUMMARY_ROW } from "@/components/contents/summary-class"
 import { TopicItem } from "@/components/contents/topic-item"
+import { TrackRead } from "@/components/contents/track-read"
 
 /** A track on the contents page: a collapsible card of its topics in order. */
 export function TrackSection({
@@ -30,10 +31,7 @@ export function TrackSection({
       (topic): topic is GraphTopic =>
         topic !== undefined && topic.track === track.id
     )
-  const lessonCount = ownTopics.reduce(
-    (sum, topic) => sum + topic.lessonIds.length,
-    0
-  )
+  const lessonIds = ownTopics.flatMap((topic) => topic.lessonIds)
 
   return (
     <section
@@ -65,10 +63,11 @@ export function TrackSection({
               <span aria-hidden="true"> · </span>
               {t("contents.trackMeta", {
                 topics: ownTopics.length,
-                n: lessonCount,
+                n: lessonIds.length,
               })}
             </span>
           </span>
+          {lessonIds.length > 0 ? <TrackRead lessonIds={lessonIds} /> : null}
           <ChevronDownIcon
             aria-hidden="true"
             className="size-5 shrink-0 text-muted-foreground group-open/track:rotate-180"
