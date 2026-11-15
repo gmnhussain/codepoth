@@ -66,7 +66,8 @@ function ResultContent({ row }: { readonly row: SearchRow }) {
 /**
  * The result rows: track dot, title, where it sits (track · topic) and its
  * kind. A link to a glossary card is a plain `<a>`, so `:target` updates
- * (docs/design.md); every other result is a client-side `Link`.
+ * (docs/design.md); every other result is a client-side `Link` without
+ * prefetching.
  */
 export function SearchResults({
   rows,
@@ -104,6 +105,9 @@ export function SearchResults({
           ) : (
             <Link
               href={row.url}
+              // A list of up to ten results changes with every query; the
+              // reader opens one, so none is fetched ahead.
+              prefetch={false}
               data-search-result=""
               onClick={onNavigate}
               className={ROW}
