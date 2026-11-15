@@ -12,7 +12,7 @@
  * - anything else is passed to `playwright test` (a spec file, `--grep`, …).
  */
 import { spawn } from "node:child_process"
-import { readFile, writeFile } from "node:fs/promises"
+import { readFile, readdir, rm, writeFile } from "node:fs/promises"
 import { createRequire } from "node:module"
 import path from "node:path"
 import { parseArgs } from "node:util"
@@ -29,7 +29,16 @@ import type { ContentMode } from "../e2e/support/content-mode.ts"
 
 const APP_DIR = path.resolve(import.meta.dirname, "..")
 const REPO_ROOT = path.resolve(APP_DIR, "..", "..")
-const MARKER_PATH = path.join(APP_DIR, ".next", BUILD_MARKER_FILE)
+const DIST_DIR = path.join(APP_DIR, ".next")
+const MARKER_PATH = path.join(DIST_DIR, BUILD_MARKER_FILE)
+/**
+ * Kept in `.next`: the same entries `next build` keeps when it cleans the
+ * folder itself. `cache` is Next's build cache (it never holds pages), and
+ * `dev` belongs to a running `next dev` (turbo's outputs leave it out too),
+ * which a test build must not disturb.
+ */
+const KEPT_ENTRIES = new Set(["cache", "dev", "diagnostics", "lock", "trace"])
+const SEARCH_INDEX_DIR = path.join(APP_DIR, "public", "pagefind")
 
 function fail(message: string): never {
   process.stderr.write(`e2e: ${message}\n`)
@@ -51,6 +60,22 @@ function run(
   })
 }
 
+/**
+ * Removes the previous build. A turbo cache hit restores the cached build's
+ * files over whatever `.next` holds and deletes nothing, so after a build
+ * of the other content `next start` served a mix of both (pages linking to
+ * drafts in the build without them). A real `next build` cleans `.next`
+ * itself; a restore does not.
+ */
+async function removePreviousBuild(): Promise<void> {
+  const entries = await readdir(DIST_DIR).catch(() => [])
+  for (const entry of entries) {
+    if (KEPT_ENTRIES.has(entry)) continue
+    await rm(path.join(DIST_DIR, entry), { recursive: true, force: true })
+  }
+  await rm(SEARCH_INDEX_DIR, { recursive: true, force: true })
+}
+
 /** Builds the site for a mode through Turborepo (content first). */
 async function build(mode: ContentMode): Promise<void> {
   // pnpm sets npm_execpath to its own entry script; running it with this
@@ -60,6 +85,7 @@ async function build(mode: ContentMode): Promise<void> {
     fail("run this through pnpm (`pnpm test:e2e`)")
   }
   process.stdout.write(`\ne2e: building with content "${mode}"\n`)
+  await removePreviousBuild()
   const code = await run(
     process.execPath,
     [pnpm, "exec", "turbo", "run", "build", "--filter=web", "--ui=stream"],

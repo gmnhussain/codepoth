@@ -56,6 +56,7 @@ Run from the repo root.
 - `pnpm dev`: run all apps in dev mode
 - `pnpm build`: build everything
 - `CONTENT_INCLUDE_DRAFTS=0 pnpm build`: the real no-drafts (production content) build. Use this to check a build without drafts: a local `apps/web/.env.local` may set `CONTENT_INCLUDE_DRAFTS=1`, so a plain `pnpm build` can silently include drafts (an explicitly set variable wins over `.env.local`)
+- When switching content modes, build with `--force`: `CONTENT_INCLUDE_DRAFTS=0 pnpm build --force` (and `=1` the same way). Without it, turbo may restore a cached build over the old `.next` without deleting anything, so a "no-drafts" `.next` can still hold draft pages that `next start` serves. A forced build runs `next build`, which cleans `.next` itself (keeping `cache` and `dev`)
 - `pnpm lint`: lint
 - `pnpm typecheck`: typecheck
 - `pnpm format`: format every file with Prettier
