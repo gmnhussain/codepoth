@@ -99,34 +99,38 @@ export function ReadingHeatmap({
         ))}
         {t("dashboard.heatMore")}
       </div>
-      <table className="sr-only">
-        <caption>{t("dashboard.heatTable")}</caption>
-        <thead>
-          <tr>
-            <td />
-            {Array.from({ length: DAYS_PER_WEEK }, (_, index) => (
-              <th key={index} scope="col">
-                {t("dashboard.heatDay", { n: index + 1 })}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {weeks.map((week, index) => (
-            <tr key={week[0]?.day ?? index}>
-              <th scope="row">{t("dashboard.heatWeek", { n: index + 1 })}</th>
-              {week.map((day) => (
-                <td key={day.day}>
-                  {t("dashboard.heatCell", {
-                    date: formatDate(day.day),
-                    n: day.count,
-                  })}
-                </td>
+      {/* sr-only goes on a wrapper: a table ignores width and overflow, so
+          on the table itself it keeps its full width and scrolls the page. */}
+      <div className="sr-only">
+        <table>
+          <caption>{t("dashboard.heatTable")}</caption>
+          <thead>
+            <tr>
+              <td />
+              {Array.from({ length: DAYS_PER_WEEK }, (_, index) => (
+                <th key={index} scope="col">
+                  {t("dashboard.heatDay", { n: index + 1 })}
+                </th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {weeks.map((week, index) => (
+              <tr key={week[0]?.day ?? index}>
+                <th scope="row">{t("dashboard.heatWeek", { n: index + 1 })}</th>
+                {week.map((day) => (
+                  <td key={day.day}>
+                    {t("dashboard.heatCell", {
+                      date: formatDate(day.day),
+                      n: day.count,
+                    })}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </section>
   )
 }
