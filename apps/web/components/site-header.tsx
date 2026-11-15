@@ -10,7 +10,7 @@ export function SiteHeader() {
   return (
     <header className="border-b">
       <div className="mx-auto flex max-w-7xl items-center gap-5 px-4 py-3 sm:px-8">
-        <BrandLink />
+        <BrandLink hideTagOnPhones />
         <nav aria-label={t("nav.main")} className="hidden flex-1 lg:block">
           <NavLinks
             className="flex flex-wrap gap-0.5"
