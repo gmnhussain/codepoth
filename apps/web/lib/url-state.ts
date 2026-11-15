@@ -25,7 +25,7 @@ function subscribe(listener: () => void): () => void {
 }
 
 /** A query parameter of the current URL, or "" when it is absent. */
-export function readUrlParam(name: string): string {
+function readUrlParam(name: string): string {
   return new URLSearchParams(window.location.search).get(name) ?? ""
 }
 
