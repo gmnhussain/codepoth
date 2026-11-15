@@ -1,5 +1,7 @@
 "use client"
 
+import { cn } from "@workspace/ui/lib/utils"
+
 import { useT } from "@/lib/labels-context"
 import { summarize } from "@/lib/progress/selectors"
 import { useProgress } from "@/lib/progress-store.client"
@@ -11,14 +13,21 @@ import { useProgress } from "@/lib/progress-store.client"
  */
 export function TrackRead({
   lessonIds,
+  className,
 }: {
   readonly lessonIds: readonly string[]
+  readonly className?: string
 }) {
   const t = useT(["contents"])
   const { done, total } = summarize(useProgress(), lessonIds)
   const percent = total === 0 ? 0 : Math.round((done / total) * 100)
   return (
-    <span className="flex w-20 shrink-0 flex-col items-end gap-1 sm:w-32">
+    <span
+      className={cn(
+        "flex w-20 shrink-0 flex-col items-end gap-1 sm:w-32",
+        className
+      )}
+    >
       <span className="font-mono text-xs text-foreground/80">
         {t("contents.trackRead", { done, total })}
       </span>

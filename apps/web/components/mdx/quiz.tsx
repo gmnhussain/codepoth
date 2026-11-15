@@ -87,7 +87,9 @@ export function QuizQuestions({
           const isRight = chosen === question.answer
           return (
             <li key={index} className="rounded-2xl border bg-card p-5 sm:p-6">
-              <fieldset className="flex flex-col gap-4">
+              {/* min-w-0: a fieldset is min-content wide by default, so a
+                  code block inside would push it past its card. */}
+              <fieldset className="flex min-w-0 flex-col gap-4">
                 <legend className="flex flex-col gap-1">
                   <span className="font-mono text-sm text-muted-foreground">
                     {t("quiz.question", { n: index + 1 })}

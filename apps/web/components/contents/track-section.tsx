@@ -41,19 +41,22 @@ export function TrackSection({
       className="relative rounded-2xl border bg-card"
     >
       <details open={defaultOpen} className="group/track">
+        {/* A grid: below sm the read count sits under the subtitle, since
+            badge, name, count and chevron in one row do not fit in 320px
+            (the WCAG reflow width); from sm they share one row. */}
         <summary
           className={cn(
             SUMMARY_ROW,
-            "min-h-18 gap-4 rounded-2xl px-5 py-4 hover:bg-muted/50"
+            "grid min-h-18 grid-cols-[auto_minmax(0,1fr)_auto] gap-x-4 gap-y-2 rounded-2xl px-5 py-4 hover:bg-muted/50 sm:grid-cols-[auto_minmax(0,1fr)_auto_auto]"
           )}
         >
           <span
             aria-hidden="true"
-            className="flex size-11 shrink-0 items-center justify-center rounded-full border-4 border-track-dot bg-background font-mono text-sm"
+            className="row-span-2 flex size-11 shrink-0 items-center justify-center rounded-full border-4 border-track-dot bg-background font-mono text-sm sm:row-span-1"
           >
             {formatTwoDigits(track.number)}
           </span>
-          <span className="flex flex-1 flex-col">
+          <span className="col-start-2 row-start-1 flex flex-col break-words">
             <h2 id={`${anchor}-heading`} className="text-xl font-bold">
               {track.titleEn}
             </h2>
@@ -66,10 +69,15 @@ export function TrackSection({
               })}
             </span>
           </span>
-          {lessonIds.length > 0 ? <TrackRead lessonIds={lessonIds} /> : null}
+          {lessonIds.length > 0 ? (
+            <TrackRead
+              lessonIds={lessonIds}
+              className="col-start-2 row-start-2 items-start sm:col-start-3 sm:row-start-1 sm:items-end"
+            />
+          ) : null}
           <ChevronDownIcon
             aria-hidden="true"
-            className="size-5 shrink-0 text-muted-foreground group-open/track:rotate-180"
+            className="col-start-3 row-start-1 size-5 shrink-0 text-muted-foreground group-open/track:rotate-180 sm:col-start-4"
           />
         </summary>
         {/* The #track-… target. It sits in the details' content, not the
