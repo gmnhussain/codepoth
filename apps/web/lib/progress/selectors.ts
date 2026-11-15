@@ -142,6 +142,17 @@ export function activityByDay(
   })
 }
 
+/** The heatmap's four shades: none, 1 lesson, 2–3, 4 or more. */
+export const HEAT_LEVELS = [0, 1, 2, 3] as const
+
+export type HeatLevel = (typeof HEAT_LEVELS)[number]
+
+export function heatLevelOf(count: number): HeatLevel {
+  if (count <= 0) return 0
+  if (count === 1) return 1
+  return count <= 3 ? 2 : 3
+}
+
 /** "শেষ সেভ": the latest timestamp anywhere in the data, computed, not stored. */
 export function lastSaved(progress: Progress): string | undefined {
   const times: string[] = []

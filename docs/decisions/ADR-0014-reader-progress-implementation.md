@@ -27,6 +27,9 @@ ADR-0007 fixes what `codepoth:v1` stores and the rules for it, but not where the
 - **Dialogs and messages.** shadcn `alert-dialog` (clear all) and `dialog` (import: merge or replace), added through the CLI. Results are an inline `role="status"` message. No toast library.
 - **Import limits.** An import file over 1 MB is refused on `File.size` before it is read. The whole file is validated with Zod; too large, not JSON, wrong `format`, unsupported `version` and invalid data each get their own message, and none of them touches the current progress.
 - **Heatmap.** An SVG grid of 20 weeks × 7 days drawn in the Dashboard island from `activity`, in the token shades from [design.md](../design.md), with every day's count also available as text (an accessible table alternative) and Bangla dates from the format helpers.
+- **Lesson data for Home and the Dashboard.** Both need data on lessons the page cannot know in advance (the last-read lesson can be any of them), and they get it in two ways:
+  - **Home fetches `/lessons.json`**, a route handler prerendered at build (`dynamic = "force-static"`) from the same content graph as the pages, so drafts follow the same rule. It holds each lesson's title, URL and scope (group, or topic), and each scope's title and lesson ids. Home requests it only when a last read exists, after hydration; a failed request, a response that fails the shape check, or a missing lesson keep the first-visit view. Most Home visits are first visits, which pay nothing; a returning reader downloads 6.5 KB gzip (170 lessons). Inlining the same data had added 8.2 KB gzip to every Home page.
+  - **The Dashboard inlines its data** in the page. Its visitors are readers with progress, who need the data on every visit, and its rows show each lesson's "track · topic › group" path, which `/lessons.json` does not carry. It reuses the same index builder (`resumeIndexOf`) and adds the path, the tracks, the topics and a trimmed map: the page's HTML grows from 7.6 to 18.5 KB gzip with 170 lessons, and no request or loading state is needed after the store is ready.
 
 ## Alternatives considered
 
@@ -39,6 +42,8 @@ ADR-0007 fixes what `codepoth:v1` stores and the rules for it, but not where the
 - **Pass the whole content graph to islands.** Rejected: it ships the graph to every page that shows a count.
 - **A toast library for results.** Rejected: a dependency for two messages, and the design shows them inline.
 - **A chart library for the heatmap.** Rejected: a dependency for 140 cells; an SVG grid draws the same thing with no extra JavaScript.
+- **Inline the lesson index on Home.** Rejected: 8.2 KB gzip on every Home page, for data only returning readers use.
+- **Fetch `/lessons.json` on the Dashboard too.** Rejected: its visitors need the data every time, the rows need the track · topic › group path, and a fetch would add a request and a loading state after the store is ready.
 
 ## Consequences
 

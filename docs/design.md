@@ -281,7 +281,20 @@ The MDX components for lesson bodies live in `apps/web/components/mdx/` and are 
 
 ## Dashboard page
 
-`/dashboard` in its first-visit state, before any reader progress exists ([ADR-0014](decisions/ADR-0014-reader-progress-implementation.md)): title, subtitle, a "এখনো কিছু সেভ হয়নি" chip, and an empty-state card (a line with only the first station reached, a welcome, and what will collect here). "প্রথম পাঠ শুরু করো" goes to the same lesson as Home's "শুরু করো" (`homeStartLesson`) and is left out while nothing is published, when "রোডম্যাপ দেখো" becomes the main button. Progress, quiz results, bookmarks, the reading heatmap and export/import (with the empty state's import link) arrive with reader progress.
+`/dashboard` ([ADR-0014](decisions/ADR-0014-reader-progress-implementation.md)): title, subtitle and a chip ("এখনো কিছু সেভ হয়নি", or "শেষ সেভ: {date}" once something is saved), then the body (`dashboard/dashboard-view.tsx`):
+
+- Until the reader's progress is read (`useProgressReady()`, false on the server), the body is an empty, busy placeholder with a screen-reader "তোমার অগ্রগতি পড়া হচ্ছে…", so a returning reader never sees the empty state flash. The prerendered HTML is that placeholder, with the empty state in `<noscript>`. The body is at least a screen tall (`min-h-svh`) in every state, so switching states moves nothing in view.
+- Nothing saved: the empty-state card (a line with only the first station reached, a welcome, and what will collect here). "প্রথম পাঠ শুরু করো" goes to the same lesson as Home's "শুরু করো" (`homeStartLesson`) and is left out while nothing is published, when "রোডম্যাপ দেখো" becomes the main button.
+- Otherwise, in two columns from `lg`:
+  - "মোট অগ্রগতি": the share of all lessons done (a large percent and a bar), "পুরো কারিকুলামের {total}টি পাঠের মধ্যে।", and three counts: lessons done, quizzes taken, topics finished.
+  - "শেষবার পড়েছ" beside it (from `lg`): the last-read lesson's "track · topic › group" and title, its group's "{group} গ্রুপের {total}টির {done}টি শেষ" (or the topic's) with a bar, and "চালিয়ে যাও" to the lesson at its saved section. It uses `resumeOf`, like Home, and is left out when there is no last read or the lesson is not in the build; the overall card then spans both columns.
+  - "লাইনভিত্তিক অগ্রগতি": each track with lessons, a bar in its colour (named "{track}: {total}টি পাঠের {done}টি পড়া") and "d/t".
+  - "আমার ম্যাপ": Home's SVG preview (`RoadmapPreview`) with `stateOf`: lines faded, each dot filled when done, a centre dot while in progress, a faded ring before; it links to the roadmap. A key counts the topics in each state with `StationDot` marks and the `status.*` words.
+  - "কুইজের ফলাফল": average score (each quiz weighted equally), questions answered, and the four weakest quizzes with place, date, a score bar in `warning` and "আবার চেষ্টা করো" to the lesson's `#quiz`. Without quizzes, a line saying so.
+  - "বুকমার্ক": newest first, each with place, "সেভ {date}" and a remove button named "{lesson} বুকমার্ক থেকে সরাও". Removing announces "“{lesson}” বুকমার্ক থেকে সরানো হয়েছে।" and moves focus to the list's heading.
+  - "যেদিন পড়েছ": 20 weeks × 7 days as an SVG grid in the four heatmap shades (none, 1, 2–3, 4+ lessons; `heatLevelOf`), "গত ২০ সপ্তাহে {n} দিন পড়েছ।" and a কম–বেশি key. The grid is `aria-hidden`; a visually hidden table gives every day's count.
+- The page's data (every lesson's title, URL, scope and "track · topic › group", each scope's title and lessons, tracks and topics with their lessons, and a trimmed map) is built on the server (`lib/dashboard-data.ts`, reusing `resumeIndexOf`) and inlined in the page; why it is inlined here and fetched on Home is in [ADR-0014](decisions/ADR-0014-reader-progress-implementation.md).
+- Export, import and clearing (with the empty state's import link) arrive in the next step.
 
 ## About page
 

@@ -154,6 +154,38 @@ describe("createProgressStore while the validator loads", () => {
     })
   })
 
+  it("is not ready until the load settles, then ready, and tells subscribers", async () => {
+    const deferred = deferredParser()
+    const store = createProgressStore({
+      ...fakeHost(stored).host,
+      loadParser: deferred.loadParser,
+    })
+    const listener = vi.fn()
+    store.subscribe(listener)
+    expect(store.isReady()).toBe(false)
+    deferred.finish()
+    await vi.waitFor(() => {
+      expect(store.isReady()).toBe(true)
+    })
+    expect(listener).toHaveBeenCalled()
+  })
+
+  it("is ready after a failed load too, so a page can show its empty state", async () => {
+    const deferred = deferredParser()
+    const store = createProgressStore({
+      ...fakeHost(stored).host,
+      loadParser: deferred.loadParser,
+    })
+    const listener = vi.fn()
+    store.subscribe(listener)
+    deferred.fail()
+    await vi.waitFor(() => {
+      expect(store.isReady()).toBe(true)
+    })
+    expect(listener).toHaveBeenCalledTimes(1)
+    expect(store.getSnapshot()).toBe(EMPTY_PROGRESS)
+  })
+
   it("keeps the page working when the load fails: empty progress, writes refused", async () => {
     const deferred = deferredParser()
     const fake = fakeHost(stored)

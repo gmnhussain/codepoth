@@ -7,6 +7,7 @@ import {
   averageQuizScore,
   bookmarksNewestFirst,
   continueLesson,
+  heatLevelOf,
   lastSaved,
   lessonState,
   nextUnfinished,
@@ -168,6 +169,12 @@ describe("activityByDay", () => {
     expect(days[0]).toEqual({ day: "2026-06-29", count: 2 })
     expect(days[1]).toEqual({ day: "2026-06-30", count: 0 })
     expect(days.at(-1)).toEqual({ day: "2026-11-15", count: 1 })
+  })
+})
+
+describe("heatLevelOf", () => {
+  it("maps lesson counts to four shades at their boundaries", () => {
+    expect([0, 1, 2, 3, 4, 9].map(heatLevelOf)).toEqual([0, 1, 2, 2, 3, 3])
   })
 })
 

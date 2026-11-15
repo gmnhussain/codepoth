@@ -40,6 +40,12 @@ export type ProgressStore = {
   readonly getSnapshot: () => Progress
   readonly getServerSnapshot: () => Progress
   /**
+   * Whether the first load of the validator has settled (loaded or failed),
+   * so `getSnapshot` is the stored value rather than the empty placeholder.
+   * Lets a page tell "nothing saved" from "not read yet".
+   */
+  readonly isReady: () => boolean
+  /**
    * Applies an operation to the stored value and saves it, once the
    * validator has loaded. If saving fails (quota, private mode, storage
    * disabled, the validator not loading) nothing changes and the page keeps
@@ -54,6 +60,8 @@ export function createProgressStore(host: ProgressStoreHost): ProgressStore {
   const listeners = new Set<() => void>()
   let parse: ParseStoredProgress | undefined
   let loading: Promise<ParseStoredProgress> | undefined
+  /** The first load has settled, either way. */
+  let hasSettled = false
   /** The parsed value; `undefined` until read, and after another tab writes. */
   let cached: Progress | undefined
 
@@ -67,11 +75,16 @@ export function createProgressStore(host: ProgressStoreHost): ProgressStore {
       (loaded) => {
         parse = loaded
         cached = undefined
+        hasSettled = true
         notify()
         return loaded
       },
       (error: unknown) => {
         loading = undefined
+        if (!hasSettled) {
+          hasSettled = true
+          notify()
+        }
         throw error
       }
     )
@@ -131,6 +144,9 @@ export function createProgressStore(host: ProgressStoreHost): ProgressStore {
     getServerSnapshot() {
       return EMPTY_PROGRESS
     },
+    isReady() {
+      return hasSettled
+    },
     async update(operation) {
       let parseValue: ParseStoredProgress
       try {
@@ -180,6 +196,19 @@ export function useProgress(): Progress {
     progressStore.subscribe,
     progressStore.getSnapshot,
     progressStore.getServerSnapshot
+  )
+}
+
+/**
+ * Whether the reader's progress has been read (or failed to), as React
+ * state: false on the server and during hydration, so the prerendered HTML
+ * is the same for every reader.
+ */
+export function useProgressReady(): boolean {
+  return useSyncExternalStore(
+    progressStore.subscribe,
+    progressStore.isReady,
+    () => false
   )
 }
 
