@@ -292,6 +292,7 @@
     "stepLabel": "ধাপ {n}",
     "breadcrumb": "অবস্থান",
     "table": "টেবিল",
+    "chipsLabel": "পাঠের তথ্য",
     "trackChip": "{track} · পথ {n}",
     "topicChip": "ধাপ {pos}",
     "groupChip": "{group} · {pos}",

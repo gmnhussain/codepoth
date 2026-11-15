@@ -217,6 +217,7 @@ The MDX components for lesson bodies live in `apps/web/components/mdx/` and are 
 | Below `lg`   | Drawer (`AppSheetContent`, left) from a button beside the breadcrumb | Collapsible bar above the summary          |
 
 - Track navigation: the track's topics on a vertical line in the track colour; interchange topics have a ring. The current topic opens to its groups (`<details>`, current group open) or loose lessons; the current lesson is marked (`aria-current="page"`). A note explains an interchange. The nav sets its own `data-track-color`, because the drawer renders outside the page wrapper.
+- Header chips (track · line, position): below `sm` one line that scrolls sideways, never wrapped, so the header's height does not depend on the font; a focusable region named "পাঠের তথ্য" so the keyboard can scroll it. From `sm` they wrap.
 - Tables in lesson bodies scroll sideways inside a focusable region named "টেবিল" (markdown tables have no caption); code blocks, in the lesson and in quiz questions, are focusable for the same reason.
 - "এই পাঠে": the lesson's blocks with the author's `###` sections nested under them, numbered like the blocks, and prev/next. The current entry (`aria-current="location"`) follows the scroll position; a link into the closed deep dive opens it first.
 - Reader progress ([ADR-0014](decisions/ADR-0014-reader-progress-implementation.md)): every mark renders its first-visit state on the server and changes in place after hydration, so nothing moves.

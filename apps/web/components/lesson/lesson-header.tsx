@@ -93,7 +93,18 @@ export function LessonHeader({
         {navTrigger}
       </div>
 
-      <div data-pagefind-ignore="all" className="flex flex-wrap gap-2">
+      {/* One line that scrolls sideways below sm, so its height never
+          depends on the font: wrapped to two lines with the fallback font
+          and one with the web font, the swap moved the whole page up on
+          slow connections (performance.md). A named, focusable region, so
+          the keyboard can scroll it. */}
+      <div
+        data-pagefind-ignore="all"
+        role="region"
+        aria-label={t("lesson.chipsLabel")}
+        tabIndex={0}
+        className="flex gap-2 overflow-x-auto rounded-lg focus-visible:outline-2 focus-visible:outline-ring sm:flex-wrap"
+      >
         {track === undefined ? null : (
           <Chip>
             <span
