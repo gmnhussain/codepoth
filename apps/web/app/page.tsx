@@ -1,7 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import {
-  ArrowRightIcon,
   BookmarkIcon,
   ListChecksIcon,
   MapIcon,
@@ -24,10 +23,12 @@ import { cn } from "@workspace/ui/lib/utils"
 
 import { Chip } from "@/components/chip"
 import { AuthorCard } from "@/components/home/author-card"
+import { HeroStart } from "@/components/home/hero-start"
 import { RoadmapPreview } from "@/components/home/roadmap-preview"
 import { StartRouteCard } from "@/components/home/start-route-card"
 import { WhatsNew } from "@/components/home/whats-new"
 import { JsonLd } from "@/components/json-ld"
+import { LabelScope } from "@/components/label-scope"
 import { buildPageMetadata } from "@/lib/metadata"
 
 export function generateMetadata(): Metadata {
@@ -71,9 +72,10 @@ const WHY_TILES = [
 const SECTION_TITLE = "text-3xl font-bold sm:text-4xl"
 
 /**
- * Home: the pitch with a map preview and where to begin, site counts, the
- * start routes, every track, why the site exists, what's new and who writes
- * it. Every number is computed; the resume card arrives with reader progress.
+ * Home: the pitch with a map preview and where to begin (or, for a returning
+ * reader, where they stopped), site counts, the start routes, every track,
+ * why the site exists, what's new and who writes it. Every number is
+ * computed.
  */
 export default function HomePage() {
   const graph = getContentGraph()
@@ -113,30 +115,30 @@ export default function HomePage() {
             <p className="max-w-xl text-lg leading-reading text-foreground/80">
               {t("home.heroText", { tracks: graph.stats.tracks })}
             </p>
-            <div className="flex flex-wrap gap-3">
-              <Link
-                href={startLesson?.url ?? "/roadmap"}
-                className={buttonVariants({ size: "lg" })}
+            <LabelScope namespaces={["home"]}>
+              <HeroStart
+                startHref={startLesson?.url ?? "/roadmap"}
+                firstVisitLine={
+                  startLesson === undefined || startTopic === undefined
+                    ? t("home.comingSoon")
+                    : t("home.firstLesson", {
+                        topic: startTopic.title,
+                        lesson: startLesson.title,
+                        n: startLesson.readingMinutes,
+                      })
+                }
               >
-                {t("home.start")}
-                <ArrowRightIcon aria-hidden="true" />
-              </Link>
-              <Link
-                href="/roadmap"
-                className={buttonVariants({ variant: "outline", size: "lg" })}
-              >
-                {t("home.roadmap")}
-              </Link>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              {startLesson === undefined || startTopic === undefined
-                ? t("home.comingSoon")
-                : t("home.firstLesson", {
-                    topic: startTopic.title,
-                    lesson: startLesson.title,
-                    n: startLesson.readingMinutes,
+                <Link
+                  href="/roadmap"
+                  className={buttonVariants({
+                    variant: "outline",
+                    size: "lg",
                   })}
-            </p>
+                >
+                  {t("home.roadmap")}
+                </Link>
+              </HeroStart>
+            </LabelScope>
           </div>
           <figure className="flex min-w-0 flex-col gap-3 lg:flex-6">
             <Link
