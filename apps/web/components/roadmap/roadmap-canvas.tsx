@@ -5,6 +5,10 @@ import type { Translate } from "@workspace/config/translate"
 import type { Roadmap, RoadmapTopic } from "@workspace/content/roadmap"
 import { cn } from "@workspace/ui/lib/utils"
 
+import { ROADMAP_STATE_LABEL } from "@/components/roadmap/state-label"
+import { StationDot } from "@/components/station-dot"
+import type { LessonState } from "@/lib/progress/selectors"
+
 /** Gap between a dot and its label, in map units; interchanges are larger. */
 const LABEL_GAP = 18
 const INTERCHANGE_EXTRA = 4
@@ -54,7 +58,9 @@ function labelPlacement(topic: RoadmapTopic): {
  * The roadmap drawing: track lines, topic labels, start flags and a 44px
  * button per topic. Presentational and hook-free, so a server page can
  * render it as a static preview (no `onSelect`: no buttons); the caller
- * passes its `t` (server `t`, or `useT()` in an island, ADR-0013).
+ * passes its `t` (server `t`, or `useT()` in an island, ADR-0013). With
+ * `stateOf`, each dot shows the reader's state and a topic button's name
+ * says it; without it, every dot is the first-visit ring.
  */
 export function RoadmapCanvas({
   t,
@@ -64,14 +70,16 @@ export function RoadmapCanvas({
   selectedKey,
   focusedTrack,
   onSelect,
+  stateOf,
 }: {
-  readonly t: Translate<"roadmap" | "topic">
+  readonly t: Translate<"roadmap" | "topic" | "status">
   readonly roadmap: Roadmap
   readonly scale: number
   readonly isVisible: (topic: RoadmapTopic) => boolean
   readonly selectedKey?: string | undefined
   readonly focusedTrack?: string | undefined
   readonly onSelect?: ((key: string) => void) | undefined
+  readonly stateOf?: ((topic: RoadmapTopic) => LessonState) | undefined
 }) {
   const trackById = new Map(roadmap.tracks.map((track) => [track.id, track]))
   const dim = "opacity-15"
@@ -154,10 +162,12 @@ export function RoadmapCanvas({
       {roadmap.topics.map((topic) => {
         const track = trackById.get(topic.track)
         const isSelected = topic.key === selectedKey
+        const state = stateOf?.(topic) ?? "not-started"
         const dot = (
-          <span
+          <StationDot
+            state={state}
             className={cn(
-              "rounded-full border-4 border-track-dot bg-background motion-safe:transition-transform",
+              "border-4 motion-safe:transition-transform",
               topic.isInterchange ? "size-6.5 border-foreground" : "size-4.5",
               onSelect !== undefined && "group-hover/station:scale-110",
               isSelected && "outline-2 outline-offset-4 outline-foreground"
@@ -199,6 +209,9 @@ export function RoadmapCanvas({
           }),
           topic.isStart ? t("roadmap.startHere") : undefined,
           topic.hasPage ? undefined : t("topic.planned"),
+          stateOf !== undefined && topic.lessonCount > 0
+            ? t(ROADMAP_STATE_LABEL[state])
+            : undefined,
         ]
           .filter((part): part is string => part !== undefined)
           .join(", ")

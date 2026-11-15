@@ -249,7 +249,12 @@ The MDX components for lesson bodies live in `apps/web/components/mdx/` and are 
 - Topic panel (`roadmap-panel.tsx`): track chips, kicker (line, position), name, description, lessons and reading time, "শুরু করো" to the first lesson and the topic page, the lessons (groups as `<details>`, the first open), the interchange note, the home track's topics (select another) and previous/next. Beside the map from `md`, where picking a topic moves focus to the panel's heading and Escape closes it and returns focus to the dot; a bottom sheet below `md`.
 - Planned topics (no published lesson) are on the map, muted, with "পরিকল্পনায় আছে" and no start or topic-page link.
 - Links in: the breadcrumbs' "রোডম্যাপ" and track (`/roadmap?track=…`), the header and footer, and the not-found page.
-- Status filters, progress bars and bookmarks arrive with reader progress.
+- Reader progress ([ADR-0014](decisions/ADR-0014-reader-progress-implementation.md)):
+  - Dots: `StationDot` (`components/station-dot.tsx`, hook-free) fills a topic's dot by its lessons' state: filled when all are done, a ring with a centre dot while in progress, an empty ring before. The canvas takes an optional `stateOf`; without it (Home's static preview, the first-visit HTML) every dot is a ring. A dot button's name adds the state for topics with lessons. Filter, dot names, key and panel chip use the site's one set of state words, the `status.*` labels the lesson marks use: "পড়া শেষ", "পড়ছ", "শুরু হয়নি". The topic page's track strip uses the same dot through `TopicStateDot`; its current topic is shown by size and weight, not by fill.
+  - Filter: one choice of "সব / শুরুর স্টেশন / পড়া শেষ / পড়ছ / শুরু হয়নি" in `?filter=start|done|reading|todo` (none: all), scrolling sideways inside its pill when it does not fit. Planned topics (no lessons) are left out of the three state filters. Pure helpers in `lib/progress/roadmap-filter.ts`.
+  - Legend: a "তোমার অগ্রগতি" box at the top (lessons done of all, a bar, "লগইন ছাড়াই — এই ব্রাউজারে সেভ থাকে"), always rendered; each track button shows its own lessons' "d/t" (reserved width) and a thin bar in the track colour.
+  - The key pill (from `lg`) shows the three states and the interchange mark; it is `aria-hidden`, since every dot's name says its state.
+  - Panel: a state chip, "তোমার অগ্রগতি" with "d/t" and a bar, and the main button per state: "শুরু করো" (first lesson), "চালিয়ে যাও" with "পরের পাঠ: {lesson} · {group}" (the next unfinished lesson), or "আবার পড়ো" with "সব পাঠ শেষ — চাইলে আবার দেখো" (first lesson). Lesson rows get their state marks. Topic bookmarks are not offered ([ADR-0007](decisions/ADR-0007-reader-progress-shape.md)).
 
 ## Glossary page
 

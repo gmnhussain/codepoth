@@ -22,13 +22,15 @@ export function generateMetadata(): Metadata {
 }
 
 /**
- * Every track and topic as a metro-style map. Picking a topic opens its
- * panel; picking a track dims the rest. State lives in the URL
- * (?topic=&track=&q=&filter=), so a view can be shared.
+ * Every track and topic as a metro-style map, each dot showing the
+ * reader's state. Picking a topic opens its panel; picking a track dims the
+ * rest. State lives in the URL (?topic=&track=&q=&filter=), so a view can
+ * be shared.
  */
 export default function RoadmapPage() {
   return (
-    <LabelScope namespaces={["roadmap", "lesson", "topic"]}>
+    // "status" for the panel's lesson marks (ADR-0013).
+    <LabelScope namespaces={["roadmap", "lesson", "topic", "status"]}>
       <RoadmapExplorer
         roadmap={buildRoadmap(getContentGraph())}
         title={t("nav.roadmap")}

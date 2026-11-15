@@ -181,7 +181,14 @@
     "interchangeNote": "ইন্টারচেঞ্জ স্টেশন — এখান থেকে {tracks} লাইনে বদল করা যায়।",
     "neighbours": "এই লাইনের আগের ও পরের স্টেশন",
     "previousTopic": "আগের স্টেশন:",
-    "nextTopic": "পরের স্টেশন:"
+    "nextTopic": "পরের স্টেশন:",
+    "yourProgress": "তোমার অগ্রগতি",
+    "progress": "{total}টির {done}টি শেষ",
+    "savedNote": "লগইন ছাড়াই — এই ব্রাউজারে সেভ থাকে",
+    "readAgain": "আবার পড়ো",
+    "ctaNext": "পরের পাঠ: {lesson}",
+    "ctaNextGroup": "পরের পাঠ: {lesson} · {group}",
+    "ctaAllDone": "সব পাঠ শেষ — চাইলে আবার দেখো"
   },
   "terms": {
     "track": "লাইন",

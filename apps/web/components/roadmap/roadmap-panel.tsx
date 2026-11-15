@@ -13,16 +13,23 @@ import { roundedDuration } from "@workspace/content/reading-time"
 import type { Roadmap, RoadmapTopic } from "@workspace/content/roadmap"
 import { topicNeighbours } from "@workspace/content/roadmap"
 import { Button, buttonVariants } from "@workspace/ui/components/button"
+import { Progress, ProgressLabel } from "@workspace/ui/components/progress"
 import { cn } from "@workspace/ui/lib/utils"
 
 import { Chip } from "@/components/chip"
+import { LessonStateIcon } from "@/components/lesson/lesson-state-icon"
 import { LessonRow } from "@/components/lesson-row"
+import { ROADMAP_STATE_LABEL } from "@/components/roadmap/state-label"
+import { StationDot } from "@/components/station-dot"
 import { useT } from "@/lib/labels-context"
+import { continueLesson, summarize } from "@/lib/progress/selectors"
+import { useProgress } from "@/lib/progress-store.client"
 
 /**
- * The selected topic: where it is, what it covers, how long it takes, where
- * to start, its lessons, and its neighbours on the home track. Shown beside
- * the map from `md` and in a bottom sheet below it.
+ * The selected topic: where it is, the reader's state and progress in it,
+ * what it covers, how long it takes, a button that starts, continues or
+ * rereads it, its lessons (each with its state), and its neighbours on the
+ * home track. Shown beside the map from `md` and in a bottom sheet below it.
  */
 export function RoadmapPanel({
   roadmap,
@@ -38,13 +45,53 @@ export function RoadmapPanel({
   readonly onClose?: (() => void) | undefined
   readonly headingRef?: Ref<HTMLHeadingElement> | undefined
 }) {
-  const t = useT(["roadmap", "topic", "lesson"])
+  const t = useT(["roadmap", "topic", "lesson", "status"])
   const trackOf = (id: string) => roadmap.tracks.find((item) => item.id === id)
   const topicOf = (key: string) =>
     roadmap.topics.find((item) => item.key === key)
   const home = trackOf(topic.track)
   const position = (home?.topicKeys.indexOf(topic.key) ?? -1) + 1
   const firstLesson = topic.groups[0]?.lessons[0] ?? topic.lessons[0]
+
+  // The reader's progress in this topic, and the lesson the button opens.
+  const progress = useProgress()
+  const ordered = [
+    ...topic.groups.flatMap((group) =>
+      group.lessons.map((lesson) => ({ lesson, groupTitle: group.title }))
+    ),
+    ...topic.lessons.map((lesson) => ({ lesson, groupTitle: undefined })),
+  ]
+  const ids = ordered.map((item) => item.lesson.id)
+  const { done, total, state } = summarize(progress, ids)
+  const continueId = continueLesson(progress, ids)
+  const resume = ordered.find((item) => item.lesson.id === continueId)
+  const cta =
+    state === "done"
+      ? {
+          label: t("roadmap.readAgain"),
+          sub: t("roadmap.ctaAllDone"),
+          url: firstLesson?.url,
+        }
+      : state === "in-progress" && resume !== undefined
+        ? {
+            label: t("topic.continue"),
+            sub:
+              resume.groupTitle === undefined
+                ? t("roadmap.ctaNext", { lesson: resume.lesson.title })
+                : t("roadmap.ctaNextGroup", {
+                    lesson: resume.lesson.title,
+                    group: resume.groupTitle,
+                  }),
+            url: resume.lesson.url,
+          }
+        : {
+            label: t("topic.start"),
+            sub:
+              firstLesson === undefined
+                ? ""
+                : t("topic.firstLesson", { lesson: firstLesson.title }),
+            url: firstLesson?.url,
+          }
   const otherTracks = topic.trackIds
     .filter((id) => id !== topic.track)
     .map((id) => trackOf(id)?.titleEn)
@@ -95,16 +142,20 @@ export function RoadmapPanel({
         >
           {topic.title}
         </h2>
-        {topic.isStart || !topic.hasPage ? (
-          <div className="flex flex-wrap gap-1.5">
-            {topic.isStart ? (
-              <Chip className="border-foreground bg-foreground text-background">
-                {t("roadmap.startForBeginners")}
-              </Chip>
-            ) : null}
-            {topic.hasPage ? null : <Chip>{t("topic.planned")}</Chip>}
-          </div>
-        ) : null}
+        <div className="flex flex-wrap gap-1.5">
+          {topic.lessonCount > 0 ? (
+            <Chip>
+              <StationDot state={state} className="size-3 border-2" />
+              {t(ROADMAP_STATE_LABEL[state])}
+            </Chip>
+          ) : null}
+          {topic.isStart ? (
+            <Chip className="border-foreground bg-foreground text-background">
+              {t("roadmap.startForBeginners")}
+            </Chip>
+          ) : null}
+          {topic.hasPage ? null : <Chip>{t("topic.planned")}</Chip>}
+        </div>
       </div>
       <p className="leading-reading text-foreground/80">{topic.description}</p>
 
@@ -131,22 +182,38 @@ export function RoadmapPanel({
         </dl>
       ) : null}
 
-      {firstLesson === undefined ? null : (
+      {topic.lessonCount > 0 ? (
+        <Progress
+          value={total === 0 ? 0 : Math.round((done / total) * 100)}
+          getAriaValueText={() => t("roadmap.progress", { total, done })}
+          className="gap-2 rounded-xl border px-3.5 py-3 [&_[data-slot=progress-indicator]]:bg-track-dot [&_[data-slot=progress-indicator]]:motion-reduce:transition-none [&_[data-slot=progress-track]]:h-1.5"
+        >
+          <ProgressLabel className="flex-1 text-sm font-semibold">
+            {t("roadmap.yourProgress")}
+          </ProgressLabel>
+          <span
+            aria-hidden="true"
+            className="font-mono text-sm text-foreground/80"
+          >
+            {formatNumber(done)}/{formatNumber(total)}
+          </span>
+        </Progress>
+      ) : null}
+
+      {firstLesson === undefined || cta.url === undefined ? null : (
         <div className="flex flex-col gap-2">
           <Link
-            href={firstLesson.url}
+            href={cta.url}
             className={cn(
               buttonVariants({ size: "lg" }),
               "h-auto min-h-14 flex-col gap-0 py-1.5 leading-snug"
             )}
           >
             <span className="inline-flex items-center gap-2">
-              {t("topic.start")}
+              {cta.label}
               <ArrowRightIcon aria-hidden="true" />
             </span>
-            <span className="text-sm font-medium opacity-80">
-              {t("topic.firstLesson", { lesson: firstLesson.title })}
-            </span>
+            <span className="text-sm font-medium opacity-80">{cta.sub}</span>
           </Link>
           {topic.hasPage ? (
             <Link
@@ -204,6 +271,7 @@ export function RoadmapPanel({
                       number={formatNumber(lessonIndex + 1)}
                       className="min-h-11 gap-3 rounded-lg px-2.5 py-1.5"
                       numberClassName="w-4 text-end text-xs"
+                      leading={<LessonStateIcon lessonId={lesson.id} />}
                     />
                   </li>
                 ))}
@@ -220,6 +288,7 @@ export function RoadmapPanel({
                     number={formatNumber(lessonIndex + 1)}
                     className="min-h-11 gap-3 rounded-lg px-2.5 py-1.5"
                     numberClassName="w-4 text-end text-xs"
+                    leading={<LessonStateIcon lessonId={lesson.id} />}
                   />
                 </li>
               ))}

@@ -181,7 +181,14 @@
     "interchangeNote": "সংযোগ ধাপ — এখান থেকে {tracks} পথে বদল করা যায়।",
     "neighbours": "এই পথের আগের ও পরের ধাপ",
     "previousTopic": "আগের ধাপ:",
-    "nextTopic": "পরের ধাপ:"
+    "nextTopic": "পরের ধাপ:",
+    "yourProgress": "তোমার অগ্রগতি",
+    "progress": "{total}টির {done}টি শেষ",
+    "savedNote": "লগইন ছাড়াই — এই ব্রাউজারে সেভ থাকে",
+    "readAgain": "আবার পড়ো",
+    "ctaNext": "পরের পাঠ: {lesson}",
+    "ctaNextGroup": "পরের পাঠ: {lesson} · {group}",
+    "ctaAllDone": "সব পাঠ শেষ — চাইলে আবার দেখো"
   },
   "terms": {
     "track": "পথ",
