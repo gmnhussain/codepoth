@@ -17,6 +17,7 @@ import {
 } from "@workspace/content/routes"
 import { Chip } from "@/components/chip"
 import { LabelScope } from "@/components/label-scope"
+import { SearchMetaTags } from "@/components/search/search-meta-tags"
 import { GroupFrame } from "@/components/topic/group-frame"
 import { GroupProgress } from "@/components/topic/group-progress"
 import { GroupStatus } from "@/components/topic/group-status"
@@ -98,6 +99,9 @@ export default async function TopicPage({ params }: TopicPageProps) {
     // Labels for the progress card, group status and lesson states (ADR-0013).
     <LabelScope namespaces={["topic", "status"]}>
       <div data-track-color={track.color}>
+        <SearchMetaTags
+          meta={{ kind: "topic", track: track.titleEn, hue: track.color }}
+        />
         <div aria-hidden="true" className="h-1.5 bg-track-dot" />
         <div className="mx-auto flex max-w-5xl flex-col gap-12 px-4 py-10 sm:px-8">
           <header className="flex flex-col gap-6">
@@ -123,12 +127,14 @@ export default async function TopicPage({ params }: TopicPageProps) {
 
             <TrackStrip graph={graph} track={track} currentKey={topic.key} />
 
-            <div className="flex flex-col gap-4">
+            {/* The search index reads the title and description; each lesson
+                is its own result (ADR-0015). */}
+            <div data-pagefind-body="" className="flex flex-col gap-4">
               <h1 className="text-5xl font-bold sm:text-6xl">{topic.title}</h1>
               <p className="max-w-3xl text-lg leading-reading text-foreground/80">
                 {topic.description}
               </p>
-              <div className="flex flex-wrap gap-2">
+              <div data-pagefind-ignore="all" className="flex flex-wrap gap-2">
                 <Chip>
                   <span
                     aria-hidden="true"
@@ -151,7 +157,10 @@ export default async function TopicPage({ params }: TopicPageProps) {
                 ) : null}
               </div>
               {otherTracks.length > 0 ? (
-                <p className="text-sm text-muted-foreground">
+                <p
+                  data-pagefind-ignore="all"
+                  className="text-sm text-muted-foreground"
+                >
                   {t("topic.interchangeNote", {
                     tracks: formatList(otherTracks),
                   })}

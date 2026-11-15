@@ -17,6 +17,9 @@ coverage
 .next/
 out/
 
+# search index, written after `next build` (ADR-0015)
+apps/web/public/pagefind/
+
 # production
 build
 dist

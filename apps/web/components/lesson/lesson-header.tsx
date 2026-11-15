@@ -61,8 +61,13 @@ export function LessonHeader({
   ]
 
   return (
+    // Only the title and description are this lesson's words for the search
+    // index; the rest is left out (ADR-0015).
     <header className="flex flex-col gap-5">
-      <div className="flex items-start justify-between gap-3">
+      <div
+        data-pagefind-ignore="all"
+        className="flex items-start justify-between gap-3"
+      >
         <nav aria-label={t("lesson.breadcrumb")} className="min-w-0">
           <ol className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
             {crumbs.map((crumb) => (
@@ -88,7 +93,7 @@ export function LessonHeader({
         {navTrigger}
       </div>
 
-      <div className="flex flex-wrap gap-2">
+      <div data-pagefind-ignore="all" className="flex flex-wrap gap-2">
         {track === undefined ? null : (
           <Chip>
             <span
@@ -122,7 +127,10 @@ export function LessonHeader({
           {lesson.description}
         </p>
       )}
-      <div className="flex flex-wrap items-start justify-between gap-3 border-t pt-4">
+      <div
+        data-pagefind-ignore="all"
+        className="flex flex-wrap items-start justify-between gap-3 border-t pt-4"
+      >
         <p className="py-1.5 text-sm text-muted-foreground">
           {t("lesson.updated", { date: formatDate(lesson.updated) })}
           <span aria-hidden="true"> · </span>

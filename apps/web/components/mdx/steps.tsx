@@ -17,7 +17,11 @@ export function Steps({ children }: { readonly children?: ReactNode }) {
           key={index}
           className="flex flex-col gap-1 rounded-xl border bg-card p-4 text-sm leading-reading"
         >
-          <span className="font-mono text-xs text-muted-foreground">
+          {/* The step number is not a word to search for (ADR-0015). */}
+          <span
+            data-pagefind-ignore="all"
+            className="font-mono text-xs text-muted-foreground"
+          >
             {t("lesson.stepLabel", { n: index + 1 })}
           </span>
           <span>{item}</span>

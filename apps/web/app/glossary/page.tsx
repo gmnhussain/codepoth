@@ -13,6 +13,7 @@ import {
 import { GlossaryControls } from "@/components/glossary/glossary-controls"
 import { TermCard } from "@/components/glossary/term-card"
 import { LabelScope } from "@/components/label-scope"
+import { SearchMetaTags } from "@/components/search/search-meta-tags"
 import { buildPageMetadata } from "@/lib/metadata"
 
 const LIST_ID = "glossary-list"
@@ -78,7 +79,13 @@ export default function GlossaryPage() {
             }))}
             letters={letters}
           />
-          <div id={LIST_ID} className="flex flex-col gap-10">
+          <SearchMetaTags meta={{ kind: "glossary" }} />
+          {/* Each card is its own search result (ADR-0015). */}
+          <div
+            id={LIST_ID}
+            data-pagefind-body=""
+            className="flex flex-col gap-10"
+          >
             {groups.map((group) => (
               <section
                 key={group.letter}
@@ -88,6 +95,7 @@ export default function GlossaryPage() {
               >
                 <h2
                   id={`letter-${group.letter}`}
+                  data-pagefind-ignore="all"
                   className="font-mono text-4xl font-medium text-muted-foreground md:w-18 md:shrink-0 md:pt-4"
                 >
                   {group.letter}

@@ -263,7 +263,7 @@ The MDX components for lesson bodies live in `apps/web/components/mdx/` and are 
 - Header: title, intro and a sample of the dotted underline that marks a `<Term>` in lessons.
 - Controls (client island, `glossary-controls.tsx`): a search field (term, Bangla name and the definition's prose; code examples are left out, `glossarySearchText`) with a count, and an A–Z bar ("সব" plus a button per letter, disabled when no term starts with it; "#" appears only for terms not starting with A–Z). Search and letter combine; the result count is announced; with no match, a card offers "সব পরিভাষা দেখাও". State lives in `?q=&letter=` (`lib/url-state.ts`).
 - Terms are server-rendered cards in letter sections (`term-card.tsx`): term (`lang="en"`), Bangla name, track chip, the definition with its code example (the same components as the popover, `definition-components.tsx`), and "যে পাঠে আছে": each lesson as track › topic › group › lesson (the `›` is hidden from screen readers and read as a comma).
-- A card's id is the term id, so the Term popover's "পরিভাষায় দেখো →" link (`/glossary#<id>`) lands on it; `:target` outlines it.
+- A card's heading (`h3`) has the term id, so the Term popover's "পরিভাষায় দেখো →" link (`/glossary#<id>`) lands on it, with the card's padding in view (`scroll-mt-30`); the card is outlined while it holds the `:target` (`has-[:target]`). The id is on the heading, not the card, because a heading with an id is what makes each term its own search result ([ADR-0015](decisions/ADR-0015-site-search-with-pagefind.md)).
 - With no published term (the production build today) the page shows an empty state instead of the controls.
 
 ## Home page

@@ -10,9 +10,11 @@ import { MdxContent } from "@/components/mdx/mdx-content"
 
 /**
  * A glossary term: name, Bangla name, track, definition, and the lessons
- * that use it as track › topic › group › lesson links. Its id is the term's
- * id, so `/glossary#<id>` (the Term popover's link) lands on it and
- * highlights it with `:target`.
+ * that use it as track › topic › group › lesson links. Its heading's id is
+ * the term's id, so `/glossary#<id>` (the Term popover's link and the
+ * term's search result) lands on it, and the card is outlined while it holds
+ * the `:target`. A heading with an id is what makes the term its own search
+ * result in Pagefind 1.5 (ADR-0015).
  */
 export function TermCard({
   graph,
@@ -29,22 +31,30 @@ export function TermCard({
 
   return (
     <article
-      id={term.id}
-      aria-labelledby={`${term.id}-term`}
+      aria-labelledby={term.id}
       data-term=""
       data-letter={letterOf(term.term)}
       data-search={glossarySearchText(term)}
-      className="flex min-w-0 scroll-mt-24 flex-col gap-4 rounded-2xl border bg-card p-6 target:border-foreground target:ring-2 target:ring-foreground"
+      className="flex min-w-0 flex-col gap-4 rounded-2xl border bg-card p-6 has-[:target]:border-foreground has-[:target]:ring-2 has-[:target]:ring-foreground"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 flex-col gap-0.5">
-          <h3 id={`${term.id}-term`} lang="en" className="text-2xl font-bold">
+          {/* Scrolled to with the card's padding above it in view. */}
+          <h3
+            id={term.id}
+            lang="en"
+            className="scroll-mt-30 text-2xl font-bold"
+          >
             {term.term}
           </h3>
           <span className="text-sm text-muted-foreground">{term.termBn}</span>
         </div>
         {track === undefined ? null : (
-          <Chip data-track-color={track.color} className="shrink-0">
+          <Chip
+            data-track-color={track.color}
+            data-pagefind-ignore="all"
+            className="shrink-0"
+          >
             <span
               aria-hidden="true"
               className="size-2 rounded-full bg-track-dot"
@@ -58,7 +68,11 @@ export function TermCard({
         <MdxContent code={term.mdx} components={definitionComponents} />
       </div>
 
-      <div className="mt-auto flex flex-col gap-2 border-t pt-3">
+      {/* Other pages' titles; not this term's words (ADR-0015). */}
+      <div
+        data-pagefind-ignore="all"
+        className="mt-auto flex flex-col gap-2 border-t pt-3"
+      >
         <h4 className="font-sans text-sm font-semibold text-muted-foreground">
           {t("glossary.usedIn")}
         </h4>

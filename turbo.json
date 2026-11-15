@@ -9,7 +9,12 @@
     "build": {
       "dependsOn": ["^build", "^content:generate"],
       "inputs": ["$TURBO_DEFAULT$", ".env*", "$TURBO_ROOT$/content/**"],
-      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**"],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**",
+        "!.next/dev/**",
+        "public/pagefind/**"
+      ],
       "env": ["CONTENT_INCLUDE_DRAFTS", "VERCEL_ENV"]
     },
     "lint": {

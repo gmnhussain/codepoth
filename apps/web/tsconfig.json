@@ -1,6 +1,9 @@
 {
   "extends": "@workspace/typescript-config/nextjs.json",
   "compilerOptions": {
+    // scripts/ run directly with Node, which needs the `.ts` in their
+    // relative imports (ADR-0015); nothing is emitted (noEmit).
+    "allowImportingTsExtensions": true,
     "paths": {
       "@/*": ["./*"],
       "@workspace/ui/*": ["../../packages/ui/src/*"]

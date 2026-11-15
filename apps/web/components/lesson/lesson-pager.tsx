@@ -21,7 +21,9 @@ export function LessonPager({
   const { previous, next } = neighboursOf(graph, lessonId)
   if (previous === undefined && next === undefined) return null
   return (
+    // Other lessons' titles; not this lesson's words (ADR-0015).
     <section
+      data-pagefind-ignore="all"
       aria-labelledby={PAGER_HEADING_ID}
       className="flex scroll-mt-24 flex-col gap-5"
     >

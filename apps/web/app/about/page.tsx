@@ -8,6 +8,7 @@ import { getAboutPage } from "@workspace/content/content"
 import { aboutComponents } from "@/components/about/about-components"
 import { AuthorCard } from "@/components/home/author-card"
 import { MdxContent } from "@/components/mdx/mdx-content"
+import { SearchMetaTags } from "@/components/search/search-meta-tags"
 import { buildPageMetadata } from "@/lib/metadata"
 
 export function generateMetadata(): Metadata {
@@ -30,20 +31,31 @@ export default function AboutPage() {
   if (page === undefined) notFound()
 
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-8 px-4 py-12 sm:px-8">
-      <header className="flex flex-col gap-2">
-        <h1 className="text-4xl font-bold sm:text-5xl">{page.title}</h1>
-        <p className="text-lg leading-reading text-foreground/80">
-          {page.description}
-        </p>
-        <p className="text-sm text-muted-foreground">
-          {t("lesson.updated", { date: formatDate(page.updated) })}
-        </p>
-      </header>
-      <AuthorCard />
-      <div className="flex flex-col gap-5">
-        <MdxContent code={page.mdx} components={aboutComponents} />
+    // The whole page is indexed for search, except the updated date
+    // (ADR-0015).
+    <>
+      <SearchMetaTags meta={{ kind: "page" }} />
+      <div
+        data-pagefind-body=""
+        className="mx-auto flex max-w-3xl flex-col gap-8 px-4 py-12 sm:px-8"
+      >
+        <header className="flex flex-col gap-2">
+          <h1 className="text-4xl font-bold sm:text-5xl">{page.title}</h1>
+          <p className="text-lg leading-reading text-foreground/80">
+            {page.description}
+          </p>
+          <p
+            data-pagefind-ignore="all"
+            className="text-sm text-muted-foreground"
+          >
+            {t("lesson.updated", { date: formatDate(page.updated) })}
+          </p>
+        </header>
+        <AuthorCard />
+        <div className="flex flex-col gap-5">
+          <MdxContent code={page.mdx} components={aboutComponents} />
+        </div>
       </div>
-    </div>
+    </>
   )
 }

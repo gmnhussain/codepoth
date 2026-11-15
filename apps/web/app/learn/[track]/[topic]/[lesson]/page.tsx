@@ -21,6 +21,7 @@ import { flatTocIds } from "@/components/lesson/toc-ids"
 import { tocItemsFor } from "@/components/lesson/toc-items"
 import { lessonComponentsFor } from "@/components/mdx/lesson-components"
 import { MdxContent } from "@/components/mdx/mdx-content"
+import { SearchMetaTags } from "@/components/search/search-meta-tags"
 import { buildPageMetadata } from "@/lib/metadata"
 
 type LessonPageProps = {
@@ -80,6 +81,15 @@ export default async function LessonPage({ params }: LessonPageProps) {
           lessonId={lesson.id}
           sectionIds={flatTocIds(tocItems)}
         />
+        <SearchMetaTags
+          meta={{
+            kind: "lesson",
+            ...(track === undefined
+              ? {}
+              : { track: track.titleEn, hue: track.color }),
+            ...(topic === undefined ? {} : { topic: topic.title }),
+          }}
+        />
         <div aria-hidden="true" className="h-1.5 bg-track-dot" />
         <div className="mx-auto flex max-w-7xl gap-10 px-4 py-10 sm:px-8">
           <aside className="hidden w-56 shrink-0 lg:block">
@@ -87,7 +97,13 @@ export default async function LessonPage({ params }: LessonPageProps) {
               {nav}
             </div>
           </aside>
-          <article className="flex max-w-3xl min-w-0 flex-1 flex-col gap-12">
+          {/* The search index reads the title, description and lesson body;
+              the header's other parts, the TOC and the pager are left out
+              (ADR-0015). */}
+          <article
+            data-pagefind-body=""
+            className="flex max-w-3xl min-w-0 flex-1 flex-col gap-12"
+          >
             <LessonHeader
               graph={graph}
               lesson={lesson}
@@ -102,7 +118,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
               }
             />
             {tocItems.length > 0 ? (
-              <div className="xl:hidden">
+              <div data-pagefind-ignore="all" className="xl:hidden">
                 <LessonToc
                   items={tocItems}
                   sectionCount={lesson.sections.length}

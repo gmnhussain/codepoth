@@ -47,6 +47,7 @@ What becomes easier or harder because of it.
 | [ADR-0012](ADR-0012-about-page-content.md)               | About page as content, privacy text kept true           | accepted |
 | [ADR-0013](ADR-0013-labels-in-client-islands.md)         | Client islands get only the label groups they use       | accepted |
 | [ADR-0014](ADR-0014-reader-progress-implementation.md)   | How reader progress is built in the web app             | accepted |
+| [ADR-0015](ADR-0015-site-search-with-pagefind.md)        | Site search with Pagefind over the pre-rendered pages   | accepted |
 
 ## Open questions (do NOT hardcode)
 

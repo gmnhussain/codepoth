@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build && node scripts/build-search-index.ts",
     "start": "next start",
     "lint": "eslint --max-warnings 0",
     "typecheck": "tsc --noEmit",
@@ -33,6 +33,7 @@
     "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
     "eslint": "catalog:",
+    "pagefind": "1.5.2",
     "typescript": "catalog:",
     "vitest": "catalog:"
   }
