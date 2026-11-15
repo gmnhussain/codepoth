@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest"
 
+import { EMPTY_PROGRESS } from "./empty-progress"
 import {
   markDone,
   recordAnchor,
@@ -8,7 +9,6 @@ import {
   setBookmark,
   unmarkDone,
 } from "./operations"
-import { EMPTY_PROGRESS } from "./progress.schema"
 import type { Progress } from "./progress.schema"
 
 const INTRO = "frontend.html.intro"

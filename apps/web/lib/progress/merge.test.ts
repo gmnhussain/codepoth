@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest"
 
+import { EMPTY_PROGRESS } from "./empty-progress"
 import { mergeProgress } from "./merge"
-import { EMPTY_PROGRESS } from "./progress.schema"
 import type { Progress } from "./progress.schema"
 
 const INTRO = "frontend.html.intro"

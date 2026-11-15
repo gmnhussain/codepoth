@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-const KEBAB = "[a-z0-9]+(?:-[a-z0-9]+)*"
+import { KEBAB, LESSON_ID_PATTERN } from "../patterns"
 
 /** One kebab-case path segment: a track, topic, group, lesson or glossary file name. */
 export const slugSchema = z
@@ -11,7 +11,7 @@ export const slugSchema = z
 export const lessonIdSchema = z
   .string()
   .regex(
-    new RegExp(`^${KEBAB}(?:\\.${KEBAB})+$`),
+    LESSON_ID_PATTERN,
     "A lesson id is dot-separated kebab-case, e.g. frontend.react.hooks.use-effect"
   )
 

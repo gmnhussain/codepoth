@@ -1,10 +1,7 @@
 import { describe, expect, it } from "vitest"
 
-import {
-  EMPTY_PROGRESS,
-  parseStoredProgress,
-  progressSchema,
-} from "./progress.schema"
+import { EMPTY_PROGRESS } from "./empty-progress"
+import { parseStoredProgress, progressSchema } from "./progress.schema"
 
 const T1 = "2026-11-10T08:00:00.000Z"
 const T2 = "2026-11-11T09:30:00.000Z"

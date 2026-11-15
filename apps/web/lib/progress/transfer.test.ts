@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { EMPTY_PROGRESS } from "./progress.schema"
+import { EMPTY_PROGRESS } from "./empty-progress"
 import type { Progress } from "./progress.schema"
 import {
   EXPORT_FORMAT,

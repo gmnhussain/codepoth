@@ -1,28 +1,37 @@
-import { lessonIdSchema } from "@workspace/content/schemas/common"
-import { z } from "zod"
+import { LESSON_ID_PATTERN } from "@workspace/content/patterns"
+import { z } from "zod/mini"
+
+import { EMPTY_PROGRESS } from "./empty-progress"
 
 /**
  * The reader's progress as stored under `codepoth:v1` (ADR-0007). Every key
  * is a stable lesson id; every timestamp is an ISO instant; activity days are
  * the reader's local calendar dates.
+ *
+ * `zod/mini`: this runs in the browser on every page, and the full Zod
+ * build would add about 30 KB gzip to it (ADR-0014).
  */
+
+const lessonIdSchema = z.string().check(z.regex(LESSON_ID_PATTERN))
 
 const timestampSchema = z.iso.datetime()
 
 export const quizAttemptSchema = z
   .object({
-    score: z.int().nonnegative(),
-    total: z.int().positive(),
+    score: z.int().check(z.nonnegative()),
+    total: z.int().check(z.positive()),
     at: timestampSchema,
   })
-  .refine((attempt) => attempt.score <= attempt.total, {
-    message: "A quiz score cannot exceed its total",
-  })
+  .check(
+    z.refine((attempt) => attempt.score <= attempt.total, {
+      message: "A quiz score cannot exceed its total",
+    })
+  )
 
 export const lessonProgressSchema = z.object({
   openedAt: timestampSchema,
-  doneAt: timestampSchema.optional(),
-  quiz: quizAttemptSchema.optional(),
+  doneAt: z.optional(timestampSchema),
+  quiz: z.optional(quizAttemptSchema),
 })
 
 export const bookmarkSchema = z.object({ at: timestampSchema })
@@ -30,7 +39,7 @@ export const bookmarkSchema = z.object({ at: timestampSchema })
 export const lastReadSchema = z.object({
   id: lessonIdSchema,
   at: timestampSchema,
-  anchor: z.string().min(1).optional(),
+  anchor: z.optional(z.string().check(z.minLength(1))),
 })
 
 export const daySchema = z.iso.date()
@@ -39,10 +48,13 @@ export const daySchema = z.iso.date()
 export const progressSchema = z.object({
   lessons: z.record(lessonIdSchema, lessonProgressSchema),
   bookmarks: z.record(lessonIdSchema, bookmarkSchema),
-  lastRead: lastReadSchema.optional(),
+  lastRead: z.optional(lastReadSchema),
   activity: z.record(
     daySchema,
-    z.array(lessonIdSchema).transform((ids) => [...new Set(ids)])
+    z.pipe(
+      z.array(lessonIdSchema),
+      z.transform((ids: string[]) => [...new Set(ids)])
+    )
   ),
 })
 
@@ -52,13 +64,6 @@ export type Bookmark = z.infer<typeof bookmarkSchema>
 export type LastRead = z.infer<typeof lastReadSchema>
 export type Progress = z.infer<typeof progressSchema>
 
-/** Progress of a reader who has done nothing yet; never mutated. */
-export const EMPTY_PROGRESS: Progress = Object.freeze({
-  lessons: Object.freeze({}),
-  bookmarks: Object.freeze({}),
-  activity: Object.freeze({}),
-})
-
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value)
 }
@@ -66,7 +71,7 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
 /** Keeps the entries whose key and value are valid, dropping the rest one by one. */
 function validEntries<T>(
   value: unknown,
-  keySchema: z.ZodType<string>,
+  keySchema: z.ZodMiniType<string>,
   parseValue: (entry: unknown) => T | undefined
 ): Record<string, T> {
   if (!isPlainObject(value)) return {}
@@ -79,7 +84,9 @@ function validEntries<T>(
   return kept
 }
 
-function parseWith<T>(schema: z.ZodType<T>): (entry: unknown) => T | undefined {
+function parseWith<T>(
+  schema: z.ZodMiniType<T>
+): (entry: unknown) => T | undefined {
   return (entry) => {
     const result = schema.safeParse(entry)
     return result.success ? result.data : undefined

@@ -1,4 +1,4 @@
-import { z } from "zod"
+import { z } from "zod/mini"
 
 import { localDay, pruneActivity } from "./days"
 import { progressSchema } from "./progress.schema"

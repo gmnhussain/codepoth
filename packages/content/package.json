@@ -47,6 +47,7 @@
     "./routes": "./src/routes.ts",
     "./search": "./src/search.ts",
     "./paths": "./src/paths.ts",
+    "./patterns": "./src/patterns.ts",
     "./schemas/*": "./src/schemas/*.schema.ts",
     "./generated": {
       "types": "./.content-collections/generated/index.d.ts",
