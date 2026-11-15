@@ -97,7 +97,12 @@ export function QuizQuestions({
                   </span>
                 </legend>
                 {question.code === undefined ? null : (
-                  <pre className="overflow-x-auto rounded-xl bg-code p-4 font-mono text-sm text-code-foreground">
+                  // Focusable, like the lesson's code blocks, so the
+                  // keyboard can scroll a long line sideways (WCAG 2.1.1).
+                  <pre
+                    tabIndex={0}
+                    className="overflow-x-auto rounded-xl bg-code p-4 font-mono text-sm text-code-foreground focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-code-foreground"
+                  >
                     <code>{question.code}</code>
                   </pre>
                 )}

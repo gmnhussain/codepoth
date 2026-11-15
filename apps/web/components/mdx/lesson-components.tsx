@@ -1,5 +1,6 @@
 import type { ComponentProps, ReactNode } from "react"
 
+import { t } from "@workspace/config/t"
 import { cn } from "@workspace/ui/lib/utils"
 
 import { BlockSection } from "@/components/mdx/block-section"
@@ -52,8 +53,16 @@ export const lessonServerComponents = {
   figure: CodeFigure,
   figcaption: CodeCaption,
   pre: CodePre,
+  // A wide table scrolls sideways; the wrapper is a named, focusable region
+  // so the keyboard can scroll it (WCAG 2.1.1). Markdown tables have no
+  // caption, so every table gets the same name.
   table: (props: ComponentProps<"table">) => (
-    <div className="overflow-x-auto rounded-xl border">
+    <div
+      role="region"
+      aria-label={t("lesson.table")}
+      tabIndex={0}
+      className="overflow-x-auto rounded-xl border focus-visible:outline-2 focus-visible:outline-ring"
+    >
       <table className="w-full border-collapse text-base" {...props} />
     </div>
   ),
