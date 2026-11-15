@@ -13,7 +13,8 @@ Every route is pre-rendered ([ADR-0004](../decisions/ADR-0004-vercel-ssg-not-sta
 
 ## Fonts
 
-- Load every font with `next/font`, with `subsets: ["bengali", "latin"]` for the Bangla fonts and `display: "swap"`.
+- Load every font with `next/font`, with `subsets: ["bengali", "latin"]` for the Bangla fonts and `display: "optional"`.
+- Why `optional`, not `swap`: a web font that arrives after the first paint makes text re-wrap, because the fallback fonts (Nirmala UI, Noto Sans Bengali, Arial…) are not the same width. With `swap`, the end-to-end sweep (Phase 5) measured layout shifts of up to 0.26 on slow loads at 320 px, from chips, breadcrumbs, stats and filter rows changing their line count, and 0.13 on `/contents` when JetBrains Mono (not preloaded) arrived about 2 s in. With `optional`, a font that is not ready by the first paint is not swapped in on that page view; it still downloads, and the next page uses it from the cache. Measured on a throttled first load (150 ms latency, 1.6 Mbps): the page stays in the fallback fonts with a layout shift of 0, and the next page renders in Anek Bangla, Hind Siliguri and JetBrains Mono. On fast loads (fonts ready before the first paint, as in every Lighthouse run below) nothing changes.
 - Anek Bangla is a variable font: load it once as a variable font, not one file per weight.
 - Font families and weights: [design.md](../design.md#fonts).
 

@@ -8,7 +8,7 @@ Tokens are CSS variables mapped onto the shadcn theme variables in `packages/ui`
 
 ## Fonts
 
-Loading rules (`next/font`, subsets, `swap`): [performance.md](development/performance.md#fonts). Loaded in `apps/web/app/layout.tsx`.
+Loading rules (`next/font`, subsets, `display: "optional"`): [performance.md](development/performance.md#fonts). On a slow first visit a page may render in the system's fallback fonts; the next page uses the web fonts. Loaded in `apps/web/app/layout.tsx`.
 
 | Font           | Use                    | Loaded as                     | Utility        |
 | -------------- | ---------------------- | ----------------------------- | -------------- |
@@ -19,7 +19,7 @@ Loading rules (`next/font`, subsets, `swap`): [performance.md](development/perfo
 - next/font exposes `--font-display`, `--font-body` and `--font-code`; `globals.css` maps them to `font-heading`, `font-sans` and `font-mono`. The names differ from the Tailwind theme variables so no variable refers to itself.
 - Code shows no ligatures (`font-variant-ligatures: none` in `globals.css`), so `=>` and `!==` look the way a beginner types them.
 - JetBrains Mono has no Bangla glyphs, so `font-mono` falls back to Hind Siliguri for Bangla text in code (comments, strings).
-- Anek Bangla and Hind Siliguri are preloaded (Bangla + Latin subsets): 8 files, 339.3 KB. JetBrains Mono is not preloaded and adds 40.1 KB on pages with monospace text, 379.4 KB in all. Measured with Lighthouse on 2026-11-15 on Home, a lesson and the Map: fonts finish before the first paint and do not delay LCP (`font-display: swap`). Per-file numbers: [performance.md](development/performance.md#font-bytes).
+- Anek Bangla and Hind Siliguri are preloaded (Bangla + Latin subsets): 8 files, 339.3 KB. JetBrains Mono is not preloaded and adds 40.1 KB on pages with monospace text, 379.4 KB in all. Measured with Lighthouse on 2026-11-15 on Home, a lesson and the Map: fonts finish before the first paint and do not delay LCP (measured with `font-display: swap`; `optional` renders such loads the same way). Per-file numbers: [performance.md](development/performance.md#font-bytes).
 - Heading weights in use: 500–700. Body line height: `leading-reading` (1.85, see [Type scale](#type-scale)).
 
 ## Colors
@@ -251,6 +251,7 @@ The MDX components for lesson bodies live in `apps/web/components/mdx/` and are 
 - Header: title, intro and computed stats (tracks, topics, lessons).
 - Toolbar (client island, `contents-controls.tsx`): a search field and "সব খোলো / সব বন্ধ করো". Search matches every word of the query against a lesson's title, its group and its topic (`matchesQuery` in `packages/content/src/search.ts`). Matching lessons stay visible with their groups, topics and tracks, all opened; the count is announced in a status line. Clearing the search restores what was open before. The query lives in `?q=` (conventions §10): written with `history.replaceState` as the reader types (no history entry per keystroke), applied on load, removed when cleared. Pages with URL state read it with `useUrlParam` (a `useSyncExternalStore` hook: "" on the server and during hydration, the URL's value on the client, updated by `writeUrlParams` and back/forward) and change it with `writeUrlParams`, both in `apps/web/lib/url-state.ts`. The URL is the only copy of that state: counts are derived from data passed as props, and effects keyed on the values only update the DOM. No `requestAnimationFrame` for state or focus: it never fires in a page that is not being rendered (a background tab, a hidden pane). A link to a `#section` on another page whose look depends on `:target` (the glossary card, the privacy section) is a plain `<a>`: `next/link` changes the hash with `pushState`, which scrolls but does not update `:target`. `useUrlParam` hears `popstate` and `writeUrlParams`, not Next's own `pushState`: a control that changes only the query on the same page calls `writeUrlParams` rather than rendering a `<Link>` (links into these pages from other pages are fine, since the page mounts with the new URL).
 - The list is server-rendered native `<details>`, so it works without JS. The first track starts open, the rest closed; groups start closed. The island only sets `hidden` and `open`.
+- Each track's summary is a grid: number badge, name and subtitle, the read count, chevron in one row from `sm`; below `sm` the read count moves under the subtitle so the row fits in 320px.
 - Each track: number badge, name (the `h2`), subtitle with topic and lesson counts, then its topics on a line in the track colour: topic link (`h3`), position, lesson count, an interchange chip, then its groups (`h4` in a `<details>`) or lessons. A topic whose home is another track shows "পাঠগুলো {track} লাইনে →" instead of lessons, linking to `#track-{id}`.
 - Each track's summary is a grid: number badge, name and subtitle, the read count, chevron in one row from `sm`; below `sm` the read count moves under the subtitle so the row fits in 320px.
 - Lesson numbers are track.topic.lesson (`৪.৪.৩`), `aria-hidden`, and hidden below `sm`.

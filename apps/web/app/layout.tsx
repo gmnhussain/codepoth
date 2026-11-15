@@ -15,9 +15,12 @@ import { ThemeProvider } from "@/components/theme-provider"
 
 // Fonts and weights: docs/design.md#fonts. Anek Bangla is variable, so it loads
 // as one file without a weight list (docs/development/performance.md#fonts).
+// `optional`: a font not ready by the first paint is not swapped in later,
+// so web fonts never re-wrap text under the reader; the next page uses it
+// from the cache (performance.md#fonts).
 const displayFont = Anek_Bangla({
   subsets: ["bengali", "latin"],
-  display: "swap",
+  display: "optional",
   variable: "--font-display",
 })
 
@@ -25,7 +28,7 @@ const displayFont = Anek_Bangla({
 const bodyFont = Hind_Siliguri({
   subsets: ["bengali", "latin"],
   weight: ["400", "500", "600"],
-  display: "swap",
+  display: "optional",
   variable: "--font-body",
 })
 
@@ -34,7 +37,7 @@ const bodyFont = Hind_Siliguri({
 // ~40 KB to every page.
 const codeFont = JetBrains_Mono({
   subsets: ["latin"],
-  display: "swap",
+  display: "optional",
   preload: false,
   variable: "--font-code",
 })
