@@ -4,30 +4,32 @@ import { CheckIcon } from "lucide-react"
 
 import { cn } from "@workspace/ui/lib/utils"
 
+import { STATE_LABEL } from "@/components/lesson/state-label"
 import { useT } from "@/lib/labels-context"
 import { lessonState } from "@/lib/progress/selectors"
-import type { LessonState } from "@/lib/progress/selectors"
 import { useProgress } from "@/lib/progress-store.client"
-
-const STATE_LABEL = {
-  done: "status.done",
-  "in-progress": "status.inProgress",
-  "not-started": "status.notStarted",
-} as const satisfies Record<LessonState, `status.${string}`>
 
 /**
  * A lesson's state as a 16px mark: a filled tick when done, a ring with a
  * dot while in progress, an empty ring before. The server and the first
  * client render show "not started" (the first-visit state); the mark changes
- * in place, so nothing moves.
+ * in place, so nothing moves. `isDecorative` hides it from screen readers
+ * where the state is also written out beside it.
  */
-export function LessonStateIcon({ lessonId }: { readonly lessonId: string }) {
+export function LessonStateIcon({
+  lessonId,
+  isDecorative = false,
+}: {
+  readonly lessonId: string
+  readonly isDecorative?: boolean
+}) {
   const t = useT(["status"])
   const state = lessonState(useProgress(), lessonId)
   return (
     <span
-      role="img"
-      aria-label={t(STATE_LABEL[state])}
+      {...(isDecorative
+        ? { "aria-hidden": true }
+        : { role: "img", "aria-label": t(STATE_LABEL[state]) })}
       className={cn(
         "flex size-4 shrink-0 items-center justify-center rounded-full",
         state === "done" && "bg-foreground text-background",

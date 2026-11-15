@@ -56,6 +56,19 @@ export function nextUnfinished(
   return ids.find((id) => lessonState(progress, id) !== "done")
 }
 
+/**
+ * The lesson to continue a started topic with: its next unfinished lesson,
+ * once any of its lessons is opened. `undefined` before the topic is started
+ * and once every lesson is done.
+ */
+export function continueLesson(
+  progress: Progress,
+  topicLessonIds: readonly string[]
+): string | undefined {
+  if (summarize(progress, topicLessonIds).started === 0) return undefined
+  return nextUnfinished(progress, topicLessonIds)
+}
+
 export type QuizResult = {
   readonly id: string
   readonly score: number

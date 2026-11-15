@@ -6,6 +6,7 @@ import {
   activityByDay,
   averageQuizScore,
   bookmarksNewestFirst,
+  continueLesson,
   lastSaved,
   lessonState,
   nextUnfinished,
@@ -91,6 +92,25 @@ describe("nextUnfinished", () => {
   it("is undefined when every lesson is done or the list is empty", () => {
     expect(nextUnfinished(progress, [INTRO])).toBeUndefined()
     expect(nextUnfinished(progress, [])).toBeUndefined()
+  })
+})
+
+describe("continueLesson", () => {
+  it("is the next unfinished lesson of a started topic", () => {
+    expect(continueLesson(progress, LESSONS)).toBe(FORMS)
+  })
+
+  it("is undefined before any lesson is opened", () => {
+    expect(continueLesson(progress, [TABLES])).toBeUndefined()
+    expect(continueLesson(EMPTY_PROGRESS, LESSONS)).toBeUndefined()
+  })
+
+  it("is undefined once every lesson is done", () => {
+    expect(continueLesson(progress, [INTRO])).toBeUndefined()
+  })
+
+  it("can be a lesson not opened yet, after a finished one", () => {
+    expect(continueLesson(progress, [INTRO, TABLES])).toBe(TABLES)
   })
 })
 

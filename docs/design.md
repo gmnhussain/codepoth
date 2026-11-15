@@ -214,7 +214,11 @@ The MDX components for lesson bodies live in `apps/web/components/mdx/` and are 
 - The track strip starts with the current topic centred (a small island sets the strip's `scrollLeft`; no `scrollIntoView`, no smooth scroll).
 - Numbered rows (here and in later lists such as Contents and the roadmap): the number is `aria-hidden` (the `<ol>` gives the order) and short units get a screen-reader form, so a row's name reads "JSX, ১ মিনিট", not "১JSX১ মি".
 - Totals are whole hours from 90 minutes, otherwise minutes rounded to 5 (`roundedDuration`).
-- The reader's state per lesson, "এখন পড়ছ" and the progress card arrive with reader progress.
+- Reader progress ([ADR-0014](decisions/ADR-0014-reader-progress-implementation.md)), with no layout shift:
+  - The card after the header shows where the reader stands. Not started (also the first-visit HTML): "এই স্টেশন শুরু করো" with the first lesson. In progress: "এই স্টেশনে তোমার অগ্রগতি", "{total}টির {done}টি শেষ" with a bar in the track colour, "পরের পাঠ: {lesson} · {group}" (the next unfinished lesson) and "চালিয়ে যাও". All done: a full bar, "পরের স্টেশন: {topic}" when the next topic has a page, and "আবার দেখো" (the first lesson). Then "অগ্রগতি শুধু এই ব্রাউজারে সেভ থাকে।". All states are stacked in one grid cell with only one visible, plus an invisible "in progress" layer with the topic's longest lesson title, so the card's height is fixed from the first render.
+  - Groups: every group is a padded frame with a border; the one holding the lesson to continue with turns tinted (`border-track/30 bg-track/5`) and gets an "এখন পড়ছ" chip; a finished group gets "গ্রুপ শেষ". The kicker line is always chip-tall. Under the group's count and time, "{total}টির {done}টি শেষ" with a bar.
+  - Lesson rows: a state mark before the number (hidden from screen readers) and the state in words before the minutes ("পড়া শেষ", "পড়ছ", "শুরু হয়নি", or "এখান থেকে" on the lesson to continue with), in a slot as wide as the longest of those; it is part of the row link's name. Below `sm` the words are screen-reader only (the slot would squeeze the titles) and the mark shows the state.
+  - The track strip's dots do not show progress yet.
 
 ## Contents page
 
