@@ -3,9 +3,13 @@ import { t } from "@workspace/config/t"
 import { BrandLink } from "@/components/brand-link"
 import { MobileNav } from "@/components/mobile-nav"
 import { NavLinks } from "@/components/nav-links"
+import { SearchButton } from "@/components/search/search-button"
 import { ThemeToggle } from "@/components/theme-toggle"
 
-/** Site header: brand, page links (from `lg`), theme toggle and mobile menu. */
+/**
+ * Site header: brand, page links (from `lg`), search, theme toggle (from
+ * `sm`; below it, in the menu sheet) and mobile menu.
+ */
 export function SiteHeader() {
   return (
     <header className="border-b">
@@ -18,7 +22,9 @@ export function SiteHeader() {
           />
         </nav>
         <div className="ml-auto flex items-center gap-2">
-          <ThemeToggle />
+          <SearchButton />
+          {/* Below sm it is in the menu sheet instead (no room here). */}
+          <ThemeToggle className="hidden sm:inline-flex" />
           <MobileNav />
         </div>
       </div>

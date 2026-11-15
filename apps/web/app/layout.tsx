@@ -42,7 +42,7 @@ const codeFont = JetBrains_Mono({
 const MAIN_CONTENT_ID = "main"
 
 /** Label groups the shell's client components and error.tsx need. */
-const SHELL_LABELS = ["common", "theme", "nav", "error"] as const
+const SHELL_LABELS = ["common", "theme", "nav", "error", "search"] as const
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),

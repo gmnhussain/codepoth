@@ -372,5 +372,21 @@
   "term": {
     "tag": "পরিভাষা",
     "seeInGlossary": "পরিভাষায় দেখো"
+  },
+  "search": {
+    "open": "খুঁজো",
+    "dialog": "সাইটে খোঁজো",
+    "field": "খোঁজার শব্দ",
+    "placeholder": "পাঠ, ধাপ বা পরিভাষা খোঁজো…",
+    "keyApple": "⌘K",
+    "keyOther": "Ctrl K",
+    "escKey": "Esc",
+    "close": "বন্ধ করো (Esc)",
+    "hint": "পাঠ, ধাপ বা পরিভাষার নাম লেখো। React, useEffect-এর মতো ইংরেজি শব্দও খোঁজা যায়।",
+    "shortcutHint": "যেকোনো পাতা থেকে {key} চাপলেও খোঁজা খোলে।",
+    "loading": "খোঁজার সূচি আসছে…",
+    "unavailable": "এই মুহূর্তে খোঁজা যাচ্ছে না।",
+    "unavailableHint": "পাঠের নাম জানলে সূচিপত্রে খুঁজে নিতে পারো।",
+    "toContents": "সূচিপত্রে যাও"
   }
 }

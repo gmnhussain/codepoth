@@ -8,9 +8,13 @@ import { Sheet, SheetTitle, SheetTrigger } from "@workspace/ui/components/sheet"
 
 import { AppSheetContent } from "@/components/app-sheet"
 import { NavLinks } from "@/components/nav-links"
+import { ThemeToggle } from "@/components/theme-toggle"
 import { useT } from "@/lib/labels-context"
 
-/** The page links in a top sheet, below the `lg` breakpoint. */
+/**
+ * The page links in a top sheet, below the `lg` breakpoint; below `sm`, also
+ * the theme toggle, which has no room in the header there.
+ */
 export function MobileNav() {
   const t = useT(["nav"])
   const [isOpen, setIsOpen] = useState(false)
@@ -33,6 +37,14 @@ export function MobileNav() {
             }}
           />
         </nav>
+        {/* From sm the header has its own; display:none keeps one theme
+            control in the accessibility tree at any width. */}
+        <div className="mt-4 border-t pt-4 sm:hidden">
+          <ThemeToggle
+            variant="labelled"
+            className="h-12 w-full rounded-xl px-4 text-lg"
+          />
+        </div>
       </AppSheetContent>
     </Sheet>
   )
