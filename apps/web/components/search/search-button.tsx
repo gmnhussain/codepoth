@@ -121,7 +121,6 @@ export function SearchButton() {
     <>
       <Button
         variant="outline"
-        aria-label={t("search.open")}
         aria-haspopup="dialog"
         aria-keyshortcuts="Meta+K Control+K"
         onClick={openSearch}
@@ -130,9 +129,10 @@ export function SearchButton() {
         className="w-11 gap-2.5 px-0 font-normal text-muted-foreground sm:w-auto sm:pr-2 sm:pl-3.5"
       >
         <SearchIcon aria-hidden="true" className="size-4.5" />
-        <span aria-hidden="true" className="hidden lg:inline">
-          {t("search.open")}
-        </span>
+        {/* The name comes from this text, visible from lg and visually
+            hidden below: an aria-label would leave the visible shortcut box
+            out of the name, which WCAG 2.5.3 does not allow. */}
+        <span className="sr-only lg:not-sr-only">{t("search.open")}</span>
         <kbd
           aria-hidden="true"
           className="hidden rounded-md border border-foreground/20 bg-muted px-1.5 font-mono text-xs text-foreground/80 sm:grid"
