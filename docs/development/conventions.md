@@ -138,6 +138,7 @@ File role suffixes: `.schema.ts` (Zod schemas), `.client.ts` (browser-only helpe
 - **MUST:** Tailwind utility classes and theme tokens only; no new colours outside the token system. Merge classes with `cn()`.
 - **MUST:** a shadcn/ui component wherever one fits, added with the CLI, not written by hand or forked without a documented reason.
 - One component per file; kebab-case filename; PascalCase named export. Pages and layouts use `export default`. List props are `readonly`.
+  - Exception: an MDX element map (the object passed as `components` to `MdxContent`) may define its small per-element styling components in the same file, e.g. `about-components.tsx` or the `figure`/`figcaption`/`pre` parts in `code-figure.tsx`. They exist only to style one element of that map; anything with logic or state gets its own file.
 - No nested component definitions. `next/image`, `next/link`, `next/font` and the Metadata API; no raw `<img>` or `<head>`.
 - Navigation that looks like a button is a real link.
 - Numbers and dates go through format helpers (Bangla digits in the UI).

@@ -1,98 +1,11 @@
-import Link from "next/link"
-
 import { formatList } from "@workspace/config/format"
 import { t } from "@workspace/config/t"
-import type {
-  ContentGraph,
-  GraphLesson,
-  GraphTopic,
-} from "@workspace/content/graph"
+import type { ContentGraph, GraphLesson } from "@workspace/content/graph"
 import { cn } from "@workspace/ui/lib/utils"
 
+import { NAV_ROW_HEIGHT } from "@/components/lesson/nav-row-height"
+import { TopicLessons } from "@/components/lesson/topic-lessons"
 import { TopicName } from "@/components/topic/topic-name"
-
-/**
- * 40px rows in the desktop column (mouse); 44px on touch screens and inside
- * the drawer (design.md#accessibility).
- */
-const TARGET_HEIGHT =
-  "min-h-10 pointer-coarse:min-h-11 in-data-[slot=sheet-content]:min-h-11"
-
-const LESSON_LINK = `${TARGET_HEIGHT} flex items-center rounded-lg px-3 py-1.5 text-sm leading-snug text-foreground/80 hover:bg-muted hover:text-foreground aria-[current=page]:bg-track/10 aria-[current=page]:font-semibold aria-[current=page]:text-foreground`
-
-function LessonLink({
-  lesson,
-  currentId,
-}: {
-  readonly lesson: GraphLesson
-  readonly currentId: string
-}) {
-  return (
-    <li>
-      <Link
-        href={lesson.url}
-        className={LESSON_LINK}
-        {...(lesson.id === currentId
-          ? { "aria-current": "page" as const }
-          : {})}
-      >
-        {lesson.title}
-      </Link>
-    </li>
-  )
-}
-
-/** The current topic's groups (current group open) or its loose lessons. */
-function TopicLessons({
-  graph,
-  topic,
-  current,
-}: {
-  readonly graph: ContentGraph
-  readonly topic: GraphTopic
-  readonly current: GraphLesson
-}) {
-  return (
-    <div className="mt-2 flex flex-col gap-1">
-      {topic.entries.map((entry) => {
-        if (entry.kind === "lesson") {
-          const lesson = graph.lessonById.get(entry.lessonId)
-          return lesson === undefined ? null : (
-            <ul key={entry.lessonId}>
-              <LessonLink lesson={lesson} currentId={current.id} />
-            </ul>
-          )
-        }
-        const group = graph.groupByKey.get(entry.groupKey)
-        if (group === undefined) return null
-        return (
-          <details
-            key={group.key}
-            open={group.key === current.groupKey}
-            className="group"
-          >
-            <summary
-              className={cn(
-                TARGET_HEIGHT,
-                "flex cursor-pointer items-center rounded-lg px-3 text-sm font-semibold hover:bg-muted"
-              )}
-            >
-              {group.title}
-            </summary>
-            <ul className="ms-3 border-s ps-2">
-              {group.lessonIds.map((id) => {
-                const lesson = graph.lessonById.get(id)
-                return lesson === undefined ? null : (
-                  <LessonLink key={id} lesson={lesson} currentId={current.id} />
-                )
-              })}
-            </ul>
-          </details>
-        )
-      })}
-    </div>
-  )
-}
 
 /**
  * The lesson's track as a vertical line of topics; the current topic opens
@@ -144,7 +57,7 @@ export function LessonNav({
               />
               <div
                 className={cn(
-                  TARGET_HEIGHT,
+                  NAV_ROW_HEIGHT,
                   "flex items-center text-sm leading-snug",
                   isCurrent ? "font-semibold" : "text-foreground/80"
                 )}
