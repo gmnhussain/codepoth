@@ -1,9 +1,11 @@
 "use client"
 
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useMemo, useRef } from "react"
 import { ChevronDownIcon } from "lucide-react"
 
+import { flatTocIds } from "@/components/lesson/toc-ids"
 import { TocList } from "@/components/lesson/toc-list"
+import { useActiveId } from "@/components/lesson/use-active-id"
 import { useT } from "@/lib/labels-context"
 
 /** One TOC entry: a block (numbered) or an author section under it. */
@@ -12,46 +14,6 @@ export type TocItem = {
   readonly label: string
   readonly number?: string | undefined
   readonly children: readonly { readonly id: string; readonly label: string }[]
-}
-
-/** Distance from the top of the viewport at which a heading counts as current. */
-const ACTIVE_OFFSET_PX = 120
-
-/** Ids in reading order, blocks followed by their sections. */
-function flatIds(items: readonly TocItem[]): string[] {
-  return items.flatMap((item) => [
-    item.id,
-    ...item.children.map((child) => child.id),
-  ])
-}
-
-/** The id of the last heading that has scrolled past the offset line. */
-function useActiveId(ids: readonly string[]): string | undefined {
-  const [activeId, setActiveId] = useState<string | undefined>(ids[0])
-  useEffect(() => {
-    const elements = ids
-      .map((id) => document.getElementById(id))
-      .filter((element): element is HTMLElement => element !== null)
-    const update = (): void => {
-      let current = elements[0]?.id
-      for (const element of elements) {
-        if (element.getBoundingClientRect().top <= ACTIVE_OFFSET_PX) {
-          current = element.id
-        }
-      }
-      setActiveId(current)
-    }
-    // The observer only says "something crossed"; the position check decides.
-    const observer = new IntersectionObserver(update, {
-      rootMargin: `-${String(ACTIVE_OFFSET_PX)}px 0px 0px 0px`,
-    })
-    for (const element of elements) observer.observe(element)
-    update()
-    return () => {
-      observer.disconnect()
-    }
-  }, [ids])
-  return activeId
 }
 
 /** Opens a closed <details> (the deep dive) so the link's target is visible. */
@@ -77,7 +39,7 @@ export function LessonToc({
   readonly variant: "sidebar" | "bar"
 }) {
   const t = useT(["lesson"])
-  const ids = useMemo(() => flatIds(items), [items])
+  const ids = useMemo(() => flatTocIds(items), [items])
   const activeId = useActiveId(ids)
   const barRef = useRef<HTMLDetailsElement>(null)
   const activeLabel =
