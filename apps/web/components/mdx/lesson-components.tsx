@@ -68,12 +68,16 @@ export const lessonServerComponents = {
   ),
 } satisfies MdxComponents
 
-/** The full component map for one lesson; the quiz reads its frontmatter. */
+/**
+ * The full component map for one lesson; the quiz reads its frontmatter and
+ * saves its score under the lesson's id.
+ */
 export function lessonComponentsFor(lesson: {
+  readonly id: string
   readonly quiz?: readonly QuizQuestion[] | undefined
 }) {
   return {
     ...lessonServerComponents,
-    Quiz: () => <QuizBlock questions={lesson.quiz} />,
+    Quiz: () => <QuizBlock lessonId={lesson.id} questions={lesson.quiz} />,
   } satisfies MdxComponents
 }

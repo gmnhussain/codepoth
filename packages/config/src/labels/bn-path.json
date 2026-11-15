@@ -222,7 +222,15 @@
     "interchangeNote": "{topic} একটা সংযোগ — এখান থেকে {tracks} পথে বদল করা যায়।",
     "inThisLesson": "এই পাঠে",
     "sectionCount": "লেখকের {n}টি অংশ",
-    "tocCurrent": "এই পাঠে · {section}"
+    "tocCurrent": "এই পাঠে · {section}",
+    "markDone": "পাঠ শেষ",
+    "bookmark": "বুকমার্ক",
+    "saveFailed": "সেভ করা যায়নি — এই ব্রাউজারে সাইটের ডেটা রাখা বন্ধ থাকতে পারে।",
+    "savedNote": "টিক চিহ্ন তোমার নিজের অগ্রগতি — এই ব্রাউজারে সেভ থাকে।",
+    "yourProgress": "তোমার অগ্রগতি",
+    "groupProgress": "{group}: {total}টির {done}টি শেষ",
+    "topicProgress": "{topic}: {total}টির {done}টি শেষ",
+    "doneOfTotal": "{total}টির {done}টি শেষ"
   },
   "topic": {
     "lessonCount": "{n}টি পাঠ",

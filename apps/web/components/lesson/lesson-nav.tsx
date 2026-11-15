@@ -4,13 +4,15 @@ import type { ContentGraph, GraphLesson } from "@workspace/content/graph"
 import { cn } from "@workspace/ui/lib/utils"
 
 import { NAV_ROW_HEIGHT } from "@/components/lesson/nav-row-height"
+import { ProgressCount } from "@/components/lesson/progress-count"
 import { TopicLessons } from "@/components/lesson/topic-lessons"
 import { TopicName } from "@/components/topic/topic-name"
 
 /**
  * The lesson's track as a vertical line of topics; the current topic opens
  * to its groups and lessons. Topics link to their pages (planned topics are
- * plain text); the reader's done/total counts arrive with reader progress.
+ * plain text). Each topic, group and lesson shows the reader's progress
+ * (client marks over the first-visit state).
  */
 export function LessonNav({
   graph,
@@ -69,6 +71,9 @@ export function LessonNav({
                 {topic.isInterchange ? (
                   <span className="sr-only"> {t("lesson.interchange")}</span>
                 ) : null}
+                {topic.lessonIds.length > 0 ? (
+                  <ProgressCount lessonIds={topic.lessonIds} />
+                ) : null}
               </div>
               {isCurrent ? (
                 <TopicLessons graph={graph} topic={topic} current={lesson} />
@@ -85,6 +90,9 @@ export function LessonNav({
           })}
         </p>
       ) : null}
+      <p className="text-xs leading-reading text-muted-foreground">
+        {t("lesson.savedNote")}
+      </p>
     </nav>
   )
 }

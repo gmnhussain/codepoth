@@ -11,8 +11,10 @@ import { QuizQuestions } from "@/components/mdx/quiz"
  * nothing.
  */
 export function QuizBlock({
+  lessonId,
   questions,
 }: {
+  readonly lessonId: string
   readonly questions: readonly QuizQuestion[] | undefined
 }) {
   if (questions === undefined || questions.length === 0) return null
@@ -21,7 +23,7 @@ export function QuizBlock({
       <Chip className="self-start">
         {t("quiz.count", { n: questions.length })}
       </Chip>
-      <QuizQuestions questions={questions} />
+      <QuizQuestions lessonId={lessonId} questions={questions} />
     </BlockSection>
   )
 }

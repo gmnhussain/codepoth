@@ -181,7 +181,7 @@ The MDX components for lesson bodies live in `apps/web/components/mdx/` and are 
 - Interactive islands (client components, the only JavaScript in a lesson body):
   - Copy buttons on every code block and AI prompt. They read the text from the page (no copy of it in the bundle), trim trailing spaces, and announce "কপি হয়েছে" through a status region.
   - `<Term>`: a dotted-underline button opening a popover with the server-rendered definition; Escape closes it and focus returns to the term.
-  - `<Quiz />`: one fieldset per question whose options are buttons, not radios, so arrow keys never answer by accident: Tab moves between options, Enter or Space answers. An answered question locks (`aria-disabled`, so focus stays) and shows ✓/✗, the explanation in a live region, the score and "আবার চেষ্টা করো". `backtick` spans in quiz text show as inline code. The score is not saved yet (reader progress).
+  - `<Quiz />`: one fieldset per question whose options are buttons, not radios, so arrow keys never answer by accident: Tab moves between options, Enter or Space answers. An answered question locks (`aria-disabled`, so focus stays) and shows ✓/✗, the explanation in a live region, the score and "আবার চেষ্টা করো". `backtick` spans in quiz text show as inline code. Answering the last question saves the attempt (score and total) in the reader's progress; only the latest attempt is kept ([ADR-0007](decisions/ADR-0007-reader-progress-shape.md)).
   - `<Term>`'s trigger has no `aria-label`: its visible text is its name (WCAG 2.5.3).
 
 ## Lesson page
@@ -196,7 +196,11 @@ The MDX components for lesson bodies live in `apps/web/components/mdx/` and are 
 
 - Track navigation: the track's topics on a vertical line in the track colour; interchange topics have a ring. The current topic opens to its groups (`<details>`, current group open) or loose lessons; the current lesson is marked (`aria-current="page"`). A note explains an interchange. The nav sets its own `data-track-color`, because the drawer renders outside the page wrapper.
 - "এই পাঠে": the lesson's blocks with the author's `###` sections nested under them, numbered like the blocks, and prev/next. The current entry (`aria-current="location"`) follows the scroll position; a link into the closed deep dive opens it first.
-- The reader's done/total counts and the progress card arrive with reader progress.
+- Reader progress ([ADR-0014](decisions/ADR-0014-reader-progress-implementation.md)): every mark renders its first-visit state on the server and changes in place after hydration, so nothing moves.
+  - Header: below the meta line (a top border), "বুকমার্ক" and "পাঠ শেষ" toggles. Their labels never change; `aria-pressed` carries the state, so a screen reader announces it once (ARIA toggle-button pattern). The eye sees a filled bookmark, and the done toggle turns primary with its tick. Fixed labels also mean a state change never changes the button's width. If saving fails, a status line under them says so and the toggle keeps its state.
+  - Track navigation: each lesson has a 16px state mark (filled tick: done, ring with a dot: in progress, ring: not started; `role="img"` with the state as its name); each group and topic a "২/৩" count (`aria-hidden`, read as "৩টির ২টি শেষ"), right-aligned in a box as wide as "total/total"; a finished group shows a tick in a slot that is always there. A note under the nav: "টিক চিহ্ন তোমার নিজের অগ্রগতি — এই ব্রাউজারে সেভ থাকে।"
+  - "তোমার অগ্রগতি" card under the sidebar TOC (from `xl`): the group's "{total}টির {done}টি শেষ" with a bar in the track colour, then the topic's with a thin muted bar (a lesson outside a group shows the topic only). Bars are shadcn `progress` (Base UI), named by their visible text.
+  - Opening the page records the lesson as opened; the reader's section is saved for the resume link once it has changed at least once.
 
 ## Topic page
 

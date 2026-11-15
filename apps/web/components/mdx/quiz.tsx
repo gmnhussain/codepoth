@@ -9,6 +9,8 @@ import { Button } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 
 import { useT } from "@/lib/labels-context"
+import { recordQuiz } from "@/lib/progress/operations"
+import { updateProgress } from "@/lib/progress-store.client"
 
 /** One question as the lesson frontmatter defines it (ADR-0009). */
 export type QuizQuestion = {
@@ -41,12 +43,15 @@ function withInlineCode(text: string): ReactNode[] {
  * once chosen, with ✓/✗ and the explanation, a score when every question is
  * answered, and "আবার চেষ্টা করো". Options are buttons, so arrow keys never
  * answer by accident: Tab moves between them, Enter or Space answers.
- * Saving the score is reader progress (Phase 3); here the state lives only
- * in the page.
+ * Answering the last question saves the attempt in the reader's progress
+ * (only the latest is kept, ADR-0007); the answers themselves stay in the
+ * page.
  */
 export function QuizQuestions({
+  lessonId,
   questions,
 }: {
+  readonly lessonId: string
   readonly questions: readonly QuizQuestion[]
 }) {
   const t = useT(["quiz"])
@@ -54,10 +59,24 @@ export function QuizQuestions({
     () => new Map()
   )
   const keys = t("quiz.optionKeys").split(" ")
-  const right = questions.filter(
-    (question, index) => answers.get(index) === question.answer
-  ).length
+  const rightIn = (given: ReadonlyMap<number, number>): number =>
+    questions.filter((question, index) => given.get(index) === question.answer)
+      .length
+  const right = rightIn(answers)
   const isFinished = answers.size === questions.length
+
+  const saveAttempt = (given: ReadonlyMap<number, number>): void => {
+    // A failed save (storage blocked) only means the score is not kept.
+    void updateProgress((progress) =>
+      recordQuiz(
+        progress,
+        lessonId,
+        rightIn(given),
+        questions.length,
+        new Date()
+      )
+    )
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -96,9 +115,11 @@ export function QuizQuestions({
                         aria-pressed={isChosen}
                         onClick={() => {
                           if (isAnswered) return
-                          setAnswers((current) =>
-                            new Map(current).set(index, optionIndex)
-                          )
+                          const next = new Map(answers).set(index, optionIndex)
+                          setAnswers(next)
+                          if (next.size === questions.length) {
+                            saveAttempt(next)
+                          }
                         }}
                         className={cn(
                           "flex min-h-11 w-full items-center gap-3 rounded-xl border px-4 py-2.5 text-start focus-visible:outline-2 focus-visible:outline-ring",

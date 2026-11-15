@@ -14,6 +14,7 @@ import { LessonHeader } from "@/components/lesson/lesson-header"
 import { LessonNav } from "@/components/lesson/lesson-nav"
 import { LessonNavDrawer } from "@/components/lesson/lesson-nav-drawer"
 import { LessonPager } from "@/components/lesson/lesson-pager"
+import { LessonProgressCard } from "@/components/lesson/lesson-progress-card"
 import { LessonProgressRecorder } from "@/components/lesson/lesson-progress-recorder"
 import { LessonToc } from "@/components/lesson/lesson-toc"
 import { flatTocIds } from "@/components/lesson/toc-ids"
@@ -61,11 +62,16 @@ export default async function LessonPage({ params }: LessonPageProps) {
     hasPager: previous !== undefined || next !== undefined,
   })
   const nav = <LessonNav graph={graph} lesson={lesson} />
+  const topic = graph.topicByKey.get(lesson.topicKey)
+  const group =
+    lesson.groupKey === undefined
+      ? undefined
+      : graph.groupByKey.get(lesson.groupKey)
 
   return (
-    // Labels for the TOC, the drawer, copy buttons, the quiz and Term
-    // popovers (ADR-0013).
-    <LabelScope namespaces={["lesson", "copy", "quiz", "term"]}>
+    // Labels for the TOC, the drawer, the progress marks and toggles, copy
+    // buttons, the quiz and Term popovers (ADR-0013).
+    <LabelScope namespaces={["lesson", "status", "copy", "quiz", "term"]}>
       <div data-track-color={track?.color}>
         {lessonJsonLd(graph, lesson, t("nav.roadmap")).map((data) => (
           <JsonLd key={String(data["@type"])} data={data} />
@@ -112,12 +118,22 @@ export default async function LessonPage({ params }: LessonPageProps) {
           </article>
           {tocItems.length > 0 ? (
             <aside className="hidden w-48 shrink-0 xl:block">
-              <div className="sticky top-6 max-h-svh overflow-y-auto pb-10">
+              <div className="sticky top-6 flex max-h-svh flex-col gap-6 overflow-y-auto pb-10">
                 <LessonToc
                   items={tocItems}
                   sectionCount={lesson.sections.length}
                   variant="sidebar"
                 />
+                {topic === undefined ? null : (
+                  <LessonProgressCard
+                    topic={{ title: topic.title, lessonIds: topic.lessonIds }}
+                    group={
+                      group === undefined
+                        ? undefined
+                        : { title: group.title, lessonIds: group.lessonIds }
+                    }
+                  />
+                )}
               </div>
             </aside>
           ) : null}

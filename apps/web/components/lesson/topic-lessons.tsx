@@ -7,6 +7,7 @@ import { cn } from "@workspace/ui/lib/utils"
 
 import { LessonNavLink } from "@/components/lesson/lesson-nav-link"
 import { NAV_ROW_HEIGHT } from "@/components/lesson/nav-row-height"
+import { ProgressCount } from "@/components/lesson/progress-count"
 
 /** The current topic's groups (current group open) or its loose lessons. */
 export function TopicLessons({
@@ -40,10 +41,11 @@ export function TopicLessons({
             <summary
               className={cn(
                 NAV_ROW_HEIGHT,
-                "flex cursor-pointer items-center rounded-lg px-3 text-sm font-semibold hover:bg-muted"
+                "flex cursor-pointer items-center gap-2 rounded-lg px-3 text-sm font-semibold hover:bg-muted"
               )}
             >
-              {group.title}
+              <span className="min-w-0 flex-1">{group.title}</span>
+              <ProgressCount lessonIds={group.lessonIds} hasCheck />
             </summary>
             <ul className="ms-3 border-s ps-2">
               {group.lessonIds.map((id) => {
