@@ -63,4 +63,4 @@ Run from the repo root.
 - Add a shadcn component: `pnpm dlx shadcn@latest add <name> -c apps/web`
 - `pnpm test:commit-msg`: test the commit message rules
 - `pnpm test`: run every package's Vitest tests (unit, label sets, theme contrast, content validation)
-- End-to-end tests: to be added
+- `pnpm test:e2e`: build with drafts and run the Playwright suite, then build without drafts and run the smoke tests (`next start` on port 3418). `--only drafts|published` runs one build, `--skip-build` tests the build already in `.next`, other arguments go to Playwright. First time: `pnpm --filter web exec playwright install chromium`

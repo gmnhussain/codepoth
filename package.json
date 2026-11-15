@@ -10,6 +10,7 @@
     "format:check": "prettier --check .",
     "typecheck": "turbo typecheck",
     "test": "turbo test",
+    "test:e2e": "pnpm --filter web test:e2e",
     "prepare": "node scripts/setup-git-hooks.mjs",
     "test:commit-msg": "node --test scripts/commit-message.test.mjs"
   },

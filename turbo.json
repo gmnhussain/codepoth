@@ -1,6 +1,7 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
+  "globalPassThroughEnv": ["CI", "npm_execpath"],
   "tasks": {
     "content:generate": {
       "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/content/**"],
