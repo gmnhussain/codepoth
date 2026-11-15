@@ -27,7 +27,11 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: isCi,
   retries: 0,
-  reporter: isCi ? [["list"], ["html", { open: "never" }]] : "list",
+  reporter: [
+    ["list"],
+    ["./e2e/support/layout-shift-reporter.ts"],
+    ...(isCi ? [["html", { open: "never" }] as const] : []),
+  ],
   use: {
     ...devices["Desktop Chrome"],
     baseURL: `http://localhost:${String(PORT)}`,
