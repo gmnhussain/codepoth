@@ -12,6 +12,8 @@ const PAGEFIND_URL = "/pagefind/pagefind.js"
 /** The part of Pagefind's browser API the search dialog uses. */
 export type PagefindApi = {
   readonly init: () => Promise<void>
+  /** Results are checked where they are read (`searchRows`). */
+  readonly search: (query: string) => Promise<unknown>
 }
 
 /**
@@ -31,10 +33,11 @@ function setStatus(next: PagefindStatus) {
 }
 
 function isPagefind(loaded: unknown): loaded is PagefindApi {
+  if (typeof loaded !== "object" || loaded === null) return false
+  const candidate = loaded as { init?: unknown; search?: unknown }
   return (
-    typeof loaded === "object" &&
-    loaded !== null &&
-    typeof (loaded as { init?: unknown }).init === "function"
+    typeof candidate.init === "function" &&
+    typeof candidate.search === "function"
   )
 }
 

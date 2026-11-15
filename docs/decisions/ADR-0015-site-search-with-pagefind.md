@@ -52,7 +52,30 @@ The index holds exactly the pages the build rendered. A build without drafts (`C
 | শুরু (4)       | —           | —           | শুরুতে 1   | —             |
 | ভাষা (4)       | —           | —           | ভাষাতে 1   | —             |
 
-As a word before another word, the possessive misses entirely: `ফাংশনের return` 0 (base 2), `সার্ভারের request` 0 (base 3), `কাজের বাইরের` 0 (base 4). A suffixed form that appears somewhere in the content matches only the pages with that exact form. Pagefind's other matches above come from a fallback whose rule this test did not pin down. The possessive is the most common suffix in the lessons, so these misses are common. A query-side trim of these suffixes is planned for the search dialog's results and will be recorded here when it is built.
+As a word before another word, the possessive misses entirely: `ফাংশনের return` 0 (base 2), `সার্ভারের request` 0 (base 3), `কাজের বাইরের` 0 (base 4). A suffixed form that appears somewhere in the content matches only the pages with that exact form. Pagefind's other matches above come from a fallback whose rule this test did not pin down. The possessive is the most common suffix in the lessons, so these misses are common.
+
+The dialog therefore trims these endings from the query (`lib/search/trim-suffixes.ts`): `-গুলো`, `-দের`, `-এর`, `-ের`, `-কে`, `-তে`, longest first, and any of them after a hyphen on an English word (`state-এর`, `API-তে`). A stem keeps at least two Bangla letters, so a word that only ends in the same letters stays whole (`থেকে`, `দিতে`); when the longest ending leaves too short a stem, a shorter one is tried (`চাঁদের` → `চাঁদ`). The trimmed query does not replace the reader's: both run, the reader's own results come first and the trimmed query only adds pages it did not find (`mergeResults`). A trim can be wrong (`বাইরের` → `বাইর`, `করতে` → `কর`), and replacing the query would then lose what the reader's spelling finds; adding never does.
+
+Measured again through the dialog on the drafts build (rows shown, at most 10, and how many of the base word's rows each form also shows):
+
+| Base (rows) | -এর / -ের         | -কে               | -ে / -তে         | -গুলো               |
+| ----------- | ----------------- | ----------------- | ---------------- | ------------------- |
+| ফাংশন (7)   | ফাংশনের 7 (7/7)   | ফাংশনকে 7 (7/7)   | ফাংশনে 7 (7/7)   | ফাংশনগুলো 7 (7/7)   |
+| সার্ভার (8) | সার্ভারের 8 (8/8) | সার্ভারকে 8 (8/8) | সার্ভারে 8 (8/8) | সার্ভারগুলো 8 (8/8) |
+| কোড (10)    | কোডের 10 (9/10)   | কোডকে 10 (10/10)  | কোডে 10 (10/10)  | কোডগুলো 10 (10/10)  |
+| কাজ (10)    | কাজের 10 (8/10)   | কাজকে 10 (9/10)   | কাজে 10 (10/10)  | কাজগুলো 10 (9/10)   |
+| শুরু (4)    | —                 | —                 | শুরুতে 4 (4/4)   | —                   |
+| ভাষা (4)    | —                 | —                 | ভাষাতে 4 (4/4)   | —                   |
+
+Before another word, every form now finds all of the base's rows: `ফাংশনের return` 5/5, `সার্ভারের request` 7/7, `কাজের বাইরের` 7/7, `return ফাংশনের` 5/5, `state-এর` 4/4. Where a form shows fewer than all of the base's rows, its own literal matches came first and the 10-row limit cut the rest. The rows count glossary terms one by one, so they differ from the page counts above.
+
+### Results
+
+- One row per page: a lesson, topic or About page is one row, however many of its sections matched (Pagefind 1.5 makes every heading with an id a sub-result, lesson sections included). Measured: `useEffect cleanup` matches 11 sections of the useEffect lesson and shows one row.
+- The glossary page is the exception: each matching term is its own row, linking to `/glossary#<id>`, at most 5 per query, placed where the glossary page ranked.
+- At most 10 rows; result data is fetched only for the pages that can become rows.
+- A row shows the track's dot, the title, where it sits (track · topic) and its kind; terms have no track in the index and show a neutral dot.
+- Known limit, ranking: `React` ranks the React Native lesson and topic above the React topic. It is not tuned now: nearly every lesson is still a short draft, and Pagefind's ranking depends on page length, so weights set today would be tuned to stubs. Revisit it once real lessons are published.
 
 ### Not verified
 

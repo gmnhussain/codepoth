@@ -387,6 +387,15 @@
     "loading": "খোঁজার সূচি আসছে…",
     "unavailable": "এই মুহূর্তে খোঁজা যাচ্ছে না।",
     "unavailableHint": "পাঠের নাম জানলে সূচিপত্রে খুঁজে নিতে পারো।",
-    "toContents": "সূচিপত্রে যাও"
+    "toContents": "সূচিপত্রে যাও",
+    "resultsLabel": "খোঁজার ফল",
+    "results": "{n}টি ফল",
+    "noResults": "“{query}” দিয়ে কিছু পাওয়া যায়নি।",
+    "noResultsHint": "অন্য শব্দে খুঁজে দেখো, বা সূচিপত্রে পাঠের নাম খোঁজো।",
+    "searchContents": "সূচিপত্রে খোঁজো",
+    "kindLesson": "পাঠ",
+    "kindTopic": "স্টেশন",
+    "kindGlossary": "পরিভাষা",
+    "kindPage": "পাতা"
   }
 }
