@@ -20,10 +20,12 @@ export type LessonRedirect = {
 
 /**
  * Every `previousSlugs` entry as a permanent redirect to the lesson's
- * current URL (ADR-0004, ADR-0006). Drafts count only when this build
- * includes them, so a redirect never points to a missing page. Throws when
- * an old path is a live lesson URL or is claimed by two lessons, which would
- * shadow a page or send readers to the wrong lesson.
+ * current URL (ADR-0004, ADR-0006). Throws when an old path is the URL of
+ * any lesson, or is claimed by two lessons, which would shadow a page or
+ * send readers to the wrong lesson. Both checks run against every lesson,
+ * drafts included, so the same content passes or fails in every build;
+ * redirects are emitted only for lessons this build shows, so one never
+ * points to a missing page.
  */
 export function lessonRedirects(
   lessons: readonly Pick<
@@ -32,18 +34,15 @@ export function lessonRedirects(
   >[],
   options: ContentOptions
 ): LessonRedirect[] {
-  const shown = lessons.filter(
-    (lesson) => options.includeDrafts || !lesson.draft
+  const lessonUrls = new Set(
+    lessons.map((lesson) => lessonUrl(lesson.location))
   )
-  const liveUrls = new Set(shown.map((lesson) => lessonUrl(lesson.location)))
   const claimedBy = new Map<string, string>()
-  const redirects: LessonRedirect[] = []
-  for (const lesson of shown) {
-    const destination = lessonUrl(lesson.location)
+  for (const lesson of lessons) {
     for (const source of lesson.previousSlugs) {
-      if (liveUrls.has(source)) {
+      if (lessonUrls.has(source)) {
         throw new Error(
-          `${lesson.id}: previousSlugs entry ${source} is the URL of a live lesson`
+          `${lesson.id}: previousSlugs entry ${source} is the URL of a lesson`
         )
       }
       const other = claimedBy.get(source)
@@ -53,8 +52,15 @@ export function lessonRedirects(
         )
       }
       claimedBy.set(source, lesson.id)
-      redirects.push({ source, destination, permanent: true })
     }
   }
-  return redirects
+  return lessons
+    .filter((lesson) => options.includeDrafts || !lesson.draft)
+    .flatMap((lesson) =>
+      lesson.previousSlugs.map((source) => ({
+        source,
+        destination: lessonUrl(lesson.location),
+        permanent: true as const,
+      }))
+    )
 }

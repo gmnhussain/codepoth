@@ -59,14 +59,14 @@ describe("lessonRedirects", () => {
     expect(lessonRedirects([draft], { includeDrafts: true })).toHaveLength(1)
   })
 
-  it("fails when an old path is a live lesson URL", () => {
+  it("fails when an old path is a lesson URL", () => {
     const live = lesson({
       id: "frontend.react.effects",
       location: { track: "frontend", topic: "react", slug: "effects" },
     })
     expect(() =>
       lessonRedirects([moved, live], { includeDrafts: false })
-    ).toThrow(/URL of a live lesson/)
+    ).toThrow(/URL of a lesson/)
   })
 
   it("fails when two lessons claim the same old path", () => {
@@ -83,5 +83,40 @@ describe("lessonRedirects", () => {
     expect(() =>
       lessonRedirects([moved, other], { includeDrafts: false })
     ).toThrow(/also claimed by frontend.react.hooks.use-effect/)
+  })
+
+  // The same content must pass or fail in every build: a conflict that
+  // involves a draft fails production (drafts left out) as well as preview.
+  describe("checks drafts too, whichever build this is", () => {
+    const draftAtOldPath = lesson({
+      id: "frontend.react.effects",
+      draft: true,
+      location: { track: "frontend", topic: "react", slug: "effects" },
+    })
+    const draftClaimingSamePath = lesson({
+      id: "frontend.react.hooks.use-state",
+      draft: true,
+      previousSlugs: ["/learn/frontend/react/effects"],
+      location: {
+        track: "frontend",
+        topic: "react",
+        group: "hooks",
+        slug: "use-state",
+      },
+    })
+
+    for (const includeDrafts of [false, true]) {
+      it(`an old path that is a draft's URL fails (includeDrafts: ${String(includeDrafts)})`, () => {
+        expect(() =>
+          lessonRedirects([moved, draftAtOldPath], { includeDrafts })
+        ).toThrow(/URL of a lesson/)
+      })
+
+      it(`an old path also claimed by a draft fails (includeDrafts: ${String(includeDrafts)})`, () => {
+        expect(() =>
+          lessonRedirects([moved, draftClaimingSamePath], { includeDrafts })
+        ).toThrow(/also claimed by/)
+      })
+    }
   })
 })
