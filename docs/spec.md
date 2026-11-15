@@ -18,7 +18,7 @@ CodePoth (কোডপথ) is a free, public, reader-first Bangla learning site 
 
 Home · Map (roadmap) · Contents (all lessons) · Topic · Lesson · Glossary · Dashboard (reader progress) · About · 404.
 
-Header search opens Pagefind (⌘K).
+Header search opens Pagefind (⌘K / Ctrl+K) over lessons, topics, glossary terms and About ([ADR-0015](decisions/ADR-0015-site-search-with-pagefind.md); what the dialog shows: [design.md](design.md#search)).
 
 URLs: `/learn/[track]/[topic]` and `/learn/[track]/[topic]/[lesson]` (no group in the URL), plus `/roadmap`, `/contents`, `/glossary`, `/dashboard`, `/about` ([ADR-0006](decisions/ADR-0006-urls-and-content-keys.md)).
 
@@ -60,7 +60,7 @@ Footer links stay inside the v1 pages: author → the author block on Home (`/#a
 - Zod for schemas (frontmatter, `_meta.json`, labels, localStorage data).
 - Testing: Vitest (unit), Playwright (E2E).
 - MDX compiled at build time with Content Collections as the typed content layer ([ADR-0005](decisions/ADR-0005-content-layer.md)).
-- Shiki for code highlighting. Pagefind for static search. Giscus for comments (later).
+- Shiki for code highlighting. Pagefind for static search, indexed right after `next build` ([ADR-0015](decisions/ADR-0015-site-search-with-pagefind.md)). Giscus for comments (later).
 - pnpm + Turborepo. Deploy on Vercel (Root Directory `apps/web`). Git + GitHub.
 
 ## Roadmap (not now)

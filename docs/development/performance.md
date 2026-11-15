@@ -26,7 +26,7 @@ Every route is pre-rendered ([ADR-0004](../decisions/ADR-0004-vercel-ssg-not-sta
 
 ## Loaded only when needed
 
-- Pagefind is imported dynamically on the first ⌘K (or search button) press, not on page load.
+- Search: the page carries only the header button and the shortcut listener. The dialog's code is its own chunk, fetched when the button is hovered or focused or the dialog first opens; Pagefind (`/pagefind/pagefind.js`, its worker, WASM and index) is fetched only once the dialog opens, through `import(/* webpackIgnore: true */ …)`, never bundled ([ADR-0015](../decisions/ADR-0015-site-search-with-pagefind.md)). Sizes: [Site search](#site-search-2026-11-15).
 - Giscus comments load when the comments area scrolls into view (IntersectionObserver).
 - `<DeepDive>` is a native `<details>` element and needs no JavaScript.
 
@@ -120,3 +120,39 @@ Same setup as the Phase 2 baseline (Lighthouse 13.6.0, default mobile profile, l
 - A first run found one accessibility failure, fixed in `4bcd381`: the Dashboard's "মোট অগ্রগতি" heading had been rendered through Base UI's `ProgressLabel`, which sets `role="presentation"`.
 - First Load JS per route (gzip, without `noModule` scripts): Home 179.9 KB, lesson 203.0 KB, topic 182.8 KB, Map 189.7 KB, Contents 184.2 KB, Glossary 181.5 KB, Dashboard 189.2 KB, About 177.3 KB. Against the Phase 2 numbers above, a page gains about 2–8 KB for its progress islands and the store; Zod is not in any of them (it loads in its own chunk after hydration). Home's resume data and the import/export code load only when used.
 - The known layout shift on `/contents#track-…` cold loads (above) is unchanged by reader progress.
+
+## Site search (2026-11-15)
+
+Pagefind search ([ADR-0015](../decisions/ADR-0015-site-search-with-pagefind.md)), measured on local production builds with drafts (`CONTENT_INCLUDE_DRAFTS=1`, `next start`).
+
+### First Load JS
+
+**Method (this table only):** for each route, the gzip size (Node `zlib`, default level) of every distinct `<script src>` in the route's pre-rendered HTML (`.next/server/app/<route>.html`), `noModule` scripts left out, summed. Both columns were measured this way on the same day. This count is larger than the one behind the Phase 2 and Phase 3 figures above (Home 179.9 KB there, 219.0 KB here for the same `main`), so compare numbers only within one table.
+
+| Route                 | `main` (`229b5b1`) | With search (`d18475f`) | Change  |
+| --------------------- | ------------------ | ----------------------- | ------- |
+| Home                  | 219.0 KB           | 221.0 KB                | +2.0 KB |
+| Lesson (`use-effect`) | 242.1 KB           | 244.1 KB                | +2.0 KB |
+| Topic (React)         | 221.9 KB           | 223.9 KB                | +2.0 KB |
+| Map (`/roadmap`)      | 228.8 KB           | 230.7 KB                | +1.9 KB |
+| Contents              | 223.3 KB           | 225.2 KB                | +1.9 KB |
+| Glossary              | 220.6 KB           | 222.5 KB                | +1.9 KB |
+| Dashboard             | 228.3 KB           | 230.7 KB                | +2.4 KB |
+| About                 | 216.3 KB           | 218.3 KB                | +2.0 KB |
+
+The 2 KB on every page is the header's search button, the ⌘K / Ctrl+K listener and the platform check for the shortcut box. Nothing of the dialog or of Pagefind is in it.
+
+### What opening search downloads
+
+Bytes over the wire (`encodedDataLength`, page and Pagefind's worker), cold cache, drafts index of 230 pages:
+
+| When                          | Transfer | What                                                                                                                                           |
+| ----------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Page load                     | 0        | No search request.                                                                                                                             |
+| Dialog opens                  | 87.9 KB  | dialog chunk 4.4 KB, `pagefind.js` 13.3 KB, worker 0.6 KB, entry 0.7 KB, index metadata 1.9 KB, WASM 67.0 KB (already compressed by Pagefind). |
+| First query (`React`)         | 34.4 KB  | one index chunk 24.2 KB and a fragment per shown result (0.7–3.7 KB each).                                                                     |
+| Next query (`ফাংশনের return`) | 2.7 KB   | one fragment; the index chunk is already loaded.                                                                                               |
+
+- Result links do not prefetch their pages (`prefetch={false}`): with prefetching, the first query also fetched 25.8 KB of lesson data the reader had not chosen (fixed in `d18475f`).
+- On disk the bundle is about 0.9 MB, mostly fragments (one per page) and Pagefind's unused UI files; a reader only downloads what the table shows.
+- CLS stays 0 while opening, typing and moving through results, at 375, 768 and 1280 px in both themes. One run recorded a single 0.0003 shift not caused by input; eight later runs of the same flow, cold and warm, recorded none, and its source was not captured.

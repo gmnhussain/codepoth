@@ -168,6 +168,28 @@ WCAG 2.2 AA, computed from the values in `globals.css`: text needs 4.5:1, while 
 - Track marks are checked on background and card, where they are placed. On `muted` several light-mode marks are below 3:1, so a mark never sits on `muted` without its value also shown as text (e.g. a progress bar next to its "৩/৬" fraction).
 - "tint only" rows are the bright `track` value, which is not used as a mark in light mode.
 
+## Site header
+
+`components/site-header.tsx`, on every page: brand, page links (from `lg`), search, theme toggle and the menu button (below `lg`).
+
+- Brand (`brand-link.tsx`): logo, the Bangla site name and the English tag, all from `site.ts`. Below `sm` the header's brand drops the English tag (the footer keeps it), so the header fits 320px, the WCAG reflow width.
+- Search button (`components/search/search-button.tsx`): a pill with the search icon, "খুঁজো" from `lg` and the shortcut box (`⌘K` on Apple devices, `Ctrl K` elsewhere) from `sm`; below `sm` a 44px icon button. The box holds both keys in one grid cell with only the reader's visible, so it keeps one width when the platform is known after hydration. The name is "খুঁজো"; `aria-keyshortcuts` names the shortcut.
+- Theme toggle (`theme-toggle.tsx`): an action button named for what it does ("ডার্ক মোডে যাও" / "লাইট মোডে যাও"), not a toggle with `aria-pressed`. From `sm` it is the square icon button in the header. Below `sm` there is no room for it, so it moves into the menu sheet under the links, as the same component with its name shown beside the icon. The copy not in use is `display: none`, so one theme control is in the accessibility tree at any width.
+- Below `sm` the header holds the brand (125px), search and the menu button. Measured on 2026-11-15: at 320px the menu button ends at 304px and the page does not scroll sideways (also at 375 and 640px, light and dark).
+
+## Search
+
+Site search with Pagefind ([ADR-0015](decisions/ADR-0015-site-search-with-pagefind.md)); the index covers lessons, topics, glossary terms and About.
+
+- Opens from the header button or ⌘K / Ctrl+K on any page (the physical K key, so a Bangla keyboard layout works too); the shortcut while open moves focus back to the field.
+- Dialog (`components/search/search-dialog.tsx`, Base UI `Dialog`): anchored near the top (96px; 16px below `sm`), not centred, so a growing list never moves the field. The field is labelled "খোঁজার শব্দ"; the close button shows "Esc" and is named "বন্ধ করো (Esc)", so its name contains its visible text. Base UI traps focus, closes on Escape and returns focus to where it was: the button, or the element focused when ⌘K was pressed.
+- States: empty (a hint and the shortcut); loading the index; results with their count ("{n}টি ফল") in a status line; no results ("“{query}” দিয়ে কিছু পাওয়া যায়নি।", a hint and a link to `/contents?q=…`); unavailable when Pagefind cannot load (in `next dev`, or a failed request), with a link to the contents page. The status line is always rendered, so what it says is announced.
+- Rows (`search-results.tsx`): the track's dot, the title, where it sits (track · topic; "·" on screen, a comma for screen readers) and the kind (পাঠ, স্টেশন, পরিভাষা, পাতা; the topic word follows the label set). One row per page, so one lesson never fills the list; each matching glossary term is its own row (at most 5); at most 10 rows. A term links to its card with a plain `<a>`, so `:target` updates; other rows are `next/link`. Following a row closes the dialog.
+- Keyboard: ↓ from the field moves into the results, ↑/↓ between them, ↑ from the first back to the field; Tab works as usual.
+- A query with Bangla endings (-এর, -কে, -তে, -গুলো…) also runs with them trimmed, and what that finds is added after the reader's own results ([ADR-0015](decisions/ADR-0015-site-search-with-pagefind.md#bangla)).
+- From the handoff: the button, the shortcut box, the top-anchored card, the field with its hidden label and the Esc close button, and the result row (dot, title, kind). Added: the place line and the result count. Not built: "জনপ্রিয় খোঁজ", which would need tracking.
+- Chrome's own clear button (×) in the search field is kept, as in the glossary's field.
+
 ## Lesson blocks
 
 The MDX components for lesson bodies live in `apps/web/components/mdx/` and are rendered on the server.
@@ -317,6 +339,7 @@ Generated shadcn components (`packages/ui/src/components/`) are added with the C
 Used as generated, with these notes:
 
 - `sheet.tsx`: its built-in close button has an English "Close" label and its overlay uses `bg-black/80` (kept: a scrim carries no text). Every sheet uses `AppSheetContent` (`apps/web/components/app-sheet.tsx`) instead of `SheetContent`: it turns the built-in button off, adds a close button labelled through `t()`, and turns the slide off for reduced motion. The overlay fade is turned off for reduced motion in `globals.css`, since the wrapper cannot reach it.
+- `dialog.tsx`: its built-in close button has an English "Close" label, so every dialog passes `showCloseButton={false}` and closes with its own labelled control (the import dialog's "বাতিল", the search dialog's "বন্ধ করো (Esc)").
 - `input.tsx`: its `bg-input/30` fill turns grey for the same reason as the button's; search fields pass `bg-background` (the design's paper colour) and `h-11` where they are used.
 - The CLI (`pnpm dlx shadcn@latest add <name> -c apps/web`) also adds `cn` to `apps/web/package.json`. The components live in `packages/ui`, which already depends on it, so revert that line.
 
