@@ -14,7 +14,9 @@ import { LessonHeader } from "@/components/lesson/lesson-header"
 import { LessonNav } from "@/components/lesson/lesson-nav"
 import { LessonNavDrawer } from "@/components/lesson/lesson-nav-drawer"
 import { LessonPager } from "@/components/lesson/lesson-pager"
+import { LessonProgressRecorder } from "@/components/lesson/lesson-progress-recorder"
 import { LessonToc } from "@/components/lesson/lesson-toc"
+import { flatTocIds } from "@/components/lesson/toc-ids"
 import { tocItemsFor } from "@/components/lesson/toc-items"
 import { lessonComponentsFor } from "@/components/mdx/lesson-components"
 import { MdxContent } from "@/components/mdx/mdx-content"
@@ -68,6 +70,10 @@ export default async function LessonPage({ params }: LessonPageProps) {
         {lessonJsonLd(graph, lesson, t("nav.roadmap")).map((data) => (
           <JsonLd key={String(data["@type"])} data={data} />
         ))}
+        <LessonProgressRecorder
+          lessonId={lesson.id}
+          sectionIds={flatTocIds(tocItems)}
+        />
         <div aria-hidden="true" className="h-1.5 bg-track-dot" />
         <div className="mx-auto flex max-w-7xl gap-10 px-4 py-10 sm:px-8">
           <aside className="hidden w-56 shrink-0 lg:block">
