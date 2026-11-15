@@ -24,6 +24,10 @@ function fakeHost(initial?: string) {
   if (initial !== undefined) items.set(PROGRESS_STORAGE_KEY, initial)
   const storageListeners = new Set<StorageListener>()
   const state = { isReadBlocked: false, isWriteBlocked: false }
+  const removeItem = (key: string) => {
+    if (state.isWriteBlocked) throw new Error("SecurityError")
+    items.delete(key)
+  }
   const storage = {
     getItem: (key: string) => {
       if (state.isReadBlocked) throw new Error("SecurityError")
@@ -33,6 +37,7 @@ function fakeHost(initial?: string) {
       if (state.isWriteBlocked) throw new Error("QuotaExceededError")
       items.set(key, value)
     },
+    removeItem,
   }
   const host: ProgressStoreHost = {
     storage: () => storage,
@@ -388,6 +393,29 @@ describe("createProgressStore", () => {
       FORMS,
       INTRO,
     ])
+  })
+
+  it("clear removes the stored key and tells subscribers", async () => {
+    const fake = fakeHost(stored)
+    const store = await loadedStore(fake.host)
+    const listener = vi.fn()
+    store.subscribe(listener)
+    expect(Object.keys(store.getSnapshot().lessons)).toEqual([INTRO])
+    expect(store.clear()).toBe(true)
+    expect(fake.items.has(PROGRESS_STORAGE_KEY)).toBe(false)
+    expect(store.getSnapshot()).toBe(EMPTY_PROGRESS)
+    expect(listener).toHaveBeenCalled()
+  })
+
+  it("clear reports failure and keeps the value when storage refuses", async () => {
+    const fake = fakeHost(stored)
+    const store = await loadedStore(fake.host)
+    store.subscribe(() => undefined)
+    const before = store.getSnapshot()
+    fake.state.isWriteBlocked = true
+    expect(store.clear()).toBe(false)
+    expect(fake.items.get(PROGRESS_STORAGE_KEY)).toBe(stored)
+    expect(store.getSnapshot()).toBe(before)
   })
 
   it("listens for storage events only while subscribed", () => {

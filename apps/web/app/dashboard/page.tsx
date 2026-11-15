@@ -86,7 +86,12 @@ export default function DashboardPage() {
           />
         ))}
       </svg>
-      <h2 id="empty-heading" className="text-3xl font-bold">
+      {/* Focusable: focus lands here after "সব মুছে ফেলো". */}
+      <h2
+        id="empty-heading"
+        tabIndex={-1}
+        className="text-3xl font-bold outline-none"
+      >
         {t("dashboard.emptyTitle")}
       </h2>
       <p className="max-w-xl text-lg leading-reading text-foreground/80">

@@ -5,6 +5,9 @@ import type { ReactNode } from "react"
 import { cn } from "@workspace/ui/lib/utils"
 
 import { BookmarkList } from "@/components/dashboard/bookmark-list"
+import { DataMessageProvider } from "@/components/dashboard/data-message"
+import { DataSection } from "@/components/dashboard/data-section"
+import { ImportControl } from "@/components/dashboard/import-control"
 import { MyMap } from "@/components/dashboard/my-map"
 import { OverallCard } from "@/components/dashboard/overall-card"
 import { QuizResults } from "@/components/dashboard/quiz-results"
@@ -24,8 +27,9 @@ import { useToday } from "@/lib/use-today"
  * `<noscript>`), so a returning reader never sees "nothing saved" flash.
  * Then: the empty state when nothing is saved, otherwise overall progress
  * (beside "শেষবার পড়েছ" when the last-read lesson is in the build),
- * per-track bars, "আমার ম্যাপ", quiz results, bookmarks and the reading
- * heatmap.
+ * per-track bars, "আমার ম্যাপ", quiz results, bookmarks, the reading
+ * heatmap and "তোমার ডেটা" (export, import, clear). Result messages and
+ * focus moves are shared by every state (`DataMessageProvider`).
  *
  * The body is at least a screen tall in every state, so swapping one state
  * for another never moves anything in view (the footer stays below the
@@ -44,44 +48,62 @@ export function DashboardView({
   const today = useToday()
   const frame = "min-h-svh"
 
-  if (!isReady || today === "") {
+  // One provider around every state, so a message and a focus request
+  // survive the switch between them (after clearing or importing).
+  return <DataMessageProvider>{body()}</DataMessageProvider>
+
+  function body(): ReactNode {
+    if (!isReady || today === "") {
+      return (
+        <div aria-busy="true" className={frame}>
+          <p className="sr-only">{t("dashboard.loading")}</p>
+          <noscript>{emptyState}</noscript>
+        </div>
+      )
+    }
+    if (lastSaved(progress) === undefined) {
+      return (
+        <div className={cn(frame, "flex flex-col items-center gap-2")}>
+          <div className="w-full">{emptyState}</div>
+          {/* Only with JavaScript: the <noscript> copy has no import. */}
+          <ImportControl variant="link" focusAfterImport="overall-heading" />
+        </div>
+      )
+    }
+    return dashboard()
+  }
+
+  function dashboard(): ReactNode {
+    const lessonIds = Object.keys(data.lessons)
+    const resume = resumeOf(progress, data)
+    const resumePath =
+      progress.lastRead === undefined
+        ? undefined
+        : data.lessons[progress.lastRead.id]?.path
     return (
-      <div aria-busy="true" className={frame}>
-        <p className="sr-only">{t("dashboard.loading")}</p>
-        <noscript>{emptyState}</noscript>
+      <div className={cn(frame, "grid content-start gap-5 lg:grid-cols-2")}>
+        {/* Overall progress, beside the resume card when there is one. */}
+        <div className={cn(resume === undefined && "lg:col-span-2")}>
+          <OverallCard
+            progress={progress}
+            lessonIds={lessonIds}
+            topics={data.topics}
+          />
+        </div>
+        {resume === undefined || resumePath === undefined ? null : (
+          <ResumeCard resume={resume} path={resumePath} />
+        )}
+        <TrackProgressList progress={progress} tracks={data.tracks} />
+        <MyMap progress={progress} map={data.map} topics={data.topics} />
+        <QuizResults progress={progress} lessons={data.lessons} />
+        <BookmarkList progress={progress} lessons={data.lessons} />
+        <div className="lg:col-span-2">
+          <ReadingHeatmap progress={progress} today={today} />
+        </div>
+        <div className="lg:col-span-2">
+          <DataSection progress={progress} />
+        </div>
       </div>
     )
   }
-  if (lastSaved(progress) === undefined) {
-    return <div className={frame}>{emptyState}</div>
-  }
-
-  const lessonIds = Object.keys(data.lessons)
-  const resume = resumeOf(progress, data)
-  const resumePath =
-    progress.lastRead === undefined
-      ? undefined
-      : data.lessons[progress.lastRead.id]?.path
-  return (
-    <div className={cn(frame, "grid content-start gap-5 lg:grid-cols-2")}>
-      {/* Overall progress, beside the resume card when there is one. */}
-      <div className={cn(resume === undefined && "lg:col-span-2")}>
-        <OverallCard
-          progress={progress}
-          lessonIds={lessonIds}
-          topics={data.topics}
-        />
-      </div>
-      {resume === undefined || resumePath === undefined ? null : (
-        <ResumeCard resume={resume} path={resumePath} />
-      )}
-      <TrackProgressList progress={progress} tracks={data.tracks} />
-      <MyMap progress={progress} map={data.map} topics={data.topics} />
-      <QuizResults progress={progress} lessons={data.lessons} />
-      <BookmarkList progress={progress} lessons={data.lessons} />
-      <div className="lg:col-span-2">
-        <ReadingHeatmap progress={progress} today={today} />
-      </div>
-    </div>
-  )
 }

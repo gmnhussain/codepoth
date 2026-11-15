@@ -294,7 +294,12 @@ The MDX components for lesson bodies live in `apps/web/components/mdx/` and are 
   - "বুকমার্ক": newest first, each with place, "সেভ {date}" and a remove button named "{lesson} বুকমার্ক থেকে সরাও". Removing announces "“{lesson}” বুকমার্ক থেকে সরানো হয়েছে।" and moves focus to the list's heading.
   - "যেদিন পড়েছ": 20 weeks × 7 days as an SVG grid in the four heatmap shades (none, 1, 2–3, 4+ lessons; `heatLevelOf`), "গত ২০ সপ্তাহে {n} দিন পড়েছ।" and a কম–বেশি key. The grid is `aria-hidden`; a visually hidden table gives every day's count.
 - The page's data (every lesson's title, URL, scope and "track · topic › group", each scope's title and lessons, tracks and topics with their lessons, and a trimmed map) is built on the server (`lib/dashboard-data.ts`, reusing `resumeIndexOf`) and inlined in the page; why it is inlined here and fetched on Home is in [ADR-0014](decisions/ADR-0014-reader-progress-implementation.md).
-- Export, import and clearing (with the empty state's import link) arrive in the next step.
+- "তোমার ডেটা" (last, full width): "তোমার তথ্য শুধু এই ব্রাউজারেই থাকে।", the hint, and three actions ([ADR-0007](decisions/ADR-0007-reader-progress-shape.md), [ADR-0014](decisions/ADR-0014-reader-progress-implementation.md)):
+  - "প্রগ্রেস এক্সপোর্ট" downloads `codepoth-progress.json` (the export format's name) with `{ format, version, exportedAt, data }`.
+  - "ইমপোর্ট" opens the file picker; the empty state has the same as "এক্সপোর্ট করা ফাইল ইমপোর্ট করো" under its card (not in the `<noscript>` copy, where it could not work). A file over 1 MB is refused on `File.size` before reading; then the whole file is validated, and too large, not JSON, wrong format, unsupported version and invalid data each have their own message, followed by "তোমার আগের অগ্রগতি যেমন ছিল তেমনই আছে।". With progress already here, a shadcn `dialog` asks "দুটো মিলিয়ে নাও" (primary, the ADR-0007 merge) or "ফাইলেরটা দিয়ে বদলে দাও", or cancel; with none, the file becomes the progress. After an import from the empty state, focus moves to "মোট অগ্রগতি".
+  - "সব মুছে ফেলো" asks first in a shadcn `alert-dialog` with the design's warning, then removes the stored key; the view returns to the empty state and focus moves to its heading.
+  - The import and export code (with Zod) loads on use, not with the page.
+- Results ("…ফাইলটা ডাউনলোড হয়েছে…", "…থেকে প্রগ্রেস ইমপোর্ট হয়েছে।", "সব তথ্য … মুছে ফেলা হয়েছে।", import errors, a failed save) appear in one `role="status"` bubble fixed at the bottom of the screen with a close button, so a message never moves the page; it outlives a switch between the dashboard and the empty state. No toast library.
 
 ## About page
 

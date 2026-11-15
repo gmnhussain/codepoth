@@ -23,7 +23,8 @@ export type ParseStoredProgress = (value: unknown) => Progress
 /** What the store needs from the browser; a fake one in tests. */
 export type ProgressStoreHost = {
   /** `localStorage`, or `undefined` outside a browser. Allowed to throw. */
-  readonly storage: () => Pick<Storage, "getItem" | "setItem"> | undefined
+  readonly storage: () =>
+    Pick<Storage, "getItem" | "setItem" | "removeItem"> | undefined
   readonly addStorageListener: (
     listener: (event: { readonly key: string | null }) => void
   ) => void
@@ -54,6 +55,11 @@ export type ProgressStore = {
   readonly update: (
     operation: (progress: Progress) => Progress
   ) => Promise<boolean>
+  /**
+   * "সব মুছে ফেলো": removes the stored key (ADR-0007) and tells every reader
+   * of the store. Returns whether storage could be changed.
+   */
+  readonly clear: () => boolean
 }
 
 export function createProgressStore(host: ProgressStoreHost): ProgressStore {
@@ -164,6 +170,18 @@ export function createProgressStore(host: ProgressStoreHost): ProgressStore {
       notify()
       return true
     },
+    clear() {
+      try {
+        const storage = host.storage()
+        if (storage === undefined) return false
+        storage.removeItem(PROGRESS_STORAGE_KEY)
+      } catch {
+        return false
+      }
+      cached = EMPTY_PROGRESS
+      notify()
+      return true
+    },
   }
 }
 
@@ -217,4 +235,9 @@ export function updateProgress(
   operation: (progress: Progress) => Progress
 ): Promise<boolean> {
   return progressStore.update(operation)
+}
+
+/** Removes all of the reader's progress; see `ProgressStore.clear`. */
+export function clearProgress(): boolean {
+  return progressStore.clear()
 }

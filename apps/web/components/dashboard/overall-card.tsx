@@ -52,9 +52,11 @@ export function OverallCard({
         getAriaValueText={() => t("dashboard.percent", { n: percent })}
         className="flex-col gap-4 [&_[data-slot=progress-indicator]]:bg-foreground [&_[data-slot=progress-indicator]]:motion-reduce:transition-none [&_[data-slot=progress-track]]:h-2.5"
       >
+        {/* Focusable: focus lands here after an import from the empty state. */}
         <ProgressLabel
           id="overall-heading"
-          className="text-sm font-semibold text-muted-foreground"
+          tabIndex={-1}
+          className="text-sm font-semibold text-muted-foreground outline-none"
           render={<h2 />}
         >
           {t("dashboard.overall")}
