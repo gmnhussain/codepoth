@@ -55,6 +55,7 @@ Run from the repo root.
 
 - `pnpm dev`: run all apps in dev mode
 - `pnpm build`: build everything
+- `CONTENT_INCLUDE_DRAFTS=0 pnpm build`: the real no-drafts (production content) build. Use this to check a build without drafts: a local `apps/web/.env.local` may set `CONTENT_INCLUDE_DRAFTS=1`, so a plain `pnpm build` can silently include drafts (an explicitly set variable wins over `.env.local`)
 - `pnpm lint`: lint
 - `pnpm typecheck`: typecheck
 - `pnpm format`: format every file with Prettier
