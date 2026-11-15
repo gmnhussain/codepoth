@@ -17,7 +17,7 @@ Adapted from a larger SaaS engineering standard. Only rules that fit a static, c
 
 - The installed Next.js may be newer than your knowledge. Read `node_modules/next/dist/docs/` before writing Next.js code and heed deprecation notices.
 - Flow for every non-trivial change: **plan → approval → change → verify → show diff → commit only when asked.**
-- In a plan, list open decisions as a table (`D-1`, …) so they can be overruled before work starts.
+- In a plan, list open decisions as a numbered table so they can be overruled before work starts. Plans are not in the repo, so their numbers never appear in repo docs: record a decision in an ADR or the affected doc and link that.
 - **MUST:** run the checks for real. Never claim a check passed without running it. Report failures with the output.
 - **MUST:** never silence, skip or weaken a failing check (lint rule, test, threshold, hook) to make it pass.
 - **One concern per change.** Do not refactor unrelated code; note it in the report instead.

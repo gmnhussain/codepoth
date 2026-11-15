@@ -226,7 +226,7 @@ The MDX components for lesson bodies live in `apps/web/components/mdx/` and are 
 
 ## Roadmap page
 
-`/roadmap`: every track and topic as a metro-style map, drawn from `content/map.json` (D-35).
+`/roadmap`: every track and topic as a metro-style map, drawn from `content/map.json` ([content model: Map](content-model.md#map)).
 
 - Data: `buildRoadmap(graph)` in `packages/content/src/roadmap.ts` gives the canvas size, track lines and each topic's position, flags and lesson tree; `isTopicVisible` (track focus, start-only, search) and `topicNeighbours` are tested there.
 - Drawing (`roadmap-canvas.tsx`, hook-free so Home can reuse it as a static preview): SVG polylines in the track colour, a label per topic placed by `map.json`'s `label`, "শুরু এখান থেকে" flags on start topics, and a button per topic (interchanges have a larger dot with a dark ring). Positions come from data, so they are inline `left`/`top`/size styles; colours and look stay in classes. Topics are in track order, which is the keyboard order.
@@ -262,7 +262,7 @@ The MDX components for lesson bodies live in `apps/web/components/mdx/` and are 
 
 ## Dashboard page
 
-`/dashboard` in its first-visit state (D-32, D-40): title, subtitle, a "এখনো কিছু সেভ হয়নি" chip, and an empty-state card (a line with only the first station reached, a welcome, and what will collect here). "প্রথম পাঠ শুরু করো" goes to the same lesson as Home's "শুরু করো" (`homeStartLesson`) and is left out while nothing is published, when "রোডম্যাপ দেখো" becomes the main button. Progress, quiz results, bookmarks, the reading heatmap and export/import (with the empty state's import link) arrive with reader progress.
+`/dashboard` in its first-visit state, before any reader progress exists ([ADR-0014](decisions/ADR-0014-reader-progress-implementation.md)): title, subtitle, a "এখনো কিছু সেভ হয়নি" chip, and an empty-state card (a line with only the first station reached, a welcome, and what will collect here). "প্রথম পাঠ শুরু করো" goes to the same lesson as Home's "শুরু করো" (`homeStartLesson`) and is left out while nothing is published, when "রোডম্যাপ দেখো" becomes the main button. Progress, quiz results, bookmarks, the reading heatmap and export/import (with the empty state's import link) arrive with reader progress.
 
 ## About page
 
