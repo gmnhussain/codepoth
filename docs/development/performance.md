@@ -177,3 +177,64 @@ Bytes over the wire (`encodedDataLength`, page and Pagefind's worker), cold cach
 - Result links do not prefetch their pages (`prefetch={false}`): with prefetching, the first query also fetched 25.8 KB of lesson data the reader had not chosen (fixed in `d18475f`).
 - On disk the bundle is about 0.9 MB, mostly fragments (one per page) and Pagefind's unused UI files; a reader only downloads what the table shows.
 - CLS stays 0 while opening, typing and moving through results, at 375, 768 and 1280 px in both themes. One run recorded a single 0.0003 shift not caused by input; eight later runs of the same flow, cold and warm, recorded none, and its source was not captured.
+
+## End of Phase 5 (2026-11-16)
+
+Measured on the build with drafts (`CONTENT_INCLUDE_DRAFTS=1 pnpm build --force`) at commit `de5993c`, with fonts on `font-display: optional` ([Fonts](#fonts)).
+
+### Lighthouse
+
+`pnpm lighthouse` ([method](#targets-and-measurement)), Chrome 157, median of 3 runs.
+
+Fresh (storage reset before each run, as in the Phase 2 baseline):
+
+| Page                  | Performance | LCP    | CLS | TBT    | Accessibility | Best practices | SEO  |
+| --------------------- | ----------- | ------ | --- | ------ | ------------- | -------------- | ---- |
+| Home                  | 98          | 0.94 s | 0   | 156 ms | 100           | 100            | 66\* |
+| Lesson (`use-effect`) | 98          | 0.99 s | 0   | 170 ms | 100           | 100            | 66\* |
+| Map (`/roadmap`)      | 99          | 1.02 s | 0   | 135 ms | 100           | 100            | 66\* |
+
+With saved progress (`--progress`, as in the Phase 3 table):
+
+| Page                  | Performance | LCP    | CLS | TBT    | Accessibility | Best practices | SEO  |
+| --------------------- | ----------- | ------ | --- | ------ | ------------- | -------------- | ---- |
+| Home                  | 100         | 0.77 s | 0   | 55 ms  | 100           | 100            | 66\* |
+| Lesson (`use-effect`) | 100         | 0.74 s | 0   | 60 ms  | 100           | 100            | 66\* |
+| Map (`/roadmap`)      | 100         | 0.83 s | 0   | 69 ms  | 100           | 100            | 66\* |
+| Topic (React)         | 100         | 0.71 s | 0   | 90 ms  | 100           | 100            | 66\* |
+| Dashboard             | 95          | 0.76 s | 0   | 251 ms | 100           | 100            | 66\* |
+
+\* As in the earlier tables: the only failing SEO audit is `is-crawlable`, because a build with drafts is `noindex` on purpose.
+
+- CLS is 0 on every page, and accessibility, best practices and LCP are as before (every LCP under 1.1 s, far below the 2.5 s target).
+- TBT on fresh loads is higher in the table above than in the Phase 2 baseline (Home 112, lesson 49, Map 40 ms), so it was compared directly. The Phase 2 baseline commit (`ed3ed97`, built with drafts in a temporary worktree) and this commit were served side by side and measured fresh with the same Chrome, alternating old and new, 5 runs each:
+
+  | Page                  | TBT, Phase 2 (`ed3ed97`)         | TBT, Phase 5 (`2ac34b6`)         | LCP, old / new |
+  | --------------------- | -------------------------------- | -------------------------------- | -------------- |
+  | Home                  | median 78 (59, 64, 78, 93, 145)  | median 98 (43, 51, 98, 119, 154) | 0.95 / 0.95 s  |
+  | Lesson (`use-effect`) | median 71 (41, 52, 71, 100, 101) | median 66 (46, 58, 66, 82, 102)  | 0.95 / 0.95 s  |
+
+  The ranges overlap fully and neither commit is consistently higher (the Phase 5 build measured higher in 2 of the 5 pairs on each page, lower in 3), so the higher numbers in the table come from run-to-run variation on this machine, not from the code since Phase 2. The 200 ms INP target is checked with field data after launch ([Targets](#targets-and-measurement)).
+
+- The Dashboard still has the most to draw on the client (176 ms TBT with progress in Phase 3, 156–251 ms here).
+
+### First Load JS
+
+**Method (this table only):** for each route, the gzip size (Node `zlib`, default level) of every distinct `<script src>` in the route's pre-rendered HTML, `noModule` scripts left out, summed. The same script measured `main` (`b011882`, before Phase 5) and this branch; its totals are lower than the [Site search](#first-load-js) table's for the same code, so compare only within this table.
+
+| Route                 | `main` (`b011882`) | Phase 5 (`de5993c`) |
+| --------------------- | ------------------ | ------------------- |
+| Home                  | 182.5 KB           | 182.5 KB            |
+| Lesson (`use-effect`) | 205.6 KB           | 205.6 KB            |
+| Topic (React)         | 185.4 KB           | 185.4 KB            |
+| Map (`/roadmap`)      | 192.1 KB           | 192.2 KB            |
+| Contents              | 186.7 KB           | 186.7 KB            |
+| Glossary              | 184.0 KB           | 184.0 KB            |
+| Dashboard             | 192.1 KB           | 192.1 KB            |
+| About                 | 179.8 KB           | 179.8 KB            |
+
+Phase 5 added tests, not browser code: its fixes (names, focusable regions, layout at 320px, font loading) changed markup and CSS only.
+
+### End-to-end sweep
+
+`pnpm test:e2e` ([conventions §14](conventions.md#14-testing)) loads every route at 320, 768 and 1280px in light and dark: 1,413 loads on the build with drafts (about 11–15 minutes locally on 6 workers) and 42 on the build without. On the final run the largest layout shift on any route was 0.0000, with no sideways scroll, console error or axe-core violation. On its first runs the sweep found what Phase 5 fixed: names that left out visible text, scroll areas the keyboard could not reach, sideways scroll at 320px, and the font-swap shifts.
