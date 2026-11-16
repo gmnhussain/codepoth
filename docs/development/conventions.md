@@ -80,7 +80,6 @@ Adapted from a larger SaaS engineering standard. Only rules that fit a static, c
 The target for these is decided, but they are not in the repo. Do not assume they are enforced.
 
 - **Dependabot:** weekly updates.
-- **CI workflow:** the gates in [§15](#15-ci-gates-every-pull-request), including `pnpm audit --prod`.
 
 ## 7. TypeScript
 
@@ -183,7 +182,7 @@ File role suffixes: `.schema.ts` (Zod schemas), `.client.ts` (browser-only helpe
 
 - No `dangerouslySetInnerHTML` without sanitising (the JSON-LD component is the one escaped exception).
 - Validate imported progress JSON with Zod before using it.
-- Lockfile committed. `pnpm audit --prod` in CI and Dependabot are [not set up yet](#not-set-up-yet).
+- Lockfile committed. `pnpm audit --prod` runs in CI ([§15](#15-ci-gates-every-pull-request)); Dependabot is [not set up yet](#not-set-up-yet).
 
 ## 14. Testing
 
@@ -210,13 +209,13 @@ File role suffixes: `.schema.ts` (Zod schemas), `.client.ts` (browser-only helpe
 2. Typecheck
 3. ESLint (`pnpm lint`) and Prettier (`pnpm format:check`)
 4. Unit and content-validation tests
-5. Build (pre-renders every route and builds the Pagefind index)
-6. Dependency audit
-7. Commit messages (same rules as the `commit-msg` hook)
-8. End-to-end tests on the production build
+5. Build (pre-renders every route and builds the Pagefind index): both builds, with and without drafts, through step 8
+6. Dependency audit (`pnpm audit --prod`, at its default level)
+7. Commit messages (same rules as the `commit-msg` hook): the hook's own tests, and every commit of the pull request through `scripts/check-commit-message.mjs`
+8. End-to-end tests on the production build: `pnpm test:e2e` with `E2E_MATRIX=reduced` ([§14](#14-testing)); the full matrix is run locally before each merge
 9. Lighthouse is not a CI gate. It runs locally with `pnpm lighthouse` by the baseline method ([performance.md](performance.md#targets-and-measurement): Lighthouse 13.6.0 through `pnpm dlx`, median of 3 runs) at each milestone. Shared CI runners are too noisy for score thresholds, and Lighthouse CI bundles its own Lighthouse version, so its numbers would not compare with the baselines.
 
-CI uses `permissions: contents: read` and cancels superseded runs. A red gate is fixed, never skipped. The workflow is [not set up yet](#not-set-up-yet).
+The workflow is `.github/workflows/ci.yml`, on every pull request and push to `main`. It uses `permissions: contents: read`, cancels superseded runs, and pins each action to a commit, with the version in a comment. A red gate is fixed, never skipped. On failure, the Playwright report is kept as an artifact for 7 days.
 
 ## 16. Gate checklist for every change
 

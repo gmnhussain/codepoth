@@ -1,0 +1,90 @@
+# The CI gates in docs/development/conventions.md §15. Lighthouse is not one
+# of them: it runs locally with `pnpm lighthouse` (performance.md).
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      # Actions are pinned to a commit (the version is in the comment), each
+      # release at least two weeks old when chosen.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # The whole history, so a pull request's commits can be checked.
+          fetch-depth: 0
+
+      # pnpm's version comes from `packageManager` in package.json.
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Format
+        run: pnpm format:check
+
+      - name: Unit and content tests
+        run: pnpm test
+
+      - name: Commit message rules
+        run: pnpm test:commit-msg
+
+      - name: Commit messages of this pull request
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          message="$(mktemp)"
+          for sha in $(git rev-list --no-merges "$BASE_SHA..$HEAD_SHA"); do
+            git log -1 --format=%B "$sha" > "$message"
+            echo "checking $(git log -1 --format='%h %s' "$sha")"
+            node scripts/check-commit-message.mjs "$message"
+          done
+
+      - name: Dependency audit
+        run: pnpm audit --prod
+
+      - name: Install Chromium for Playwright
+        run: pnpm --filter web exec playwright install --with-deps chromium
+
+      # Both builds (with drafts, then without) and their end-to-end tests.
+      # The reduced route matrix keeps CI short; the full matrix is run
+      # locally before each merge (conventions §14).
+      - name: Builds and end-to-end tests
+        env:
+          E2E_MATRIX: reduced
+        run: pnpm test:e2e
+
+      - name: Upload the Playwright report
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: playwright-report
+          path: |
+            apps/web/playwright-report/
+            apps/web/test-results/
+          retention-days: 7
