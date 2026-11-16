@@ -19,6 +19,14 @@ catalog:
   vitest: ^5.1.0
   zod: ^4.6.7
 
+# next@16.4.5 resolved baseline-browser-mapping 2.10.32, which has a moderate
+# advisory (GHSA-w5vr-8v7q-w6rv, fixed in 2.11.0). next's own range (^2.9.19)
+# allows the fix, but `pnpm update` picks the newest release (days old), so
+# next's copy is pinned to the 2.11 release this lockfile already uses for
+# its other dependents. Same major. Remove when next resolves >=2.11 itself.
+overrides:
+  "next>baseline-browser-mapping": 2.11.36
+
 allowBuilds:
   esbuild: true
   sharp: true
