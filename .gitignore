@@ -20,7 +20,7 @@ blob-report/
 .next/
 out/
 
-# search index, written after `next build` (ADR-0015)
+# search index, written by the build adapter during `next build` (ADR-0016)
 apps/web/public/pagefind/
 
 # production

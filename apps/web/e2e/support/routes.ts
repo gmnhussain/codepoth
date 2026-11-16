@@ -1,26 +1,18 @@
-import { readFileSync } from "node:fs"
-import path from "node:path"
 import { fileURLToPath } from "node:url"
 
 import {
-  htmlPathOf,
-  prerenderedPageRoutes,
-} from "../../scripts/build-search-index.ts"
+  readBuiltHtml,
+  readBuiltPages,
+} from "../../scripts/prerendered-pages.ts"
 
 const DIST_DIR = fileURLToPath(new URL("../../.next/", import.meta.url))
 
-function readManifest(): unknown {
-  return JSON.parse(
-    readFileSync(path.join(DIST_DIR, "prerender-manifest.json"), "utf8")
-  )
-}
-
 /**
  * Every page route the build under test pre-rendered, sorted: the same list
- * the search index is built from (ADR-0015), so a test never keeps its own.
+ * the search index is built from (ADR-0016), so a test never keeps its own.
  */
 export function builtPageRoutes(): string[] {
-  const routes = prerenderedPageRoutes(readManifest())
+  const routes = readBuiltPages(DIST_DIR).map((page) => page.route)
   if (routes.length === 0) {
     throw new Error("the build under test has no pre-rendered page routes")
   }
@@ -29,7 +21,7 @@ export function builtPageRoutes(): string[] {
 
 /** The pre-rendered HTML of a route in the build under test. */
 export function builtHtmlOf(route: string): string {
-  return readFileSync(path.join(DIST_DIR, htmlPathOf(route)), "utf8")
+  return readBuiltHtml(DIST_DIR, route)
 }
 
 /** Next's own error routes, which the sweep visits as a missing page. */

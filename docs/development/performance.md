@@ -145,7 +145,7 @@ Pagefind search ([ADR-0015](../decisions/ADR-0015-site-search-with-pagefind.md))
 
 ### First Load JS
 
-**Method (this table only):** for each route, the gzip size (Node `zlib`, default level) of every distinct `<script src>` in the route's pre-rendered HTML (`.next/server/app/<route>.html`), `noModule` scripts left out, summed. Both columns were measured this way on the same day. This count is larger than the one behind the Phase 2 and Phase 3 figures above (Home 179.9 KB there, 219.0 KB here for the same `main`), so compare numbers only within one table.
+**Method (this table only):** for each route, the gzip size (Node `zlib`, default level) of every distinct `<script src>` in the route's pre-rendered HTML (then `.next/server/app/<route>.html`; since [ADR-0016](../decisions/ADR-0016-search-index-built-in-a-build-adapter.md) the file is listed in `.next/prerendered-pages.json`), `noModule` scripts left out, summed. Both columns were measured this way on the same day. This count is larger than the one behind the Phase 2 and Phase 3 figures above (Home 179.9 KB there, 219.0 KB here for the same `main`), so compare numbers only within one table.
 
 | Route                 | `main` (`229b5b1`) | With search (`d18475f`) | Change  |
 | --------------------- | ------------------ | ----------------------- | ------- |

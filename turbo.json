@@ -16,7 +16,12 @@
         "!.next/dev/**",
         "public/pagefind/**"
       ],
-      "env": ["CONTENT_INCLUDE_DRAFTS", "VERCEL_ENV"]
+      "env": [
+        "CONTENT_INCLUDE_DRAFTS",
+        "VERCEL_ENV",
+        "VERCEL",
+        "NEXT_ADAPTER_PATH"
+      ]
     },
     "lint": {
       "dependsOn": ["^lint", "^content:generate", "content:generate"]

@@ -1,3 +1,5 @@
+import { fileURLToPath } from "node:url"
+
 import { createContentCollectionPlugin } from "@content-collections/next"
 import type { NextConfig } from "next"
 
@@ -25,6 +27,12 @@ const SECURITY_HEADERS = [
 ]
 
 const nextConfig: NextConfig = {
+  // Builds the search index inside `next build`, then runs the platform's
+  // adapter from NEXT_ADAPTER_PATH, if any (ADR-0016). An absolute path:
+  // Next resolves it from its own package.
+  adapterPath: fileURLToPath(
+    new URL("./scripts/search-index-adapter.ts", import.meta.url)
+  ),
   poweredByHeader: false,
   transpilePackages: [
     "@workspace/ui",

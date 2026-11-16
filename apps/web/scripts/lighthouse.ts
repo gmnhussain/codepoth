@@ -29,6 +29,8 @@ import type { BrowserContext, Page } from "@playwright/test"
 
 import { site } from "@workspace/config/site"
 
+import { readBuiltHtml } from "./prerendered-pages.ts"
+
 const LIGHTHOUSE = "lighthouse@13.6.0"
 const SERVER_PORT = 3419
 const DEBUGGING_PORT = 9334
@@ -113,8 +115,8 @@ async function activeLabels(): Promise<{
 }
 
 /** A lesson's pre-rendered HTML in the build. */
-function builtHtml(url: string): Promise<string> {
-  return readFile(path.join(DIST_DIR, "server", "app", `${url}.html`), "utf8")
+function builtHtml(url: string): string {
+  return readBuiltHtml(DIST_DIR, url)
 }
 
 /** In-page links of a built page: its sections, plus the skip link. */
@@ -150,7 +152,7 @@ async function seedProgress(context: BrowserContext): Promise<string> {
   }
   await press(labels.lesson.bookmark)
 
-  const quizUrl = await firstLessonWith(urls, 'id="quiz"')
+  const quizUrl = firstLessonWith(urls, 'id="quiz"')
   await open(quizUrl)
   for (const question of await page.locator("#quiz fieldset").all()) {
     await question.locator("button[aria-pressed]").first().click()
@@ -161,12 +163,10 @@ async function seedProgress(context: BrowserContext): Promise<string> {
   }
 
   // The last-read lesson: the one with the most sections, read to a section.
-  const sized = await Promise.all(
-    urls.map(async (url) => ({
-      url,
-      sections: inPageLinks(await builtHtml(url)),
-    }))
-  )
+  const sized = urls.map((url) => ({
+    url,
+    sections: inPageLinks(builtHtml(url)),
+  }))
   const longest = sized.sort((a, b) => b.sections.length - a.sections.length)[0]
   if (longest === undefined) fail("no lesson to read")
   await open(longest.url)
@@ -178,12 +178,9 @@ async function seedProgress(context: BrowserContext): Promise<string> {
   return stored ?? ""
 }
 
-async function firstLessonWith(
-  urls: readonly string[],
-  marker: string
-): Promise<string> {
+function firstLessonWith(urls: readonly string[], marker: string): string {
   for (const url of urls) {
-    if ((await builtHtml(url)).includes(marker)) return url
+    if (builtHtml(url).includes(marker)) return url
   }
   fail(`no lesson has ${marker}`)
 }
