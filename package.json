@@ -11,6 +11,7 @@
     "typecheck": "turbo typecheck",
     "test": "turbo test",
     "test:e2e": "pnpm --filter web test:e2e",
+    "lighthouse": "pnpm --filter web lighthouse",
     "prepare": "node scripts/setup-git-hooks.mjs",
     "test:commit-msg": "node --test scripts/commit-message.test.mjs"
   },

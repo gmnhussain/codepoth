@@ -47,7 +47,8 @@ Core Web Vitals at the 75th percentile, on mobile:
 | INP    | < 200 ms |
 | CLS    | < 0.1    |
 
-- Lighthouse CI on Home, Lesson and Map pages with score thresholds (planned; CI gate in [conventions](conventions.md#15-ci-gates-every-pull-request)).
+- Lighthouse is measured locally with `pnpm lighthouse <path>… [--progress]` (`apps/web/scripts/lighthouse.ts`), on a build with drafts (`CONTENT_INCLUDE_DRAFTS=1 pnpm build --force`). It uses the baseline method below: Lighthouse 13.6.0 through `pnpm dlx` (not a dependency), the default mobile profile, the installed Google Chrome, `next start`, and the median of 3 runs per page, printed as the tables in this file. With `--progress` it first reads lessons in that Chrome as a reader does (three marked done, two opened, a bookmark, a quiz answered, a last-read lesson at a saved section) and keeps that storage. It is not a CI gate ([conventions §15](conventions.md#15-ci-gates-every-pull-request)).
+- The pages measured at each milestone: Home (`/`), a lesson (`/learn/frontend/react/use-effect`) and the Map (`/roadmap`) fresh; those three, the React topic (`/learn/frontend/react`) and the Dashboard (`/dashboard`) with `--progress`.
 - `@next/bundle-analyzer` to inspect client bundles when a page's JavaScript grows (planned).
 - Turborepo remote cache on Vercel to keep builds fast.
 

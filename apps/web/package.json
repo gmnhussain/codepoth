@@ -10,7 +10,8 @@
     "lint": "eslint --max-warnings 0",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:e2e": "node scripts/e2e.ts"
+    "test:e2e": "node scripts/e2e.ts",
+    "lighthouse": "node scripts/lighthouse.ts"
   },
   "dependencies": {
     "@mdx-js/mdx": "catalog:",

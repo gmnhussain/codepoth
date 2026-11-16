@@ -80,7 +80,7 @@ Adapted from a larger SaaS engineering standard. Only rules that fit a static, c
 The target for these is decided, but they are not in the repo. Do not assume they are enforced.
 
 - **Dependabot:** weekly updates.
-- **CI workflow:** the gates in [§15](#15-ci-gates-every-pull-request), including `pnpm audit --prod` and Lighthouse CI.
+- **CI workflow:** the gates in [§15](#15-ci-gates-every-pull-request), including `pnpm audit --prod`.
 
 ## 7. TypeScript
 
@@ -214,7 +214,7 @@ File role suffixes: `.schema.ts` (Zod schemas), `.client.ts` (browser-only helpe
 6. Dependency audit
 7. Commit messages (same rules as the `commit-msg` hook)
 8. End-to-end tests on the production build
-9. Lighthouse CI on Home, Lesson and Map against the [performance targets](performance.md#targets-and-measurement)
+9. Lighthouse is not a CI gate. It runs locally with `pnpm lighthouse` by the baseline method ([performance.md](performance.md#targets-and-measurement): Lighthouse 13.6.0 through `pnpm dlx`, median of 3 runs) at each milestone. Shared CI runners are too noisy for score thresholds, and Lighthouse CI bundles its own Lighthouse version, so its numbers would not compare with the baselines.
 
 CI uses `permissions: contents: read` and cancels superseded runs. A red gate is fixed, never skipped. The workflow is [not set up yet](#not-set-up-yet).
 
