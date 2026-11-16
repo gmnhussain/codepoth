@@ -58,6 +58,19 @@ Core Web Vitals at the 75th percentile, on mobile:
 - **Cause:** the track's `#track-…` target sits inside its closed `<details>`, and Chrome opens it itself ("ancestor details revealing") once parsing ends. On a cold load with JavaScript on, Chrome first paints a frame already scrolled to the still-closed track, with the closed tracks below it in view; opening the track then pushes them down. Without JavaScript, parsing ends before the first paint, so that frame does not exist. Opening the track from the island instead (the earlier behaviour) measured the same.
 - **Status:** left for a performance trace in Phase 5, to find what triggers the early paint.
 
+Contents filtered by the URL (found by the end-to-end tests, 2026-11-16):
+
+- **Page:** `/contents?q=…`, and `/contents?status=todo|done` when the reader has saved progress. The search dialog's "সূচিপত্রে খোঁজো" link on no results goes to `/contents?q=…` as a full page load, so this happens inside the site too, not only on shared links.
+- **CLS:** 0.21 on every load of `/contents?q=useEffect` at 1280px (warm and cold), with no input. `/glossary?letter=…` and `/roadmap?topic=…` measure 0.
+- **Cause:** the page is static, so its HTML is the whole list for every URL. The island reads `?q=` and `?status=` only after hydration ([design.md](../design.md#contents-page)), hides the tracks without a match, and the first matching track moves up into view. Avoiding it would need a blocking script before the list, which was rejected.
+- **Status:** accepted. The end-to-end test checks that a shared link applies and records its load shift without failing on it; every in-page search and filter is held to the 0.01 limit.
+
+Early status filter click (found by the end-to-end tests, 2026-11-16):
+
+- **Page:** `/contents` with saved progress.
+- **CLS:** 0.07 when "পড়া শেষ" is clicked before the reader's progress has loaded (the first ~100–300 ms after hydration, while the schema chunk loads, [ADR-0014](../decisions/ADR-0014-reader-progress-implementation.md)). The filter shows no lessons until the progress arrives; the matching lessons then appear more than 500 ms after the click, so the shift does not count as caused by input.
+- **Status:** accepted, rare. A click after the count shows (as the end-to-end test does) does not shift.
+
 ## Baseline (2026-11-15, end of Phase 2)
 
 Lighthouse 13.6.0, default mobile profile (simulated slow 4G and 4× CPU throttling), against a local production build with drafts (`next start`, commit `ed3ed97`); median of 3 runs per page.
