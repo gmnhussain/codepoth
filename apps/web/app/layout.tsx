@@ -33,11 +33,23 @@ const bodyFont = Hind_Siliguri({
 })
 
 // No Bangla subset; Bangla characters in code fall back to the body font.
+// No metric-adjusted Arial fallback: with `optional` the font never swaps
+// in later, so the fallback is what code shows when the font is late, and
+// it must be monospaced. globals.css gives `--font-mono` a monospace stack.
 const codeFont = JetBrains_Mono({
   subsets: ["latin"],
   display: "optional",
-  variable: "--font-code",
+  adjustFontFallback: false,
 })
+
+// Turbopack in Next 16.4.5 ignores `adjustFontFallback` for next/font/google
+// (webpack honours it), so `style.fontFamily` still ends in the Arial
+// fallback. `--font-code` is set on <html> to the font's own family alone.
+// Re-check on every Next upgrade; once the option works, go back to
+// `variable: "--font-code"` and `codeFont.variable` (docs/design.md#fonts).
+const codeFontFamily =
+  codeFont.style.fontFamily.split(",")[0] ?? codeFont.style.fontFamily
+const htmlStyle = { "--font-code": codeFontFamily } as React.CSSProperties
 
 const MAIN_CONTENT_ID = "main"
 
@@ -69,9 +81,9 @@ export default function RootLayout({
       className={cn(
         "font-sans antialiased",
         displayFont.variable,
-        bodyFont.variable,
-        codeFont.variable
+        bodyFont.variable
       )}
+      style={htmlStyle}
     >
       <body className="flex min-h-svh flex-col">
         <ThemeProvider>
