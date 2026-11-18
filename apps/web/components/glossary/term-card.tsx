@@ -43,7 +43,7 @@ export function TermCard({
           <h3
             id={term.id}
             lang="en"
-            className="scroll-mt-30 text-2xl font-bold"
+            className="scroll-mt-30 text-2xl font-semibold"
           >
             {term.term}
           </h3>

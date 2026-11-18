@@ -26,7 +26,7 @@ export function WhatsNew({ graph }: { readonly graph: ContentGraph }) {
       className="flex min-w-0 scroll-mt-24 flex-col gap-2.5 rounded-2xl border bg-card px-7 pt-7 pb-3.5 lg:flex-3"
     >
       <div className="flex items-baseline justify-between gap-3">
-        <h2 id="new-heading" className="text-2xl font-bold">
+        <h2 id="new-heading" className="text-2xl font-semibold">
           {t("footer.whatsNew")}
         </h2>
         <Link

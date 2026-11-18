@@ -10,10 +10,11 @@
 @source "../../../config/src/**/*.{ts,tsx}";
 
 @theme inline {
-  /* next/font sets --font-body and --font-display on <html>, and the layout
-     sets --font-code (apps/web/app/layout.tsx); distinct names avoid a
-     self-referencing var. */
-  --font-heading: var(--font-display), var(--font-body), sans-serif;
+  /* next/font sets --font-body on <html>, and the layout sets --font-code
+     (apps/web/app/layout.tsx); distinct names avoid a self-referencing var.
+     Headings use the body font (ADR-0017); a separate heading font would be
+     set here. */
+  --font-heading: var(--font-body), sans-serif;
   /* When the code font is not used, a system monospace face takes over:
      named faces for desktops, then the generic family (Android, Linux).
      None of them has Bangla glyphs, so Bangla in code moves on to the body

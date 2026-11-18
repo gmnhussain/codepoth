@@ -18,7 +18,7 @@ export function PrivacySection({
       aria-labelledby="privacy-heading"
       className="flex scroll-mt-24 flex-col gap-4 rounded-2xl border bg-card p-7 target:ring-2 target:ring-foreground"
     >
-      <h2 id="privacy-heading" className="text-2xl font-bold">
+      <h2 id="privacy-heading" className="text-2xl font-semibold">
         {t("about.privacyHeading")}
       </h2>
       {children}

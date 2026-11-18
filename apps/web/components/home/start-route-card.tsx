@@ -50,7 +50,7 @@ export function StartRouteCard({
           ))}
         </span>
       </div>
-      <h3 className="text-2xl font-bold">{route.title}</h3>
+      <h3 className="text-2xl font-semibold">{route.title}</h3>
       <p className="flex-1 leading-reading text-foreground/80">
         {route.description}
       </p>

@@ -57,7 +57,7 @@ export function TrackSection({
             {formatTwoDigits(track.number)}
           </span>
           <span className="col-start-2 row-start-1 flex flex-col break-words">
-            <h2 id={`${anchor}-heading`} className="text-xl font-bold">
+            <h2 id={`${anchor}-heading`} className="text-xl font-semibold">
               {track.titleEn}
             </h2>
             <span className="text-sm text-muted-foreground">

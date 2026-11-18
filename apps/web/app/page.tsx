@@ -69,7 +69,7 @@ const WHY_TILES = [
   text: LabelKey
 }[]
 
-const SECTION_TITLE = "text-3xl font-bold sm:text-4xl"
+const SECTION_TITLE = "text-3xl font-semibold sm:text-4xl"
 
 /**
  * Home: the pitch with a map preview and where to begin (or, for a returning
@@ -108,7 +108,7 @@ export default function HomePage() {
             </Chip>
             <h1
               id="hero-heading"
-              className="text-4xl leading-tight font-bold sm:text-6xl"
+              className="text-4xl leading-tight font-semibold sm:text-6xl"
             >
               {t("home.heroTitle")}
             </h1>
@@ -244,7 +244,7 @@ export default function HomePage() {
                       n: formatTwoDigits(track.number),
                     })}
                   </span>
-                  <h3 className="text-xl font-bold group-hover/track:underline group-hover/track:underline-offset-4">
+                  <h3 className="text-xl font-semibold group-hover/track:underline group-hover/track:underline-offset-4">
                     {track.titleEn}
                   </h3>
                   <span className="flex-1 leading-snug text-foreground/80">

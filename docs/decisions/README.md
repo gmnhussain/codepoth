@@ -49,6 +49,7 @@ What becomes easier or harder because of it.
 | [ADR-0014](ADR-0014-reader-progress-implementation.md)        | How reader progress is built in the web app                         | accepted                                                        |
 | [ADR-0015](ADR-0015-site-search-with-pagefind.md)             | Site search with Pagefind over the pre-rendered pages               | accepted; build and "Not verified" parts superseded by ADR-0016 |
 | [ADR-0016](ADR-0016-search-index-built-in-a-build-adapter.md) | Search index built in a build adapter (supersedes part of ADR-0015) | accepted                                                        |
+| [ADR-0017](ADR-0017-one-font-for-text-and-headings.md)        | One font for text and headings (Anek Bangla removed)                | accepted                                                        |
 
 ## Open questions (do NOT hardcode)
 

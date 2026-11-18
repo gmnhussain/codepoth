@@ -90,7 +90,7 @@ export default function DashboardPage() {
       <h2
         id="empty-heading"
         tabIndex={-1}
-        className="text-3xl font-bold outline-none"
+        className="text-3xl font-semibold outline-none"
       >
         {t("dashboard.emptyTitle")}
       </h2>
@@ -128,7 +128,7 @@ export default function DashboardPage() {
       <div className="mx-auto flex max-w-7xl flex-col gap-7 px-4 py-12 sm:px-8">
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div className="flex flex-col gap-1.5">
-            <h1 className="text-4xl font-bold sm:text-5xl">
+            <h1 className="text-4xl font-semibold sm:text-5xl">
               {t("dashboard.title")}
             </h1>
             <p className="text-lg text-foreground/80">

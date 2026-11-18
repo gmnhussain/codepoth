@@ -47,7 +47,7 @@ export default function GlossaryPage() {
     <div className="mx-auto flex max-w-7xl flex-col gap-7 px-4 py-12 sm:px-8">
       <header className="flex flex-wrap items-end justify-between gap-6">
         <div className="flex max-w-2xl flex-col gap-2">
-          <h1 className="text-5xl font-bold">{t("nav.glossary")}</h1>
+          <h1 className="text-5xl font-semibold">{t("nav.glossary")}</h1>
           <p className="text-lg leading-reading text-foreground/80">
             {t("glossary.intro")}
           </p>

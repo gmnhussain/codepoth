@@ -138,7 +138,7 @@ export function RoadmapPanel({
         <h2
           ref={headingRef}
           tabIndex={-1}
-          className="text-3xl font-bold outline-none"
+          className="text-3xl font-semibold outline-none"
         >
           {topic.title}
         </h2>

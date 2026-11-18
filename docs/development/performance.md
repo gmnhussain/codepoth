@@ -13,9 +13,15 @@ Every route is pre-rendered ([ADR-0004](../decisions/ADR-0004-vercel-ssg-not-sta
 
 ## Fonts
 
-- Load every font with `next/font`, with `subsets: ["bengali", "latin"]` for the Bangla fonts and `display: "optional"`.
-- Why `optional`, not `swap`: a web font that arrives after the first paint makes text re-wrap, because the fallback fonts (Nirmala UI, Noto Sans Bengali, Arial…) are not the same width. With `swap`, the end-to-end sweep (Phase 5) measured layout shifts of up to 0.26 on slow loads at 320 px, from chips, breadcrumbs, stats and filter rows changing their line count, and 0.13 on `/contents` when JetBrains Mono (not preloaded) arrived about 2 s in. With `optional`, a font that is not ready by the first paint is not swapped in on that page view; it still downloads, and the next page uses it from the cache. Measured on a throttled first load (150 ms latency, 1.6 Mbps): the page stays in the fallback fonts with a layout shift of 0, and the next page renders in Anek Bangla, Hind Siliguri and JetBrains Mono. On fast loads (fonts ready before the first paint, as in every Lighthouse run below) nothing changes.
-- Anek Bangla is a variable font: load it once as a variable font, not one file per weight.
+- Load every font with `next/font`, with `subsets: ["bengali", "latin"]` for the Bangla font, `display: "optional"`, and a preload: every page uses both fonts.
+- Why `optional`, not `swap`: a web font that arrives after the first paint makes text re-wrap, because the fallback fonts (Nirmala UI, Noto Sans Bengali, Arial…) are not the same width. With `swap`, the end-to-end sweep (Phase 5) measured layout shifts of up to 0.26 on slow loads at 320 px, from chips, breadcrumbs, stats and filter rows changing their line count, and 0.13 on `/contents` when JetBrains Mono (not preloaded then) arrived about 2 s in.
+- With `optional`, a face that is not ready by the first paint is not swapped in later: it stays in the fallback for the whole document, including client-side navigations, which keep the document. It still downloads, so the next full page load (a reload, or a new visit while it is cached) uses it. Measured on a throttled first load (150 ms latency, 1.6 Mbps): the page stays in the fallback fonts with a layout shift of 0.
+- Fonts do not always make the first paint. Lighthouse on localhost showed every font finishing before it ([Font bytes](#font-bytes)), but a deployed site on a mobile connection does not. Measured on the live site on 2026-11-18 with `pnpm measure:fonts` ([method](#targets-and-measurement); `/`, `/roadmap`, `/contents`, 3 runs each), before [ADR-0017](../decisions/ADR-0017-one-font-for-text-and-headings.md):
+  - No throttling: first paint about 0.4–0.5 s, the preloaded fonts arrive before it and render.
+  - Fast 4G: first paint about 0.93 s. Hind Siliguri's files arrive at 0.59–0.89 s and render; Anek Bangla's 152 KB Bangla file arrives at about 1.1 s, and headings stayed in the system font in 8–9 of 9 loads.
+  - Slow 4G: first paint about 2.0–2.5 s; headings in the system font in 9 of 9 loads, body text renders.
+  - JetBrains Mono, not preloaded then, rendered in the fallback in every load on every profile. It is preloaded since, and its fallback is a monospace stack ([design.md](../design.md#fonts)).
+- So the fonts are few and small enough to arrive with the first paint on Fast 4G: one family for text and headings ([ADR-0017](../decisions/ADR-0017-one-font-for-text-and-headings.md)), Hind Siliguri at 400, 500 and 600 only (no 700), and JetBrains Mono's Latin subset. A new font, weight or subset is measured with `pnpm measure:fonts` on a deployed preview before it is added.
 - Font families and weights: [design.md](../design.md#fonts).
 
 ## Build-time rendering instead of client libraries
@@ -116,9 +122,9 @@ The same 9 files load on all three pages, 379.4 KB in all (transfer size, from L
 | JetBrains Mono · variable · Latin | 40.1 KB      | no                     |
 | **Total**                         | **379.4 KB** | 8 preloaded (339.3 KB) |
 
-- They do not delay LCP: every `@font-face` uses `font-display: swap` with a metric-matched fallback (`next/font`), Lighthouse's font-display check passes, and in these runs every font had finished (94–147 ms) before the first paint (205–228 ms observed), where LCP equals FCP. The LCP element is text: Home's heading, the lesson's description, the Map's summary.
+- They do not delay LCP: every `@font-face` uses `font-display: swap` with a metric-matched fallback (`next/font`), Lighthouse's font-display check passes, and in these runs every font had finished (94–147 ms) before the first paint (205–228 ms observed), where LCP equals FCP. The LCP element is text: Home's heading, the lesson's description, the Map's summary. That holds on localhost only: on the live site with a Fast 4G connection, Anek Bangla arrived after the first paint ([Fonts](#fonts)).
 - JetBrains Mono loads on all three pages, because each shows some monospace text (track numbers, lesson numbers, code). It was not preloaded in these runs; it has been since 2026-11-18, because a code font fetched after the CSS missed `display: optional`'s window and code stayed in the fallback for the whole visit. As built, the 9 preloaded files are 374.5 KB (file sizes; the table above shows Lighthouse's transfer sizes).
-- The largest single file is Anek Bangla's Bangla subset (152.8 KB, the variable font). It is the first candidate if font bytes ever need to shrink.
+- The largest single file was Anek Bangla's Bangla subset (152.8 KB, the variable font). Anek Bangla was removed on 2026-11-18 ([ADR-0017](../decisions/ADR-0017-one-font-for-text-and-headings.md)): as built, the preloaded fonts went from 9 files, 374.5 KB, to 7 files, 180.4 KB (Hind Siliguri's six files, 140.8 KB, and JetBrains Mono's Latin file, 39.5 KB).
 
 ## With reader progress (2026-11-15, end of Phase 3)
 

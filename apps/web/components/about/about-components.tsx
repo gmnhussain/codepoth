@@ -4,7 +4,7 @@ import { PrivacySection } from "@/components/about/privacy-section"
 import { proseComponents } from "@/components/mdx/prose-components"
 
 function Heading2(props: ComponentProps<"h2">) {
-  return <h2 className="text-2xl font-bold" {...props} />
+  return <h2 className="text-2xl font-semibold" {...props} />
 }
 
 function Heading3(props: ComponentProps<"h3">) {

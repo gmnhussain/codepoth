@@ -40,7 +40,7 @@ export default function AboutPage() {
         className="mx-auto flex max-w-3xl flex-col gap-8 px-4 py-12 sm:px-8"
       >
         <header className="flex flex-col gap-2">
-          <h1 className="text-4xl font-bold sm:text-5xl">{page.title}</h1>
+          <h1 className="text-4xl font-semibold sm:text-5xl">{page.title}</h1>
           <p className="text-lg leading-reading text-foreground/80">
             {page.description}
           </p>

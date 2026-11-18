@@ -132,7 +132,7 @@ export function LessonHeader({
         )}
       </div>
 
-      <h1 className="text-4xl font-bold sm:text-5xl">{lesson.title}</h1>
+      <h1 className="text-4xl font-semibold sm:text-5xl">{lesson.title}</h1>
       {lesson.description === undefined ? null : (
         <p className="text-lg leading-reading text-foreground/80">
           {lesson.description}

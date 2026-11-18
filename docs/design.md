@@ -8,21 +8,21 @@ Tokens are CSS variables mapped onto the shadcn theme variables in `packages/ui`
 
 ## Fonts
 
-Loading rules (`next/font`, subsets, `display: "optional"`): [performance.md](development/performance.md#fonts). On a slow first visit a page may render in the system's fallback fonts; the next page uses the web fonts. Loaded in `apps/web/app/layout.tsx`.
+Loading rules (`next/font`, subsets, `display: "optional"`): [performance.md](development/performance.md#fonts). On a slow first visit a font may miss the first paint; the page then stays in the system's fallback for that font, including client-side navigations, until the next full page load. Loaded in `apps/web/app/layout.tsx`.
 
-| Font           | Use                    | Loaded as                     | Utility        |
-| -------------- | ---------------------- | ----------------------------- | -------------- |
-| Anek Bangla    | headings (`h1`–`h4`)   | variable font, one file       | `font-heading` |
-| Hind Siliguri  | body, UI               | static, weights 400, 500, 600 | `font-sans`    |
-| JetBrains Mono | code, numbers in chips | variable font, Latin only     | `font-mono`    |
+| Font           | Use                               | Loaded as                     | Utility                     |
+| -------------- | --------------------------------- | ----------------------------- | --------------------------- |
+| Hind Siliguri  | body, UI and headings (`h1`–`h4`) | static, weights 400, 500, 600 | `font-sans`, `font-heading` |
+| JetBrains Mono | code, numbers in chips            | variable font, Latin only     | `font-mono`                 |
 
-- next/font exposes `--font-display` and `--font-body`, and `layout.tsx` sets `--font-code` (see the Turbopack note below); `globals.css` maps them to `font-heading`, `font-sans` and `font-mono`. The names differ from the Tailwind theme variables so no variable refers to itself.
+- One font for text and headings ([ADR-0017](decisions/ADR-0017-one-font-for-text-and-headings.md)): Anek Bangla, the former heading font, missed the first paint on most mobile first visits. `font-heading` stays as an alias of the body font, so a separate heading font is a change to one line in `globals.css` plus loading it, after measuring it with `pnpm measure:fonts`.
+- next/font exposes `--font-body`, and `layout.tsx` sets `--font-code` (see the Turbopack note below); `globals.css` maps them to `font-sans`, `font-heading` and `font-mono`. The names differ from the Tailwind theme variables so no variable refers to itself.
 - Code shows no ligatures (`font-variant-ligatures: none` in `globals.css`), so `=>` and `!==` look the way a beginner types them.
 - JetBrains Mono has no Bangla glyphs, so `font-mono` falls back to Hind Siliguri for Bangla text in code (comments, strings).
 - When JetBrains Mono is not used (it missed the first paint, or failed), code falls back to a system monospace face, not to Arial: `ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace`, then Hind Siliguri. None of these faces has Bangla glyphs, so Bangla in code still renders in Hind Siliguri. The generic `monospace` comes before the body font so Android, which has none of the named faces, still gets a monospaced face for Latin.
 - The code font is loaded with `adjustFontFallback: false`, but Turbopack in Next 16.4.5 ignores that option for `next/font/google` (webpack honours it) and still adds a metric-adjusted Arial fallback to the font's family list. So `layout.tsx` sets `--font-code` on `<html>` itself, to JetBrains Mono's family alone, instead of using next/font's `variable`. Re-check on every Next upgrade and go back to `codeFont.variable` once the option works.
-- All three fonts are preloaded: Anek Bangla and Hind Siliguri with Bangla + Latin subsets, JetBrains Mono with Latin only. That is 9 files, 374.5 KB as built (measured on 2026-11-18). Every page shows some monospace text, so the code font loads everywhere anyway. Measured with Lighthouse on 2026-11-15 on Home, a lesson and the Map: fonts finish before the first paint and do not delay LCP (measured with `font-display: swap`; `optional` renders such loads the same way). Per-file numbers: [performance.md](development/performance.md#font-bytes).
-- Heading weights in use: 500–700. Body line height: `leading-reading` (1.85, see [Type scale](#type-scale)).
+- Both fonts are preloaded: Hind Siliguri with Bangla + Latin subsets, JetBrains Mono with Latin only. That is 7 files, 180.4 KB as built (measured on 2026-11-18; 9 files, 374.5 KB with Anek Bangla). Every page shows some monospace text, so the code font loads everywhere anyway. Whether they make the first paint depends on the connection: on the live site, unthrottled loads render every font, and on Chrome DevTools' Fast 4G preset Hind Siliguri renders while Anek Bangla's 152 KB file did not ([performance.md](development/performance.md#fonts)). Per-file numbers: [performance.md](development/performance.md#font-bytes).
+- Weights in use: 400, 500 and 600, the ones loaded. Headings are `font-semibold` (600); their size carries the hierarchy. Nothing in Hind Siliguri uses 700 (`font-bold`), which would be a synthesized bold; `b` and `strong` are semibold too. Body line height: `leading-reading` (1.85, see [Type scale](#type-scale)).
 
 ## Colors
 

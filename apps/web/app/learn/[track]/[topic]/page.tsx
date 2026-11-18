@@ -130,7 +130,7 @@ export default async function TopicPage({ params }: TopicPageProps) {
             {/* The search index reads the title and description; each lesson
                 is its own result (ADR-0015). */}
             <div data-pagefind-body="" className="flex flex-col gap-4">
-              <h1 className="text-4xl font-bold break-words sm:text-6xl">
+              <h1 className="text-4xl font-semibold break-words sm:text-6xl">
                 {topic.title}
               </h1>
               <p className="max-w-3xl text-lg leading-reading text-foreground/80">

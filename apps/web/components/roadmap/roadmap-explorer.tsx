@@ -234,7 +234,7 @@ export function RoadmapExplorer({
         className="flex shrink-0 flex-col gap-3.5 px-4 pt-6 pb-3 md:w-75 md:overflow-y-auto md:border-e md:py-5"
       >
         <div className="flex flex-col gap-1 md:px-2">
-          <h1 id="roadmap-title" className="text-3xl font-bold">
+          <h1 id="roadmap-title" className="text-3xl font-semibold">
             {title}
           </h1>
           <p className="text-sm leading-relaxed text-muted-foreground">

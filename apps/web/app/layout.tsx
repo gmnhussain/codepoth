@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { Anek_Bangla, Hind_Siliguri, JetBrains_Mono } from "next/font/google"
+import { Hind_Siliguri, JetBrains_Mono } from "next/font/google"
 
 import "@workspace/ui/globals.css"
 import { site } from "@workspace/config/site"
@@ -13,18 +13,14 @@ import { SiteHeader } from "@/components/site-header"
 import { SkipLink } from "@/components/skip-link"
 import { ThemeProvider } from "@/components/theme-provider"
 
-// Fonts and weights: docs/design.md#fonts. Anek Bangla is variable, so it loads
-// as one file without a weight list (docs/development/performance.md#fonts).
-// `optional`: a font not ready by the first paint is not swapped in later,
-// so web fonts never re-wrap text under the reader; the next page uses it
-// from the cache (performance.md#fonts).
-const displayFont = Anek_Bangla({
-  subsets: ["bengali", "latin"],
-  display: "optional",
-  variable: "--font-display",
-})
+// Fonts and weights: docs/design.md#fonts; one body font for text and
+// headings (ADR-0017). `optional`: a font not ready by the first paint is
+// not swapped in later, so web fonts never re-wrap text under the reader; a
+// face that misses it stays in the fallback until the next full page load
+// (docs/development/performance.md#fonts).
 
 // Hind Siliguri has no variable version, so each weight in use is listed.
+// No 700: headings use 600, and their size carries the hierarchy.
 const bodyFont = Hind_Siliguri({
   subsets: ["bengali", "latin"],
   weight: ["400", "500", "600"],
@@ -78,11 +74,7 @@ export default function RootLayout({
     <html
       lang="bn"
       suppressHydrationWarning
-      className={cn(
-        "font-sans antialiased",
-        displayFont.variable,
-        bodyFont.variable
-      )}
+      className={cn("font-sans antialiased", bodyFont.variable)}
       style={htmlStyle}
     >
       <body className="flex min-h-svh flex-col">
