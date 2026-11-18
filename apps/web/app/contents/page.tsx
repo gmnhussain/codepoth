@@ -75,7 +75,7 @@ export default function ContentsPage() {
                 <dt className="text-sm font-semibold text-muted-foreground">
                   {stat.label}
                 </dt>
-                <dd className="font-heading text-3xl font-bold">
+                <dd className="font-heading text-3xl font-semibold">
                   {formatNumber(stat.value)}
                 </dd>
               </div>
@@ -84,7 +84,7 @@ export default function ContentsPage() {
               <dt className="text-sm font-semibold text-muted-foreground">
                 {t("contents.statRead")}
               </dt>
-              <dd className="font-heading text-3xl font-bold">
+              <dd className="font-heading text-3xl font-semibold">
                 <ReadCount lessonIds={lessons.map((lesson) => lesson.id)} />
               </dd>
             </div>

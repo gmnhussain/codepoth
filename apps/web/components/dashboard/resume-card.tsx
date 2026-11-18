@@ -43,7 +43,7 @@ export function ResumeCard({
       </h2>
       <div className="flex flex-col gap-1">
         <span className="text-sm text-foreground/80">{path}</span>
-        <span className="font-heading text-2xl leading-snug font-bold">
+        <span className="font-heading text-2xl leading-snug font-semibold">
           {resume.title}
         </span>
       </div>

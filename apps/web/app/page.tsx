@@ -176,7 +176,7 @@ export default function HomePage() {
               )}
             >
               <dt className="text-sm text-muted-foreground">{stat.label}</dt>
-              <dd className="font-heading text-3xl font-bold whitespace-nowrap">
+              <dd className="font-heading text-3xl font-semibold whitespace-nowrap">
                 {t("home.statValue", { n: formatNumber(stat.value) })}
               </dd>
             </div>

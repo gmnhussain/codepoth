@@ -64,7 +64,7 @@ export function OverallCard({
         className="flex-col gap-4 [&_[data-slot=progress-indicator]]:bg-foreground [&_[data-slot=progress-indicator]]:motion-reduce:transition-none [&_[data-slot=progress-track]]:h-2.5"
       >
         <div className="flex flex-wrap items-end gap-x-6 gap-y-2">
-          <span className="font-heading text-6xl leading-none font-bold">
+          <span className="font-heading text-6xl leading-none font-semibold">
             {t("dashboard.percent", { n: percent })}
           </span>
           <span className="pb-1 text-foreground/80">

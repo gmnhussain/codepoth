@@ -45,7 +45,7 @@ export function AuthorCard() {
       <div className="flex items-center gap-4">
         <span
           aria-hidden="true"
-          className="flex size-16 shrink-0 items-center justify-center rounded-full border bg-muted font-heading text-xl font-bold text-foreground/80"
+          className="flex size-16 shrink-0 items-center justify-center rounded-full border bg-muted font-heading text-xl font-semibold text-foreground/80"
         >
           {initialsOf(author.name.bn)}
         </span>

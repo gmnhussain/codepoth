@@ -66,7 +66,7 @@ export function TopicProgressCard({
       getAriaValueText={() => progressText}
       className="flex-col gap-3 [&_[data-slot=progress-indicator]]:bg-track-dot [&_[data-slot=progress-indicator]]:motion-reduce:transition-none [&_[data-slot=progress-track]]:h-2.5"
     >
-      <ProgressLabel className="font-heading text-3xl leading-tight font-bold">
+      <ProgressLabel className="font-heading text-3xl leading-tight font-semibold">
         {progressText}
       </ProgressLabel>
     </Progress>

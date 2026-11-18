@@ -26,7 +26,7 @@ export function BrandLink({
       className="flex min-h-11 shrink-0 items-center gap-2.5 self-start rounded-lg"
     >
       <Logo className="size-7" />
-      <span className="font-heading text-2xl leading-none font-bold">
+      <span className="font-heading text-2xl leading-none font-semibold">
         {site.name.bn}
       </span>
       {/* Keeps the words apart in the name; flex ignores it on screen. */}{" "}
