@@ -65,4 +65,5 @@ Run from the repo root.
 - `pnpm test:commit-msg`: test the commit message rules
 - `pnpm test`: run every package's Vitest tests (unit, label sets, theme contrast, content validation)
 - `pnpm lighthouse <path>… [--progress]`: Lighthouse by the baseline method on the build in `.next` (build with drafts first); `next start` on port 3419. See [performance.md](docs/development/performance.md#targets-and-measurement)
+- `pnpm measure:fonts <url> [path…]`: first-visit font loading on a deployed site (fresh context, cache disabled, no throttling / Fast 4G / Slow 4G). Run it in PowerShell. See [performance.md](docs/development/performance.md#targets-and-measurement)
 - `pnpm test:e2e`: build with drafts and run the Playwright suite, then build without drafts and run the smoke tests (`next start` on port 3418). `--only drafts|published` runs one build, `--skip-build` tests the build already in `.next`, other arguments go to Playwright. First time: `pnpm --filter web exec playwright install chromium`

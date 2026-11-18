@@ -11,7 +11,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:e2e": "node scripts/e2e.ts",
-    "lighthouse": "node scripts/lighthouse.ts"
+    "lighthouse": "node scripts/lighthouse.ts",
+    "measure:fonts": "node scripts/measure-fonts.ts"
   },
   "dependencies": {
     "@mdx-js/mdx": "catalog:",
