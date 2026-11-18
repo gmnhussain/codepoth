@@ -116,7 +116,7 @@ The same 9 files load on all three pages, 379.4 KB in all (transfer size, from L
 | **Total**                         | **379.4 KB** | 8 preloaded (339.3 KB) |
 
 - They do not delay LCP: every `@font-face` uses `font-display: swap` with a metric-matched fallback (`next/font`), Lighthouse's font-display check passes, and in these runs every font had finished (94–147 ms) before the first paint (205–228 ms observed), where LCP equals FCP. The LCP element is text: Home's heading, the lesson's description, the Map's summary.
-- JetBrains Mono is not preloaded but loads on all three pages, because each shows some monospace text (track numbers, lesson numbers, code). On a slow connection that is 40 KB fetched after the CSS.
+- JetBrains Mono loads on all three pages, because each shows some monospace text (track numbers, lesson numbers, code). It was not preloaded in these runs; it has been since 2026-11-18, because a code font fetched after the CSS missed `display: optional`'s window and code stayed in the fallback for the whole visit. As built, the 9 preloaded files are 374.5 KB (file sizes; the table above shows Lighthouse's transfer sizes).
 - The largest single file is Anek Bangla's Bangla subset (152.8 KB, the variable font). It is the first candidate if font bytes ever need to shrink.
 
 ## With reader progress (2026-11-15, end of Phase 3)

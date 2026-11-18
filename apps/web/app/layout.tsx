@@ -33,12 +33,9 @@ const bodyFont = Hind_Siliguri({
 })
 
 // No Bangla subset; Bangla characters in code fall back to the body font.
-// Not preloaded: code is rarely above the fold, and preloading would add
-// ~40 KB to every page.
 const codeFont = JetBrains_Mono({
   subsets: ["latin"],
   display: "optional",
-  preload: false,
   variable: "--font-code",
 })
 
