@@ -11,10 +11,21 @@ const CODE_FONT_FAMILY = "JetBrains Mono"
  */
 const DIGITS_FONT_FAMILY = "banglaDigits"
 
-/** Absolute URLs of every file the page's `@font-face` rules for `family` use. */
-function fontFaceUrls(page: Page, family: string): Promise<string[]> {
+/** One `@font-face` rule of the page, its `url()`s made absolute. */
+type FontFaceRule = {
+  readonly family: string
+  readonly weight: string
+  readonly unicodeRange: string
+  /** The `src` descriptor with every `url()` absolute. */
+  readonly src: string
+  readonly urls: readonly string[]
+}
+
+/** The page's `@font-face` rules for `family`. */
+function fontFaceRules(page: Page, family: string): Promise<FontFaceRule[]> {
   return page.evaluate((wanted) => {
-    const urls: string[] = []
+    const URL_PATTERN = /url\(\s*["']?([^"')]+)["']?\s*\)/g
+    const found: FontFaceRule[] = []
     for (const sheet of Array.from(document.styleSheets)) {
       const base = sheet.href ?? document.baseURI
       for (const rule of Array.from(sheet.cssRules)) {
@@ -23,15 +34,31 @@ function fontFaceUrls(page: Page, family: string): Promise<string[]> {
           .getPropertyValue("font-family")
           .replace(/^["']|["']$/g, "")
         if (name !== wanted) continue
-        const src = rule.style.getPropertyValue("src")
-        for (const match of src.matchAll(/url\(\s*["']?([^"')]+)["']?\s*\)/g)) {
-          const url = match[1]
-          if (url !== undefined) urls.push(new URL(url, base).href)
-        }
+        const urls: string[] = []
+        const src = rule.style
+          .getPropertyValue("src")
+          .replace(URL_PATTERN, (_, url: string) => {
+            const absolute = new URL(url, base).href
+            urls.push(absolute)
+            return `url("${absolute}")`
+          })
+        found.push({
+          family: name,
+          weight: rule.style.getPropertyValue("font-weight") || "400",
+          unicodeRange:
+            rule.style.getPropertyValue("unicode-range") || "U+0-10FFFF",
+          src,
+          urls,
+        })
       }
     }
-    return urls
+    return found
   }, family)
+}
+
+/** Absolute URLs of every file the page's `@font-face` rules for `family` use. */
+async function fontFaceUrls(page: Page, family: string): Promise<string[]> {
+  return (await fontFaceRules(page, family)).flatMap((rule) => rule.urls)
 }
 
 /** Absolute URLs of the page's `<link rel="preload" as="font">` elements. */
@@ -198,11 +225,9 @@ test.describe("fonts", { tag: "@both" }, () => {
         status: face.status,
       }))
     }, DIGITS_FONT_FAMILY)
-    expect(faces.map((face) => face.weight).sort()).toEqual([
-      "400",
-      "500",
-      "600",
-    ])
+    expect(faces.map((face) => face.weight).sort()).toEqual(
+      [...DIGIT_WEIGHTS].sort()
+    )
     for (const face of faces) {
       expect(face.range, face.weight).toBe("U+9E6-9EF")
       expect(face.status, face.weight).toBe("loaded")
@@ -222,26 +247,37 @@ test.describe("fonts", { tag: "@both" }, () => {
     await page.goto("/")
     // `font-display: swap`: once a weight has loaded, digits render in it.
     await page.evaluate(
-      async ([family, digit]) => {
+      async ({ family, digit, weights }) => {
         await Promise.all(
-          ["400", "500", "600"].map((weight) =>
+          weights.map((weight) =>
             document.fonts.load(`${weight} 16px ${family}`, digit)
           )
         )
         await document.fonts.ready
       },
-      [DIGITS_FONT_FAMILY, DIGITS.charAt(0)] as const
-    )
-    for (const weight of DIGIT_WEIGHTS) {
-      const isDigitsFace = (family: string) =>
-        family.startsWith(DIGITS_FACE_NAME)
-      const forDigits = await renderedFamilies(page, DIGITS, weight)
-      expect(forDigits.length, `digits at ${weight}`).toBeGreaterThan(0)
-      expect(forDigits.every(isDigitsFace), `digits at ${weight}`).toBe(true)
-      for (const text of [LATIN, BANGLA]) {
-        const families = await renderedFamilies(page, text, weight)
-        expect(families.some(isDigitsFace), `${text} at ${weight}`).toBe(false)
+      {
+        family: DIGITS_FONT_FAMILY,
+        digit: DIGITS.charAt(0),
+        weights: DIGIT_WEIGHTS,
       }
+    )
+    const renderedFamilies = await openFontProbe(page)
+    try {
+      for (const weight of DIGIT_WEIGHTS) {
+        const isDigitsFace = (family: string) =>
+          family.startsWith(DIGITS_FACE_NAME)
+        const forDigits = await renderedFamilies(DIGITS, weight)
+        expect(forDigits.length, `digits at ${weight}`).toBeGreaterThan(0)
+        expect(forDigits.every(isDigitsFace), `digits at ${weight}`).toBe(true)
+        for (const text of [LATIN, BANGLA]) {
+          const families = await renderedFamilies(text, weight)
+          expect(families.some(isDigitsFace), `${text} at ${weight}`).toBe(
+            false
+          )
+        }
+      }
+    } finally {
+      await renderedFamilies.close()
     }
   })
 
@@ -256,33 +292,13 @@ test.describe("fonts", { tag: "@both" }, () => {
   }) => {
     await page.goto("/")
     const results = await page.evaluate(
-      async ({ body, digits, samples, weights }) => {
-        const rulesOf = (family: string) => {
-          const found: CSSFontFaceRule[] = []
-          for (const sheet of Array.from(document.styleSheets)) {
-            for (const rule of Array.from(sheet.cssRules)) {
-              if (!(rule instanceof CSSFontFaceRule)) continue
-              const name = rule.style
-                .getPropertyValue("font-family")
-                .replace(/^["']|["']$/g, "")
-              if (name === family) found.push(rule)
-            }
-          }
-          return found
-        }
+      async ({ bodyRules, digitRules, samples, weights }) => {
         // Test-only copies of every face of a family, loaded now.
-        const copy = async (family: string, as: string) => {
-          const faces = rulesOf(family).map((rule) => {
-            const src = rule.style.getPropertyValue("src")
-            const base = rule.parentStyleSheet?.href ?? document.baseURI
-            const resolved = src.replace(
-              /url\(\s*["']?([^"')]+)["']?\s*\)/g,
-              (_, url: string) => `url("${new URL(url, base).href}")`
-            )
-            const face = new FontFace(as, resolved, {
-              weight: rule.style.getPropertyValue("font-weight") || "400",
-              unicodeRange:
-                rule.style.getPropertyValue("unicode-range") || "U+0-10FFFF",
+        const copy = async (rules: readonly FontFaceRule[], as: string) => {
+          const faces = rules.map((rule) => {
+            const face = new FontFace(as, rule.src, {
+              weight: rule.weight,
+              unicodeRange: rule.unicodeRange,
             })
             document.fonts.add(face)
             return face
@@ -290,8 +306,8 @@ test.describe("fonts", { tag: "@both" }, () => {
           await Promise.all(faces.map((face) => face.load()))
           return faces.length
         }
-        const bodyFaces = await copy(body, "TestBody")
-        const digitFaces = await copy(digits, "TestDigits")
+        const bodyFaces = await copy(bodyRules, "TestBody")
+        const digitFaces = await copy(digitRules, "TestDigits")
         const measure = (
           text: string,
           family: string,
@@ -327,8 +343,8 @@ test.describe("fonts", { tag: "@both" }, () => {
         return { bodyFaces, digitFaces, rows }
       },
       {
-        body: BODY_FONT_FAMILY,
-        digits: DIGITS_FONT_FAMILY,
+        bodyRules: await fontFaceRules(page, BODY_FONT_FAMILY),
+        digitRules: await fontFaceRules(page, DIGITS_FONT_FAMILY),
         samples: WIDTH_SAMPLES,
         weights: DIGIT_WEIGHTS,
       }
@@ -353,35 +369,37 @@ test.describe("fonts", { tag: "@both" }, () => {
 })
 
 /**
- * The font families Chrome used to draw `text` in a `font-sans` span at
- * `weight` (DevTools protocol), deduplicated.
+ * Opens one DevTools protocol session on `page` and returns a function that
+ * tells the font families Chrome used to draw `text` in a `font-sans` span
+ * at `weight`, deduplicated. Call `close()` when done.
  */
-async function renderedFamilies(
-  page: Page,
-  text: string,
-  weight: string
-): Promise<string[]> {
-  await page.evaluate(
-    ([content, fontWeight]) => {
-      const span = document.createElement("span")
-      span.id = "font-probe"
-      span.className = "font-sans"
-      span.style.fontWeight = fontWeight
-      span.textContent = content
-      document.body.append(span)
-    },
-    [text, weight] as const
-  )
+async function openFontProbe(page: Page): Promise<{
+  (text: string, weight: string): Promise<string[]>
+  close: () => Promise<void>
+}> {
   const cdp = await page.context().newCDPSession(page)
   await cdp.send("DOM.enable")
   await cdp.send("CSS.enable")
   const { root } = await cdp.send("DOM.getDocument")
-  const { nodeId } = await cdp.send("DOM.querySelector", {
-    nodeId: root.nodeId,
-    selector: "#font-probe",
-  })
-  const { fonts } = await cdp.send("CSS.getPlatformFontsForNode", { nodeId })
-  await cdp.detach()
-  await page.evaluate(() => document.getElementById("font-probe")?.remove())
-  return [...new Set(fonts.map((font) => font.familyName))]
+  const probe = async (text: string, weight: string) => {
+    await page.evaluate(
+      ([content, fontWeight]) => {
+        const span = document.createElement("span")
+        span.id = "font-probe"
+        span.className = "font-sans"
+        span.style.fontWeight = fontWeight
+        span.textContent = content
+        document.body.append(span)
+      },
+      [text, weight] as const
+    )
+    const { nodeId } = await cdp.send("DOM.querySelector", {
+      nodeId: root.nodeId,
+      selector: "#font-probe",
+    })
+    const { fonts } = await cdp.send("CSS.getPlatformFontsForNode", { nodeId })
+    await page.evaluate(() => document.getElementById("font-probe")?.remove())
+    return [...new Set(fonts.map((font) => font.familyName))]
+  }
+  return Object.assign(probe, { close: () => cdp.detach() })
 }
