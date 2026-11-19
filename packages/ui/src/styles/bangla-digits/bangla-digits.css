@@ -1,0 +1,47 @@
+/*
+ * Bangla digits ০–৯ (U+09E6–U+09EF): Noto Sans Bengali's shapes with Hind
+ * Siliguri's advance widths and line metrics, made by make-digits.py in this
+ * folder (README.md, ADR-0017). globals.css imports this file and puts
+ * --font-digits first in font-sans and font-heading and right after the code
+ * font in font-mono; unicode-range leaves every other character to the faces
+ * after it, and a page downloads a weight only when it shows digits in it.
+ *
+ * Separate files, not preloaded and not inlined: inlined they made the
+ * render-blocking stylesheet about 6 KB gzip larger, and preloaded they
+ * queued in front of the body font's files. `font-display: swap`, unlike the
+ * site's other fonts (`optional`): every digit is exactly as wide as Hind
+ * Siliguri's at the same weight, and the line metrics are Hind's, so when
+ * the face arrives the swap changes only the digits' shapes, never a line
+ * break or a line height, and text is never invisible meanwhile.
+ */
+
+:root {
+  --font-digits: banglaDigits;
+}
+
+@font-face {
+  font-family: banglaDigits;
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  unicode-range: U+09E6-09EF;
+  src: url("./bangla-digits-400.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: banglaDigits;
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  unicode-range: U+09E6-09EF;
+  src: url("./bangla-digits-500.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: banglaDigits;
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  unicode-range: U+09E6-09EF;
+  src: url("./bangla-digits-600.woff2") format("woff2");
+}

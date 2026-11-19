@@ -13,7 +13,7 @@ Every route is pre-rendered ([ADR-0004](../decisions/ADR-0004-vercel-ssg-not-sta
 
 ## Fonts
 
-- Load every font with `next/font`, with `subsets: ["bengali", "latin"]` for the Bangla font, `display: "optional"`, and a preload: every page uses both fonts.
+- Load every font file with `next/font`, with `subsets: ["bengali", "latin"]` for the Bangla font, `display: "optional"`, and a preload: every page uses both fonts. The one exception is the Bangla digits face: about 1.8 KB per weight, declared in the stylesheet with `font-display: swap` and not preloaded. Its digits have Hind Siliguri's widths and line metrics, so the swap changes only their shapes, never a line break ([ADR-0017](../decisions/ADR-0017-one-font-for-text-and-headings.md), [measurements](#bangla-digits-2026-11-19)).
 - Why `optional`, not `swap`: a web font that arrives after the first paint makes text re-wrap, because the fallback fonts (Nirmala UI, Noto Sans Bengali, Arial…) are not the same width. With `swap`, the end-to-end sweep (Phase 5) measured layout shifts of up to 0.26 on slow loads at 320 px, from chips, breadcrumbs, stats and filter rows changing their line count, and 0.13 on `/contents` when JetBrains Mono (not preloaded then) arrived about 2 s in.
 - With `optional`, a face that is not ready by the first paint is not swapped in later: it stays in the fallback for the whole document, including client-side navigations, which keep the document. It still downloads, so the next full page load (a reload, or a new visit while it is cached) uses it. Measured on a throttled first load (150 ms latency, 1.6 Mbps): the page stays in the fallback fonts with a layout shift of 0.
 - Fonts do not always make the first paint. Lighthouse on localhost showed every font finishing before it ([Font bytes](#font-bytes)), but a deployed site on a mobile connection does not. Measured on the live site on 2026-11-18 with `pnpm measure:fonts` ([method](#targets-and-measurement); `/`, `/roadmap`, `/contents`, 3 runs each), before [ADR-0017](../decisions/ADR-0017-one-font-for-text-and-headings.md):
@@ -245,3 +245,86 @@ Phase 5 added tests, not browser code: its fixes (names, focusable regions, layo
 ### End-to-end sweep
 
 `pnpm test:e2e` ([conventions §14](conventions.md#14-testing)) loads every route at 320, 768 and 1280px in light and dark: 1,413 loads on the build with drafts (about 11–15 minutes locally on 6 workers) and 42 on the build without. On the final run the largest layout shift on any route was 0.0000, with no sideways scroll, console error or axe-core violation. On its first runs the sweep found what Phase 5 fixed: names that left out visible text, scroll areas the keyboard could not reach, sideways scroll at 320px, and the font-swap shifts.
+
+## Bangla digits (2026-11-19)
+
+Hind Siliguri's ১ reads poorly, so the Bangla digits come from their own face ([ADR-0017](../decisions/ADR-0017-one-font-for-text-and-headings.md), [design.md](../design.md#fonts)). The final setup, **files-swap**: width-matched digits (Noto Sans Bengali's shapes, Hind Siliguri's advance widths and line metrics) as three separate woff2 files, `font-display: swap`, not preloaded. It was measured with the earlier attempts on local production builds with drafts (`next start`, which serves HTTP/1.1, so at most 6 connections per host), against the Hind-only build (`dde4d8a`). A deployed-preview measurement (HTTP/2) is still to come.
+
+### Font loading
+
+`pnpm measure:fonts http://localhost:3419 --runs 5` ([method](#targets-and-measurement)): `/`, `/roadmap`, `/contents`, 15 loads per profile. Each cell is the number of loads in which a face fell back.
+
+| Profile       | Face                 | Hind only   | Inlined width-matched, `swap` | **Files-swap (final)** |
+| ------------- | -------------------- | ----------- | ----------------------------- | ---------------------- |
+| No throttling | Hind 400 / 500 / 600 | 0 / 1 / 1   | 0 / 0 / 0                     | 0 / 0 / 0              |
+|               | JetBrains Mono       | 1           | 0                             | 0                      |
+|               | first paint          | 0.25–0.32 s | 0.18–0.20 s                   | 0.14–0.19 s            |
+| Fast 4G       | Hind 400 / 500 / 600 | 0 / 0 / 5   | 0 / 0 / 0                     | 0 / 0 / 5              |
+|               | JetBrains Mono       | 0           | 0                             | 0                      |
+|               | first paint          | 0.70–0.75 s | 0.68–0.71 s                   | 0.70–0.76 s            |
+| Slow 4G       | Hind 400 / 500 / 600 | 0 / 0 / 15  | 0 / 0 / 15                    | 0 / 0 / 15             |
+|               | JetBrains Mono       | 15          | 15                            | 15                     |
+|               | first paint          | 1.67–1.76 s | 1.85–1.95 s                   | 1.67–1.77 s            |
+| CSS           | files, gzip          | 1, 14.0 KB  | 1, 20.2 KB                    | 1, 14.0 KB             |
+
+- With `swap` the digits never stay in the fallback: they swap in when their file arrives. The probe of `measure:fonts` draws every face once the page has loaded, which also fetches digit weights the page never used, so for files-swap its "fonts done" column (up to 2.85 s on Fast 4G and 8.4 s on Slow 4G) overstates when the page's own digit files arrive. Those were timed separately, from the resource timings of the files the page itself requested (5 loads per page and profile, median and range):
+
+  | Profile       | First paint    | Digit files done | Hind's digits shown before the swap |
+  | ------------- | -------------- | ---------------- | ----------------------------------- |
+  | No throttling | 192–244 ms     | 69–97 ms         | 0 ms (done before the first paint)  |
+  | Fast 4G       | 692–740 ms     | 720–903 ms       | 17–143 ms (0–193 ms)                |
+  | Slow 4G       | 1,676–1,772 ms | 2,679–2,705 ms   | 944–1,011 ms (923–1,035 ms)         |
+
+- Preloaded fonts are unchanged by the digits: Hind Siliguri's six files and JetBrains Mono's Latin file, 7 files, 180.4 KB. A page fetches only the digit weights it shows (1,752–1,772 B each).
+- Hind Siliguri 600 misses in about a third of local Fast 4G loads (5 of 15, all on `/contents`) and in every Slow 4G load, with or without the digits; 400 and 500 never missed.
+
+Earlier attempts, same method:
+
+| Profile       | Face                   | Hind only      | Noto digits, 3 preloaded files, `optional` | Noto inlined, `optional`, own stylesheet | Noto inlined, `block`, one stylesheet |
+| ------------- | ---------------------- | -------------- | ------------------------------------------ | ---------------------------------------- | ------------------------------------- |
+| No throttling | digits 400 / 500 / 600 | n/a            | 0 / 0 / 0                                  | 3 / 13 / 3                               | 0 / 0 / 0                             |
+|               | Hind 400 / 500 / 600   | 0 / 1 / 1      | 0 / 0 / 0                                  | 0 / 0 / 0                                | 0 / 0 / 0                             |
+|               | JetBrains Mono         | 1              | 0                                          | 0                                        | 0                                     |
+|               | first paint            | 0.25–0.32 s    | 0.20–0.27 s                                | 0.20 s                                   | 0.18–0.19 s                           |
+| Fast 4G       | digits 400 / 500 / 600 | n/a            | 8 / 10 / 11                                | 0 / 10 / 0                               | 0 / 0 / 0                             |
+|               | Hind 400 / 500 / 600   | 0 / 0 / 5      | 0 / 0 / 7                                  | 0 / 0 / 0                                | 0 / 0 / 0                             |
+|               | JetBrains Mono         | 0              | 0                                          | 0                                        | 0                                     |
+|               | first paint            | 0.70–0.75 s    | 0.68–0.79 s                                | 0.70–0.78 s                              | 0.68–0.71 s                           |
+| Slow 4G       | digits 400 / 500 / 600 | n/a            | 15 / 15 / 15                               | 13 / 15 / 13                             | 0 / 0 / 0                             |
+|               | Hind 400 / 500 / 600   | 0 / 0 / 15     | 0 / 0 / 15                                 | 0 / 0 / 10                               | 0 / 0 / 15                            |
+|               | JetBrains Mono         | 15             | 15                                         | 2                                        | 15                                    |
+|               | first paint            | 1.67–1.76 s    | 1.68–1.76 s                                | 2.12 s                                   | 1.83–1.95 s                           |
+| CSS           | files, gzip            | 1, about 14 KB | 1, 14.0 KB                                 | 2, 19.3 KB                               | 1, 20.2 KB                            |
+
+- As preloaded files, Noto's digits queued behind the body font's preloads and missed, and pushed Hind Siliguri 600's Fast 4G misses from 5 to 7; inlined with `optional`, the face needed for the first paint missed because its decode starts at first use and Chrome paints before it ends; as its own stylesheet it added a second render-blocking request (Slow 4G first paint about 0.45 s later); inlined with `block`, the digits rendered in every load but cost about 6 KB gzip of CSS and re-wrapped text (below).
+
+### Layout shift
+
+- **Re-wrapping with Noto's own widths.** Noto's digits are all 0.592 em wide, Hind's are proportional (১ is 0.500 em), so "১১ নভেম্বর, ২০২৬" is about 11% wider in Noto. With the inlined `block` variant, text laid out with Hind's digits during the block period re-wrapped when the face arrived: 5 lesson routes at 320 px, run 10 times each with 3 end-to-end workers, failed 9 of 100 times with shifts of 0.066–0.095 (the Hind-only build: 100 of 100 passed, shift 0). With width-matched digits, inlined or as files, the same 100 runs all pass, largest shift 0.0005.
+- **CLS script.** A first visit per load (fresh context, cache disabled, 4× CPU slowdown), `/`, `/roadmap` and the `use-effect` lesson at 320 and 375 px, 3 runs per profile and width, 54 loads per build:
+
+  | Build                  | Loads with a shift | Largest | Source                                                                                                 |
+  | ---------------------- | ------------------ | ------- | ------------------------------------------------------------------------------------------------------ |
+  | Hind only              | 0                  | 0       |                                                                                                        |
+  | Inlined, width-matched | 13                 | 0.0092  | the lesson's bookmark and done buttons moving 44 px, which also happens on the Hind-only build (below) |
+  | Files-swap (final)     | 12                 | 0.0003  | digit text on Slow 4G, such as "১৭০/১৭০০/১৭০", getting narrower when the face arrives (57.8 → 53.1 px) |
+
+  Width matching holds against Hind's digits. Where a Hind Siliguri face itself missed the first paint (600 always does on Slow 4G), the digits start in the system fallback, whose widths differ, so they change width when the digits face arrives.
+
+- **End-to-end sweep, files-swap.** 1,462 + 54 passed. 89 of 235 routes recorded a shift above 0, most 0.0005 or less; the largest, 0.0077 on `/learn/tools/npm`, reproduced once in 10 loads at 768 px with 4× CPU (the "start this topic" block moving 74 px at 489 ms) and not in 20 loads of the Hind-only build; the cause is not confirmed, most likely the same fallback-width case.
+- **Not from the digits.** On the lesson page at 375 px with 4× CPU, the Hind-only build shows two shifts after the first paint while the page hydrates: the breadcrumb's last-but-one item wrapping to a second line (0.0094) and the bookmark and done buttons moving 44 px down (0.0111, over the 0.01 limit). They are to be fixed separately.
+
+### Lighthouse
+
+`pnpm dlx lighthouse@13.6.0` with DevTools (applied) throttling: a 4× slower CPU and a real slow network. 3 runs each, median and range, Chrome 157.
+
+| Page                  | Hind only: LCP (FCP)      | Inlined width-matched, `swap` | **Files-swap (final)**       |
+| --------------------- | ------------------------- | ----------------------------- | ---------------------------- |
+| Home                  | 2.84 s, 2.49–3.17 (= LCP) | 3.02 s, 2.58–3.02 (= LCP)     | 2.63 s, 2.58–2.85 (= LCP)    |
+| Lesson (`use-effect`) | 2.58 s, 2.27–2.62 (= LCP) | 2.78 s, 2.56–3.12 (FCP 2.56)  | 2.66 s, 2.28–3.05 (FCP 2.28) |
+| Map (`/roadmap`)      | 2.38 s, 2.35–2.40 (= LCP) | 2.63 s, 2.60–2.97 (= LCP)     | 2.37 s, 2.23–2.39 (= LCP)    |
+
+- CLS was 0 in every run except 0.0003 on the lesson with files-swap.
+- Inlined, the stylesheet grows from about 14 to 20 KB gzip and FCP and LCP come about 0.2–0.25 s later; as files they stay within the Hind-only build's range. (The earlier inlined `block` variant measured LCP about 0.7 s later on Home, with text held invisible during the block period, and Lighthouse's simulated throttling reported 3.9 s on Home and the Map because it modelled the inlined `data:` fonts as downloads.)
+- Lighthouse's default simulated throttling (`pnpm lighthouse`) measured the Hind-only build at LCP 0.93 s (Home), 0.98 s (lesson) and 0.91 s (Map), and the inlined width-matched build at 0.96, 1.07 and 0.91 s.
+- These are local numbers on HTTP/1.1; the deployed preview (HTTP/2) is still to be measured.

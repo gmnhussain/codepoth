@@ -28,7 +28,8 @@ const bodyFont = Hind_Siliguri({
   variable: "--font-body",
 })
 
-// No Bangla subset; Bangla characters in code fall back to the body font.
+// No Bangla subset: Bangla digits in code come from the digits face, other
+// Bangla characters from the body font.
 // No metric-adjusted Arial fallback: with `optional` the font never swaps
 // in later, so the fallback is what code shows when the font is late, and
 // it must be monospaced. globals.css gives `--font-mono` a monospace stack.

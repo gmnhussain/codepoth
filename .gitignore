@@ -34,6 +34,9 @@ dist
 .DS_Store
 *.pem
 
+# Python bytecode from one-off tools (packages/ui/src/styles/bangla-digits/make-digits.py)
+__pycache__/
+
 # debug
 npm-debug.log*
 yarn-debug.log*
