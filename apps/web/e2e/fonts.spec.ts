@@ -5,7 +5,10 @@ import { expect, test } from "./support/test"
 
 /** The code font's `font-family` in next/font's `@font-face` rules. */
 const CODE_FONT_FAMILY = "JetBrains Mono"
-/** The Bangla digits face's `font-family` (apps/web/app/layout.tsx). */
+/**
+ * The Bangla digits face's `font-family`
+ * (packages/ui/src/styles/bangla-digits/bangla-digits.css).
+ */
 const DIGITS_FONT_FAMILY = "banglaDigits"
 
 /** Absolute URLs of every file the page's `@font-face` rules for `family` use. */
@@ -243,7 +246,9 @@ test.describe("fonts", { tag: "@both" }, () => {
   })
 
   // The digits face has Hind Siliguri's advance widths and line metrics, so
-  // swapping it in changes glyph shapes only: no re-wrap, no layout shift.
+  // swapping it in over Hind's digits changes glyph shapes only: no re-wrap,
+  // no layout shift. (Over the system fallback, when Hind itself missed the
+  // first paint, widths can change: ADR-0017, Consequences.)
   // Compared on copies of both faces loaded by the test, so whether the page's
   // own `optional` body font made the first paint does not matter.
   test("Bangla digits are exactly as wide and tall as the body font's", async ({

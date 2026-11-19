@@ -1,8 +1,8 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-/* Bangla digits face and --font-digits, inlined (base64); kept in its own
-   file so the data stays out of this one. */
+/* Bangla digits face and --font-digits: three separate woff2 files served
+   through url() in bangla-digits.css (not inlined; README.md there). */
 @import "./bangla-digits/bangla-digits.css";
 
 @custom-variant dark (&:is(.dark *));

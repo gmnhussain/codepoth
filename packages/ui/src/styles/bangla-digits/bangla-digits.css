@@ -11,8 +11,12 @@
  * queued in front of the body font's files. `font-display: swap`, unlike the
  * site's other fonts (`optional`): every digit is exactly as wide as Hind
  * Siliguri's at the same weight, and the line metrics are Hind's, so when
- * the face arrives the swap changes only the digits' shapes, never a line
- * break or a line height, and text is never invisible meanwhile.
+ * Hind Siliguri made the first paint the swap changes only the digits'
+ * shapes, never a line break or a line height, and text is never invisible
+ * meanwhile. When a Hind face missed it (Hind 600 always does on Slow 4G
+ * locally), the digits start in the system fallback, can change width when
+ * this face arrives and can shift text slightly (up to about 0.008 measured;
+ * ADR-0017, Consequences).
  */
 
 :root {
