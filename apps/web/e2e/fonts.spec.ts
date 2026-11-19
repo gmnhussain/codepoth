@@ -78,6 +78,9 @@ const WIDE = "MMMMMMMMMM"
 const BANGLA = "পরিবর্তনশীল"
 /** Bangla digits; ১ is the one Hind Siliguri draws as a hook. */
 const DIGITS = "১১১১১১"
+/** The ten Bangla digits, U+09E6–U+09EF. */
+const ALL_DIGITS = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"]
+const ALL_DIGITS_PATTERN = /[০-৯]/gu
 /** Latin letters (sample text, not a UI label). */
 const LATIN = "Hamburgefonstiv"
 /** The body font's `font-family` in next/font's `@font-face` rules. */
@@ -287,12 +290,20 @@ test.describe("fonts", { tag: "@both" }, () => {
   // first paint, widths can change: ADR-0017, Consequences.)
   // Compared on copies of both faces loaded by the test, so whether the page's
   // own `optional` body font made the first paint does not matter.
-  test("Bangla digits are exactly as wide and tall as the body font's", async ({
+  //
+  // The advances are compared exactly, on a canvas at 1000 px, where Chrome
+  // uses the font's own advances. Laid-out text cannot be compared exactly:
+  // Chrome on Linux rounds each glyph's advance to whole pixels, and how it
+  // rounds depends on the outline, so a digit with the same advance can come
+  // out 1 px wider or narrower in either face (at 400, 40 px, ০ is 22.96 px:
+  // 22 in Hind Siliguri, 23 in the digits face). The layout check therefore
+  // allows 1 px per digit; heights stay exact.
+  test("Bangla digits have the body font's advances and line height", async ({
     page,
   }) => {
     await page.goto("/")
     const results = await page.evaluate(
-      async ({ bodyRules, digitRules, samples, weights }) => {
+      async ({ bodyRules, digitRules, samples, weights, digits }) => {
         // Test-only copies of every face of a family, loaded now.
         const copy = async (rules: readonly FontFaceRule[], as: string) => {
           const faces = rules.map((rule) => {
@@ -325,6 +336,25 @@ test.describe("fonts", { tag: "@both" }, () => {
           element.remove()
           return { width, height }
         }
+        // Advances at 1000 px: one pixel per 1/1000 em, no rounding to the
+        // pixel grid.
+        const context = document.createElement("canvas").getContext("2d")
+        const advance = (family: string, weight: string, digit: string) => {
+          if (context === null) return Number.NaN
+          context.font = `${weight} 1000px ${family}`
+          return context.measureText(digit).width
+        }
+        const advances = []
+        for (const weight of weights) {
+          for (const digit of digits) {
+            advances.push({
+              weight,
+              digit,
+              body: advance("TestBody", weight, digit),
+              digits: advance("TestDigits", weight, digit),
+            })
+          }
+        }
         const rows = []
         for (const weight of weights) {
           for (const text of samples) {
@@ -340,17 +370,28 @@ test.describe("fonts", { tag: "@both" }, () => {
             }
           }
         }
-        return { bodyFaces, digitFaces, rows }
+        return { bodyFaces, digitFaces, advances, rows }
       },
       {
         bodyRules: await fontFaceRules(page, BODY_FONT_FAMILY),
         digitRules: await fontFaceRules(page, DIGITS_FONT_FAMILY),
         samples: WIDTH_SAMPLES,
         weights: DIGIT_WEIGHTS,
+        digits: ALL_DIGITS,
       }
     )
     expect(results.bodyFaces, "body font faces").toBeGreaterThan(0)
     expect(results.digitFaces, "digits faces").toBe(DIGIT_WEIGHTS.length)
+    expect(results.advances).toHaveLength(
+      DIGIT_WEIGHTS.length * ALL_DIGITS.length
+    )
+    for (const { weight, digit, body, digits } of results.advances) {
+      // Within half of 1/1000 em: make-digits.py rounds to whole font units.
+      expect(
+        Math.abs(digits - body),
+        `${digit} at ${weight}: advance at 1000 px`
+      ).toBeLessThanOrEqual(0.5)
+    }
     for (const {
       weight,
       text,
@@ -359,10 +400,11 @@ test.describe("fonts", { tag: "@both" }, () => {
       withDigits,
     } of results.rows) {
       const label = `"${text}" at ${weight}, line-height ${lineHeight}`
+      const digitCount = text.match(ALL_DIGITS_PATTERN)?.length ?? 0
       expect(
         Math.abs(withDigits.width - alone.width),
-        `${label}: width`
-      ).toBeLessThan(0.5)
+        `${label}: width (1 px per digit)`
+      ).toBeLessThanOrEqual(digitCount)
       expect(withDigits.height, `${label}: height`).toBe(alone.height)
     }
   })

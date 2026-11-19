@@ -52,6 +52,7 @@ Earlier attempts at the digits face, each measured locally (`next start`, [perfo
 - Headings render in the web font whenever body text does, and the page uses one Bangla face throughout instead of a system font next to Hind Siliguri. Headings lose their separate face; the design's hierarchy rests on size and weight 600.
 - On a first visit Hind Siliguri's digits show until the digits face arrives and swaps in: none unthrottled, about 0.1 s on Fast 4G and about 1 s on Slow 4G (local measurement).
 - Small layout shifts, up to about 0.008, remain where a Hind Siliguri face itself missed the first paint: the digits then start in the system fallback, whose widths differ, and change width when the digits face arrives. The end-to-end limit is 0.01.
+- On platforms that round each glyph's advance to whole pixels (Chrome on Linux), the rounding depends on the outline, so a swap can change a line's length by up to about 1 px per digit, although the advances in the fonts are equal.
 - ২ is visibly narrower than Noto's at 600.
 - A bold Bangla digit in code is synthesized from the 600 face, because the digits face has no 700.
 - If Hind Siliguri's metrics or Noto Sans Bengali's digits change, the faces are regenerated with `make-digits.py`; the end-to-end check that compares the widths and line heights with Hind's catches a drift.
