@@ -79,8 +79,11 @@ function fail(message: string): never {
 async function probePage(): Promise<Load> {
   const BANGLA_SAMPLE = "কোডপথে শেখা"
   const LATIN_SAMPLE = "Hamburgefonstiv 0123"
+  const DIGITS_SAMPLE = "০১২৩৪৫৬৭৮৯"
   const BANGLA_CODE_POINT = 0x0995
   const LATIN_CODE_POINT = 0x0048
+  // A face for the Bangla digits alone covers neither a letter nor Latin.
+  const DIGIT_CODE_POINT = 0x09e7
   const SETTLE_MS = 500
 
   const covers = (unicodeRange: string, codePoint: number) =>
@@ -113,6 +116,8 @@ async function probePage(): Promise<Load> {
         rules.push({ family, weight, subset: "Bangla", text: BANGLA_SAMPLE })
       } else if (covers(range, LATIN_CODE_POINT)) {
         rules.push({ family, weight, subset: "Latin", text: LATIN_SAMPLE })
+      } else if (covers(range, DIGIT_CODE_POINT)) {
+        rules.push({ family, weight, subset: "digits", text: DIGITS_SAMPLE })
       }
     }
   }
