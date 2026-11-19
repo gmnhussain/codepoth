@@ -20,6 +20,7 @@ Every route is pre-rendered ([ADR-0004](../decisions/ADR-0004-vercel-ssg-not-sta
   - No throttling: first paint about 0.4–0.5 s, the preloaded fonts arrive before it and render.
   - Fast 4G: first paint about 0.93 s. Hind Siliguri's files arrive at 0.59–0.89 s and render; Anek Bangla's 152 KB Bangla file arrives at about 1.1 s, and headings stayed in the system font in 8–9 of 9 loads.
   - Slow 4G: first paint about 2.0–2.5 s; headings in the system font in 9 of 9 loads, body text renders.
+  - Correction: "body text renders" on Slow 4G overstates it. The probe then measured Hind Siliguri's Bangla faces with a sample containing a space; the space rendered in Hind's Latin face, which loads in time, so Bangla faces that had fallen back still read as real. Chrome DevTools shows body text on Slow 4G with its Bangla in Nirmala UI. The deployed-preview measurement with the fixed probe will give the real numbers.
   - JetBrains Mono, not preloaded then, rendered in the fallback in every load on every profile. It is preloaded since, and its fallback is a monospace stack ([design.md](../design.md#fonts)).
 - So the fonts are few and small enough to arrive with the first paint on Fast 4G: one family for text and headings ([ADR-0017](../decisions/ADR-0017-one-font-for-text-and-headings.md)), Hind Siliguri at 400, 500 and 600 only (no 700), and JetBrains Mono's Latin subset. A new font, weight or subset is measured with `pnpm measure:fonts` on a deployed preview before it is added.
 - Font families and weights: [design.md](../design.md#fonts).
@@ -277,6 +278,7 @@ Hind Siliguri's ১ reads poorly, so the Bangla digits come from their own face 
 
 - Preloaded fonts are unchanged by the digits: Hind Siliguri's six files and JetBrains Mono's Latin file, 7 files, 180.4 KB. A page fetches only the digit weights it shows (1,752–1,772 B each).
 - Hind Siliguri 600 misses in about a third of local Fast 4G loads (5 of 15, all on `/contents`) and in every Slow 4G load, with or without the digits; 400 and 500 never missed.
+- Correction: these tables (this one and the earlier attempts below) overstate Hind Siliguri on Slow 4G. The probe before the fix measured Hind's Bangla faces with a sample containing a space; the space rendered in Hind's Latin face, which loads in time, so Bangla faces that had fallen back still read as real. Chrome DevTools shows body text on Slow 4G with its Bangla in Nirmala UI, so the "0" for Hind 400 and 500 there is not a real result. The numbers are kept as measured; the deployed-preview measurement with the fixed probe will give the real ones.
 
 Earlier attempts, same method:
 
@@ -297,6 +299,7 @@ Earlier attempts, same method:
 | CSS           | files, gzip            | 1, about 14 KB | 1, 14.0 KB                                 | 2, 19.3 KB                               | 1, 20.2 KB                            |
 
 - As preloaded files, Noto's digits queued behind the body font's preloads and missed, and pushed Hind Siliguri 600's Fast 4G misses from 5 to 7; inlined with `optional`, the face needed for the first paint missed because its decode starts at first use and Chrome paints before it ends; as its own stylesheet it added a second render-blocking request (Slow 4G first paint about 0.45 s later); inlined with `block`, the digits rendered in every load but cost about 6 KB gzip of CSS and re-wrapped text (below).
+- The Hind Siliguri rows on Slow 4G in this table carry the same overstatement as the table above (see the correction there).
 
 ### Layout shift
 

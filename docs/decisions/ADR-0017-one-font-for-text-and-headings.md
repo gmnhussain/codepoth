@@ -12,6 +12,7 @@ Lighthouse on localhost showed every font finishing before the first paint. Meas
 - **No throttling:** first paint about 0.4–0.5 s; the preloaded fonts arrive before it, and headings and body render in their web fonts.
 - **Fast 4G** (Chrome DevTools preset, 165 ms, 9 Mbps): first paint about 0.93 s. Hind Siliguri's files arrive at 0.59–0.89 s and render. Anek Bangla's Bangla file arrives at about 1.1 s, past `optional`'s window of about 100 ms, so headings stayed in the system font in 9 of 9 loads (8 of 9 in a second run of `pnpm measure:fonts`).
 - **Slow 4G** (562.5 ms, 1.6 Mbps): headings in the system font in 9 of 9 loads; body text renders.
+  - Correction (2026-11-19): "body text renders" overstates it. The probe of `measure:fonts` then measured Hind Siliguri's Bangla faces with a sample containing a space; the space rendered in Hind's Latin face, which loads in time, so Bangla faces that had fallen back still read as real. Chrome DevTools shows body text on Slow 4G with its Bangla in Nirmala UI, the system fallback. The probe is fixed; the deployed-preview measurement with it will give the real numbers ([performance.md](../development/performance.md#fonts)).
 
 So on a mobile connection, most first visits paid for Anek Bangla and never showed it, and headings were set in whatever Bangla font the system had, next to body text in Hind Siliguri.
 
