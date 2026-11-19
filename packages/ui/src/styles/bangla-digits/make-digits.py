@@ -19,7 +19,9 @@ Google Fonts CSS API, then writes `bangla-digits-<weight>.woff2`:
 - kerning and shaping tables are dropped (digits need neither), hinting
   instructions too (the outlines changed);
 - the name table says "Bangla Digits", not "Noto Sans Bengali": this is a
-  Modified Version under the SIL Open Font License (OFL.txt).
+  Modified Version under the SIL Open Font License (OFL.txt);
+- head.modified is the Noto input's, not the time of the run, so the same
+  inputs always give byte-identical files.
 
 bangla-digits.css serves these files by name (README.md).
 """
@@ -75,6 +77,12 @@ def match_widths(noto: TTFont, hind: TTFont) -> list[str]:
         name = noto_cmap[ord(char)]
         advance = round(hind["hmtx"][hind_cmap[ord(char)]][0] * scale)
         glyph = glyf[name]
+        if glyph.isComposite():
+            raise SystemExit(
+                f"U+{ord(char):04X} ({name}) is a composite glyph: this script "
+                "moves simple outlines only. Decompose it first, or take a "
+                "Noto release whose digits are simple glyphs."
+            )
         glyph.recalcBounds(glyf)
         x_min, x_max = glyph.xMin, glyph.xMax
         ink = x_max - x_min
@@ -148,7 +156,16 @@ def rename(font: TTFont, weight: int) -> None:
 
 def main() -> None:
     for weight in WEIGHTS:
-        noto = TTFont(f"noto-sans-bengali-digits-{weight}.woff2")
+        source = f"noto-sans-bengali-digits-{weight}.woff2"
+        # Keep the input's head.modified instead of stamping the save time,
+        # so a rerun on the same inputs writes byte-identical files.
+        noto = TTFont(source, recalcTimestamp=False)
+        if "fvar" in noto:
+            raise SystemExit(
+                f"{source} is a variable font: its variation tables would "
+                "override the new widths and outlines. Download one static "
+                "file per weight (README.md, Regenerating, step 1)."
+            )
         hind = hind_digits(weight)
         report = match_widths(noto, hind)
         copy_vertical_metrics(noto, hind)
