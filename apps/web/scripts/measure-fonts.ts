@@ -9,13 +9,22 @@
  * through the DevTools protocol. Paths default to `/ /roadmap /contents`.
  * One unthrottled load first is not counted (browser and DNS warm-up).
  *
- * Per load it records the first paint, when the last font file finished,
- * and, for each `@font-face` rule on the page (one file: a family, weight
- * and subset), whether text in that face renders in the web font ("real")
- * or in the fallback. With `display: optional` a face that missed the first
- * paint stays in the fallback for the whole document, so a sample in that
- * face measures the same as the fallback. A family counts as real in a load
- * when all of its faces are. The result is printed as performance.md's table.
+ * Per load it records the first paint and the font files the page itself
+ * requested: how many, and when the last one finished. These are read
+ * before the probe draws anything, so they leave out files the probe would
+ * fetch. For each `@font-face` rule on the page (one file: a family, weight
+ * and subset) it reports one of:
+ * - "unused": the page never requested the face's file (not drawn, so the
+ *   probe does not fetch it either);
+ * - for an `optional` face, "real" or "fallback": whether text in the face
+ *   renders in the web font. A face that missed the first paint stays in the
+ *   fallback for the whole document, so a sample in it measures the same as
+ *   the fallback;
+ * - for a `swap` face, "real" or "late": whether its file finished before the
+ *   first paint or swapped in after it (it always ends up rendering).
+ * Per family and load, the faces the page used decide: their state when they
+ * all agree, "partial" otherwise, "unused" when the page used none. The
+ * result is printed as performance.md's table.
  *
  * Node runs this file directly.
  */
@@ -50,11 +59,13 @@ const PROFILES = [
   },
 ] as const
 
+type FaceState = "real" | "fallback" | "late" | "unused"
+
 type Face = {
   readonly family: string
   readonly weight: string
   readonly subset: string
-  readonly real: boolean
+  readonly state: FaceState
 }
 
 type Load = {
@@ -64,20 +75,26 @@ type Load = {
   readonly faces: readonly Face[]
 }
 
+const STATES = ["real", "late", "partial", "fallback", "unused"] as const
+type FamilyState = (typeof STATES)[number]
+
+/** For wrong arguments, before the browser starts. */
 function fail(message: string): never {
   process.stderr.write(`measure:fonts: ${message}\n`)
   process.exit(1)
 }
 
 /**
- * Runs in the page: paint and font timings, and whether each `@font-face`
- * rule's face renders. Sample text in the face's own subset is measured in
- * the face (fallback: serif) and in serif alone; equal widths mean the
- * fallback. Faces the page has not used yet get the chance to load first,
- * so only faces that missed their window report the fallback.
+ * Runs in the page: the first paint, the font files the page requested, and
+ * each `@font-face` rule's state (see the top of this file). An `optional`
+ * face the page used is drawn as sample text in its own subset, in the face
+ * (fallback: serif) and in serif alone; equal widths mean the fallback.
  */
 async function probePage(): Promise<Load> {
-  const BANGLA_SAMPLE = "কোডপথে শেখা"
+  // Sample text, not UI labels. The Bangla sample has no space: a space
+  // comes from the Latin face, so one that rendered would make a Bangla face
+  // that fell back measure as real.
+  const BANGLA_SAMPLE = "পরিবর্তনশীল"
   const LATIN_SAMPLE = "Hamburgefonstiv 0123"
   const DIGITS_SAMPLE = "০১২৩৪৫৬৭৮৯"
   const BANGLA_CODE_POINT = 0x0995
@@ -85,6 +102,19 @@ async function probePage(): Promise<Load> {
   // A face for the Bangla digits alone covers neither a letter nor Latin.
   const DIGIT_CODE_POINT = 0x09e7
   const SETTLE_MS = 500
+
+  // First, before anything below can start a download: what the page loaded.
+  const paint =
+    performance.getEntriesByName("first-paint")[0] ??
+    performance.getEntriesByName("first-contentful-paint")[0]
+  const firstPaint = paint?.startTime ?? -1
+  const fontEntries = performance
+    .getEntriesByType("resource")
+    .filter((entry) => /\.woff2(\?|$)/.test(entry.name))
+    .map((entry) => entry as PerformanceResourceTiming)
+  const requested = new Map(
+    fontEntries.map((entry) => [entry.name, entry.responseEnd])
+  )
 
   const covers = (unicodeRange: string, codePoint: number) =>
     unicodeRange === "" ||
@@ -101,8 +131,12 @@ async function probePage(): Promise<Load> {
     weight: string
     subset: string
     text: string
+    display: string
+    /** When the face's file finished, if the page requested it. */
+    done: number | undefined
   }[] = []
   for (const sheet of Array.from(document.styleSheets)) {
+    const base = sheet.href ?? document.baseURI
     for (const rule of Array.from(sheet.cssRules)) {
       if (!(rule instanceof CSSFontFaceRule)) continue
       const family = rule.style
@@ -112,12 +146,22 @@ async function probePage(): Promise<Load> {
       if (family.endsWith(" Fallback")) continue
       const weight = rule.style.getPropertyValue("font-weight") || "400"
       const range = rule.style.getPropertyValue("unicode-range")
+      const display = rule.style.getPropertyValue("font-display") || "auto"
+      const src = rule.style.getPropertyValue("src")
+      let done: number | undefined
+      for (const match of src.matchAll(/url\(\s*["']?([^"')]+)["']?\s*\)/g)) {
+        const url = match[1]
+        const end =
+          url === undefined ? undefined : requested.get(new URL(url, base).href)
+        if (end !== undefined) done = Math.max(done ?? 0, end)
+      }
+      const face = { family, weight, display, done }
       if (covers(range, BANGLA_CODE_POINT)) {
-        rules.push({ family, weight, subset: "Bangla", text: BANGLA_SAMPLE })
+        rules.push({ ...face, subset: "Bangla", text: BANGLA_SAMPLE })
       } else if (covers(range, LATIN_CODE_POINT)) {
-        rules.push({ family, weight, subset: "Latin", text: LATIN_SAMPLE })
+        rules.push({ ...face, subset: "Latin", text: LATIN_SAMPLE })
       } else if (covers(range, DIGIT_CODE_POINT)) {
-        rules.push({ family, weight, subset: "digits", text: DIGITS_SAMPLE })
+        rules.push({ ...face, subset: "digits", text: DIGITS_SAMPLE })
       }
     }
   }
@@ -133,38 +177,47 @@ async function probePage(): Promise<Load> {
     document.body.append(element)
     return element
   }
-  const pairs = rules.map((rule) => ({
-    rule,
-    face: span(`"${rule.family}", serif`, rule.weight, rule.text),
-    fallback: span("serif", rule.weight, rule.text),
-  }))
+  // Only faces whose file the page requested are drawn, so the probe starts
+  // no download of its own.
+  const drawn = rules.map((rule) =>
+    rule.done === undefined || rule.display === "swap"
+      ? undefined
+      : {
+          face: span(`"${rule.family}", serif`, rule.weight, rule.text),
+          fallback: span("serif", rule.weight, rule.text),
+        }
+  )
   await document.fonts.ready
   await new Promise((resolve) => setTimeout(resolve, SETTLE_MS))
-  const faces = pairs.map(({ rule, face, fallback }) => {
-    const real =
-      face.getBoundingClientRect().width !==
-      fallback.getBoundingClientRect().width
-    face.remove()
-    fallback.remove()
+  const faces = rules.map((rule, index): Face => {
+    let state: FaceState
+    const pair = drawn[index]
+    if (rule.done === undefined) {
+      state = "unused"
+    } else if (pair === undefined) {
+      state = rule.done <= firstPaint ? "real" : "late"
+    } else {
+      state =
+        pair.face.getBoundingClientRect().width !==
+        pair.fallback.getBoundingClientRect().width
+          ? "real"
+          : "fallback"
+      pair.face.remove()
+      pair.fallback.remove()
+    }
     return {
       family: rule.family,
       weight: rule.weight,
       subset: rule.subset,
-      real,
+      state,
     }
   })
 
-  const paint =
-    performance.getEntriesByName("first-paint")[0] ??
-    performance.getEntriesByName("first-contentful-paint")[0]
-  const fonts = performance
-    .getEntriesByType("resource")
-    .filter((entry) => /\.woff2(\?|$)/.test(entry.name))
-    .map((entry) => (entry as PerformanceResourceTiming).responseEnd)
+  const ends = fontEntries.map((entry) => entry.responseEnd)
   return {
-    firstPaint: Math.round(paint?.startTime ?? -1),
-    fontsDone: Math.round(fonts.length > 0 ? Math.max(...fonts) : -1),
-    fontFiles: fonts.length,
+    firstPaint: Math.round(firstPaint),
+    fontsDone: Math.round(ends.length > 0 ? Math.max(...ends) : -1),
+    fontFiles: ends.length,
     faces,
   }
 }
@@ -191,7 +244,9 @@ async function measure(
       timeout: LOAD_TIMEOUT_MS,
     })
     if (response === null || !response.ok()) {
-      fail(`${url} answered ${String(response?.status() ?? "nothing")}`)
+      throw new Error(
+        `${url} answered ${String(response?.status() ?? "nothing")}`
+      )
     }
     await page.waitForLoadState("networkidle", { timeout: LOAD_TIMEOUT_MS })
     return await page.evaluate(probePage)
@@ -200,27 +255,37 @@ async function measure(
   }
 }
 
+/** The median; for an even count, the mean of the two middle values. */
 function median(values: readonly number[]): number {
   const sorted = [...values].sort((a, b) => a - b)
-  return sorted[Math.floor(sorted.length / 2)] ?? Number.NaN
+  const middle = Math.floor(sorted.length / 2)
+  if (sorted.length % 2 === 1) return sorted[middle] ?? Number.NaN
+  const low = sorted[middle - 1]
+  const high = sorted[middle]
+  return low === undefined || high === undefined ? Number.NaN : (low + high) / 2
 }
 
-/** A family is real in a load when every face of it rendered. */
-function familyState(
-  load: Load,
-  family: string
-): "real" | "fallback" | "partial" {
-  const faces = load.faces.filter((face) => face.family === family)
-  const real = faces.filter((face) => face.real).length
-  if (real === faces.length) return "real"
-  return real === 0 ? "fallback" : "partial"
+/**
+ * A family's state in a load, from the faces the page used: their state
+ * when they all agree, "partial" otherwise, "unused" when it used none.
+ */
+function familyState(load: Load, family: string): FamilyState {
+  const used = new Set(
+    load.faces
+      .filter((face) => face.family === family && face.state !== "unused")
+      .map((face) => face.state)
+  )
+  const [only] = used
+  if (only === undefined) return "unused"
+  return used.size === 1 ? only : "partial"
 }
 
 function familyCell(loads: readonly Load[], family: string): string {
-  const counts = { real: 0, partial: 0, fallback: 0 }
+  const counts = Object.fromEntries(STATES.map((state) => [state, 0])) as {
+    [state in FamilyState]: number
+  }
   for (const load of loads) counts[familyState(load, family)]++
-  return (["real", "partial", "fallback"] as const)
-    .filter((state) => counts[state] > 0)
+  return STATES.filter((state) => counts[state] > 0)
     .map((state) => `${state} ${String(counts[state])}/${String(loads.length)}`)
     .join(", ")
 }
@@ -261,11 +326,17 @@ async function main() {
           const load = await measure(browser, origin + page, profile.conditions)
           loads.push(load)
           for (const face of load.faces) families.add(face.family)
-          const fallbacks = load.faces
-            .filter((face) => !face.real)
-            .map((face) => `${face.family} ${face.weight} ${face.subset}`)
+          const notReal = load.faces
+            .filter(
+              (face) => face.state === "fallback" || face.state === "late"
+            )
+            .map(
+              (face) =>
+                `${face.family} ${face.weight} ${face.subset} ${face.state}`
+            )
+          const unused = load.faces.filter((face) => face.state === "unused")
           process.stdout.write(
-            `measure:fonts: ${profile.name} ${page} run ${String(run + 1)}: first paint ${String(load.firstPaint)} ms, ${String(load.fontFiles)} font files done at ${String(load.fontsDone)} ms, fallback: ${fallbacks.join("; ") || "none"}\n`
+            `measure:fonts: ${profile.name} ${page} run ${String(run + 1)}: first paint ${String(load.firstPaint)} ms, ${String(load.fontFiles)} font files done at ${String(load.fontsDone)} ms, not real: ${notReal.join("; ") || "none"}, unused faces: ${String(unused.length)}\n`
           )
         }
         results.push({ profile: profile.name, page, loads })
@@ -304,4 +375,12 @@ async function main() {
   )
 }
 
-await main()
+try {
+  await main()
+} catch (error) {
+  // main's `finally` has closed the browser by now.
+  process.stderr.write(
+    `measure:fonts: ${error instanceof Error ? error.message : String(error)}\n`
+  )
+  process.exitCode = 1
+}
