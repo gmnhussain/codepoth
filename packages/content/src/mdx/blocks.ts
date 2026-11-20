@@ -37,8 +37,8 @@ function isNeutral(node: RootContent): boolean {
 /**
  * Remark plugin: checks the block structure, gives every author `###` a
  * stable id and stores the sections on `file.data.sections`. Structure rules
- * apply to every lesson; completeness (all seven blocks, nothing outside a
- * block) only to published lessons, since a draft may be a stub (ADR-0009).
+ * apply to every lesson; completeness (every required block, nothing outside
+ * a block) only to published lessons, since a draft may be a stub (ADR-0009).
  */
 export function remarkLessonBlocks({
   isPublished,
@@ -101,7 +101,7 @@ export function remarkLessonBlocks({
 
     if (isPublished) {
       for (const block of LESSON_BLOCKS) {
-        if (!seen.includes(block.id)) {
+        if (block.required && !seen.includes(block.id)) {
           problems.push(`a published lesson needs <${block.component}>`)
         }
       }

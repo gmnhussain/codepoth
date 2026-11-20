@@ -73,7 +73,7 @@ describe("compileLesson", () => {
     })
   })
 
-  it("requires all seven blocks in a published lesson", async () => {
+  it("requires every required block in a published lesson", async () => {
     const source = ALL_BLOCKS.filter(
       (block) => !block.startsWith("<Practice")
     ).join("\n\n")
@@ -81,6 +81,18 @@ describe("compileLesson", () => {
       "needs <Practice>"
     )
     await expect(compileLesson(source, draft)).resolves.toBeDefined()
+  })
+
+  it("accepts an optional block after the others, and a published lesson without it", async () => {
+    const exercises = "<Exercises>\n\nকাজ।\n\n</Exercises>"
+    const withIt = await compileLesson(
+      [...ALL_BLOCKS, exercises].join("\n\n"),
+      published
+    )
+    expect(withIt.blocks.at(-1)).toBe("exercises")
+    await expect(
+      compileLesson(ALL_BLOCKS.join("\n\n"), published)
+    ).resolves.toBeDefined()
   })
 
   it("rejects blocks out of order or twice, even in a draft", async () => {

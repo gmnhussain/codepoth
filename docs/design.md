@@ -206,6 +206,11 @@ The MDX components for lesson bodies live in `apps/web/components/mdx/` and are 
 - `<Summary>`: tinted card in the track colour (`border-track/30 bg-track/5`).
 - `<Mistakes>` and `<Steps>`: the author writes a plain numbered list; the component renumbers it with Bangla digits (round badges for mistakes, "ধাপ ১" cards for steps).
 - `<DeepDive>`: a native `<details>`, closed by default, with the "অভিজ্ঞদের জন্য" chip and the one-line `hint`.
+- Template v2 parts ([ADR-0018](decisions/ADR-0018-lesson-template-v2.md)), all server-rendered:
+  - `<Note>`, `<Tip>`, `<Pitfall>` (`callout.tsx`): a left-border box on `bg-muted` with a lucide icon and a visible label ("নোট", "টিপ", "সাবধান"). The border is muted foreground, the track colour and `destructive`. A plain `div`, not `<aside>`, so a lesson does not fill up with landmarks.
+  - `<Think>`: the neutral card (like the deep dive), labelled "ভেবে দেখো", with its `<Answer>` collapsed under "উত্তর দেখো".
+  - `<Exercises>` ("নিজে করো"): one card per `<Exercise>`, with its title (`h3`, no id) and a level chip ("সহজ", "মাঝারি", "চ্যালেঞ্জ"), the task, the hints ("ইঙ্গিত ১" …) and "সমাধান দেখো". A hint is shown once the one before it is open (CSS on `details[open]`, no JavaScript). The solution is outside that group and can be opened at any time.
+  - Answers, hints and solutions use one native `<details>` (`disclosure.tsx`) and are left out of the search index. Labels and level chips are left out too; they are not lesson words.
 - Code blocks: see [Colors](#colors) and [ADR-0010](decisions/ADR-0010-dark-code-blocks.md); file name in the caption, Bangla line numbers that screen readers skip.
 - Tables scroll sideways inside a bordered card on narrow screens.
 - Interactive islands (client components, the only JavaScript in a lesson body):

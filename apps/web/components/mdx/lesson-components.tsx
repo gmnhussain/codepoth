@@ -3,18 +3,26 @@ import type { ComponentProps, ReactNode } from "react"
 import { t } from "@workspace/config/t"
 import { cn } from "@workspace/ui/lib/utils"
 
+import { Answer } from "@/components/mdx/answer"
 import { BlockSection } from "@/components/mdx/block-section"
 import { CodeCaption, CodeFigure, CodePre } from "@/components/mdx/code-figure"
 import { DeepDive } from "@/components/mdx/deep-dive"
+import { Exercise } from "@/components/mdx/exercise"
+import { Hint } from "@/components/mdx/hint"
 import type { MdxComponents } from "@/components/mdx/mdx-content"
 import { Mistakes } from "@/components/mdx/mistakes"
+import { Note } from "@/components/mdx/note"
+import { Pitfall } from "@/components/mdx/pitfall"
 import type { QuizQuestion } from "@/components/mdx/quiz"
 import { QuizBlock } from "@/components/mdx/quiz-block"
+import { Solution } from "@/components/mdx/solution"
 import { Term } from "@/components/mdx/term"
 import { Practice } from "@/components/mdx/practice"
 import { proseComponents } from "@/components/mdx/prose-components"
 import { Steps } from "@/components/mdx/steps"
 import { Summary } from "@/components/mdx/summary"
+import { Think } from "@/components/mdx/think"
+import { Tip } from "@/components/mdx/tip"
 
 /**
  * Styles for the author's own prose inside a block. Ordered lists keep their
@@ -42,6 +50,19 @@ export const lessonServerComponents = {
   Mistakes,
   DeepDive,
   Practice,
+  Exercises: ({ children }: Children) => (
+    <BlockSection block="exercises" className={PROSE}>
+      {children}
+    </BlockSection>
+  ),
+  Exercise,
+  Hint,
+  Solution,
+  Note,
+  Tip,
+  Pitfall,
+  Think,
+  Answer,
   Steps,
   Term,
   h3: ({ className, ...props }: ComponentProps<"h3">) => (
