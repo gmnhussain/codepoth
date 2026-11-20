@@ -41,15 +41,16 @@ What becomes easier or harder because of it.
 | [ADR-0006](ADR-0006-urls-and-content-keys.md)                 | URL scheme, topic keys, permanent lesson ids                        | accepted                                                        |
 | [ADR-0007](ADR-0007-reader-progress-shape.md)                 | Shape of the reader progress in localStorage                        | accepted                                                        |
 | [ADR-0008](ADR-0008-design-tokens.md)                         | Design tokens, track colours and type scale                         | accepted                                                        |
-| [ADR-0009](ADR-0009-lesson-blocks-and-content-fields.md)      | Lesson blocks, quiz data, drafts, new fields                        | accepted                                                        |
+| [ADR-0009](ADR-0009-lesson-blocks-and-content-fields.md)      | Lesson blocks, quiz data, drafts, new fields                        | accepted; blocks superseded, reading time amended by ADR-0018   |
 | [ADR-0010](ADR-0010-dark-code-blocks.md)                      | Dark code blocks with one Shiki theme (amends ADR-0008)             | accepted                                                        |
-| [ADR-0011](ADR-0011-mdx-compiled-at-build-time.md)            | MDX compiled at build time, structure checked                       | accepted                                                        |
+| [ADR-0011](ADR-0011-mdx-compiled-at-build-time.md)            | MDX compiled at build time, structure checked                       | accepted; required-block list superseded by ADR-0018            |
 | [ADR-0012](ADR-0012-about-page-content.md)                    | About page as content, privacy text kept true                       | accepted                                                        |
 | [ADR-0013](ADR-0013-labels-in-client-islands.md)              | Client islands get only the label groups they use                   | accepted                                                        |
 | [ADR-0014](ADR-0014-reader-progress-implementation.md)        | How reader progress is built in the web app                         | accepted                                                        |
 | [ADR-0015](ADR-0015-site-search-with-pagefind.md)             | Site search with Pagefind over the pre-rendered pages               | accepted; build and "Not verified" parts superseded by ADR-0016 |
 | [ADR-0016](ADR-0016-search-index-built-in-a-build-adapter.md) | Search index built in a build adapter (supersedes part of ADR-0015) | accepted                                                        |
 | [ADR-0017](ADR-0017-one-font-for-text-and-headings.md)        | One font for text and headings; width-matched Bangla digits face    | accepted                                                        |
+| [ADR-0018](ADR-0018-lesson-template-v2.md)                    | Lesson template v2 (supersedes part of ADR-0009 and ADR-0011)       | accepted                                                        |
 
 ## Open questions (do NOT hardcode)
 
