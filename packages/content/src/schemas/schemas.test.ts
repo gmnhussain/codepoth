@@ -23,6 +23,13 @@ const lesson = {
   updated: "2026-11-12",
   level: "beginner",
   quiz: [question, question, question],
+  goals: ["এক পারবে", "দুই পারবে", "তিন পারবে"],
+}
+
+const resource = {
+  title: "Synchronizing with Effects",
+  url: "https://react.dev/learn/synchronizing-with-effects",
+  lang: "en",
 }
 
 /** A copy of `value` without `key`. */
@@ -69,10 +76,78 @@ describe("lessonFrontmatterSchema", () => {
       "level",
       "published",
       "quiz",
+      "goals",
     ])
     expect(
       lessonFrontmatterSchema.safeParse({ ...stub, draft: true }).success
     ).toBe(true)
+  })
+
+  it("accepts 3 to 5 goals, required unless the lesson is a draft", () => {
+    for (const count of [3, 5]) {
+      const goals = Array.from({ length: count }, () => "পারবে")
+      expect(
+        lessonFrontmatterSchema.safeParse({ ...lesson, goals }).success
+      ).toBe(true)
+    }
+    for (const count of [2, 6]) {
+      const goals = Array.from({ length: count }, () => "পারবে")
+      expect(
+        issuePaths(lessonFrontmatterSchema.safeParse({ ...lesson, goals }))
+      ).toEqual(["goals"])
+    }
+    const noGoals = without(lesson, "goals")
+    expect(issuePaths(lessonFrontmatterSchema.safeParse(noGoals))).toEqual([
+      "goals",
+    ])
+    expect(
+      lessonFrontmatterSchema.safeParse({ ...noGoals, draft: true }).success
+    ).toBe(true)
+  })
+
+  it("accepts 1 to 5 resources, optional even when published", () => {
+    for (const count of [1, 5]) {
+      const resources = Array.from({ length: count }, () => resource)
+      expect(
+        lessonFrontmatterSchema.safeParse({ ...lesson, resources }).success
+      ).toBe(true)
+    }
+    for (const count of [0, 6]) {
+      const resources = Array.from({ length: count }, () => resource)
+      expect(
+        issuePaths(lessonFrontmatterSchema.safeParse({ ...lesson, resources }))
+      ).toEqual(["resources"])
+    }
+    expect(
+      lessonFrontmatterSchema.safeParse({
+        ...lesson,
+        resources: [{ title: "বাংলা", url: "https://example.com/a" }],
+      }).success
+    ).toBe(true)
+  })
+
+  it("rejects a resource with an http url, an unknown lang or an extra key", () => {
+    for (const bad of [
+      { ...resource, url: "http://react.dev/learn" },
+      { ...resource, url: "react.dev/learn" },
+      { ...resource, lang: "fr" },
+      { ...resource, note: "x" },
+      { url: resource.url },
+    ]) {
+      const result = lessonFrontmatterSchema.safeParse({
+        ...lesson,
+        resources: [bad],
+      })
+      expect(issuePaths(result)[0]).toMatch(/^resources\.0/)
+    }
+  })
+
+  it("has no kind field", () => {
+    const result = lessonFrontmatterSchema.safeParse({
+      ...lesson,
+      kind: "lesson",
+    })
+    expect(result.success).toBe(false)
   })
 
   it("rejects updated before published", () => {

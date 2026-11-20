@@ -15,18 +15,12 @@ export type TocItem = {
   readonly children: readonly { readonly id: string; readonly label: string }[]
 }
 
-/** Opens a closed <details> (the deep dive) so the link's target is visible. */
-function revealTarget(id: string): void {
-  const details = document.getElementById(id)?.closest("details")
-  if (details !== null && details !== undefined && !details.open) {
-    details.open = true
-  }
-}
-
 /**
  * "এই পাঠে": the lesson's blocks with the author's sections nested under
  * them, following the reader's scroll position. `sidebar` is the right
- * column (from `xl`); `bar` is the collapsible bar above the summary below it.
+ * column (from `xl`); `bar` is the collapsible bar above the lesson body
+ * below it. No entry points into a closed <details>: headings never sit
+ * inside a collapsed part (ADR-0018).
  */
 export function LessonToc({
   items,
@@ -46,8 +40,7 @@ export function LessonToc({
       .flatMap((item) => [item, ...item.children])
       .find((item) => item.id === activeId)?.label ?? items[0]?.label
 
-  const onNavigate = (id: string): void => {
-    revealTarget(id)
+  const onNavigate = (): void => {
     if (barRef.current !== null) barRef.current.open = false
   }
 

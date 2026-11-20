@@ -11,6 +11,14 @@ level: beginner # beginner | intermediate | advanced
 draft: true # set to false (or remove) when the lesson is reviewed and ready
 glossary: [] # glossary ids (file names in content/glossary) this lesson uses
 prerequisites: [] # lesson ids to read first
+goals: # 3–5 outcomes, each "…পারবে"; shown in the header under "এই পাঠে শিখবে"
+  - প্রথম কাজটা করতে পারবে
+  - দ্বিতীয় জিনিসটা চিনতে পারবে
+  - তৃতীয় ভুলটা ঠিক করতে পারবে
+resources: # optional, 1–5 links shown at the end under "আরও পড়ো"; https only
+  - title: লিংকের শিরোনাম
+    url: https://example.com/guide
+    lang: en # bn | en; en shows a marker
 quiz: # 3–5 questions; 2–4 options each; answer is the 0-based index of the right option
   - question: একটা সাধারণ প্রশ্ন?
     options: [প্রথম বিকল্প, দ্বিতীয় বিকল্প, তৃতীয় বিকল্প]
@@ -29,7 +37,80 @@ quiz: # 3–5 questions; 2–4 options each; answer is the 0-based index of the 
     explanation: প্রতিটা প্রশ্নের ব্যাখ্যা লাগবে।
 ---
 
-{/* 1. Summary: exactly three bullets. No block number. */}
+{/* 1. Concept (required): prose and code interleaved. Sections are ### headings (each block renders its own h2); they appear in the TOC. Only here: Note, Tip, Pitfall, Steps, Think, DeepDive. No heading inside a component. */}
+
+<Concept>
+
+ধারণাটা শূন্য থেকে ব্যাখ্যা করো। নতুন term প্রথমবার এলে glossary-তে লিংক করো: <Term id="glossary-id">term</Term>।
+
+### লেখকের একটা অংশ
+
+ছোট অনুচ্ছেদ, একটা ধারণা, তারপর কোড।
+
+```js title="example.js"
+// ধারণাটা দেখানোর ছোট কোড
+```
+
+{/* Note: background or a side remark. Tip: a practical habit. Pitfall: a trap while learning the idea. */}
+
+<Note>
+
+পাশের একটা কথা।
+
+</Note>
+
+{/* Think: a question for the reader, with exactly one Answer as its last part (collapsed). */}
+
+<Think>
+
+পড়া থামিয়ে ভেবে দেখার মতো একটা প্রশ্ন?
+
+<Answer>
+
+উত্তর, আর কেন।
+
+</Answer>
+
+</Think>
+
+{/* DeepDive: collapsed; only for real internals, trade-offs or edge cases. title is required, hint is one optional line. */}
+
+<DeepDive title="গভীরের বিষয়টা" hint="প্রথমবার পড়ার সময় এড়িয়ে গেলেও চলবে।">
+
+Internals, trade-off বা edge case।
+
+</DeepDive>
+
+</Concept>
+
+{/* 2. Example (optional): one complete, realistic example, only when the parts need showing together. Say where to run it and what the reader will see. */}
+
+<Example>
+
+উদাহরণটা কী দেখাবে, এক বাক্যে।
+
+**কোথায় চালাবে:** কোন ফাইলে রাখবে, কীভাবে চালাবে।
+
+```js title="example.js"
+// চালানো যায় এমন বাস্তব উদাহরণ
+```
+
+**যা দেখবে:** আউটপুট বা স্ক্রিনে কী আসবে।
+
+</Example>
+
+{/* 3. Mistakes (included by default; leave out only when it would be filler): symptom → why → fix, neutral tone. */}
+
+<Mistakes>
+
+1. **ভুলটার নাম**
+   - **লক্ষণ:** কী দেখা যায় — থাকলে আসল error message, যেমন `TypeError: …`।
+   - **কেন:** কারণটা।
+   - **ঠিক উপায়:** কী করতে হবে।
+
+</Mistakes>
+
+{/* 4. Summary (required): 3–5 bullets, the lesson's recap. */}
 
 <Summary>
 
@@ -39,56 +120,50 @@ quiz: # 3–5 questions; 2–4 options each; answer is the 0-based index of the 
 
 </Summary>
 
-{/* 2. Concept: prose, diagrams. Author sections are ### headings (each block renders its own h2); they appear in the TOC under this block. */}
+{/* 5. Quiz (required): renders the frontmatter quiz. */}
 
-<Concept>
+<Quiz />
 
-ধারণাটা শূন্য থেকে ব্যাখ্যা করো। নতুন term প্রথমবার এলে glossary-তে লিংক করো: <Term id="glossary-id">term</Term>।
+{/* 6. Exercises (required): 2–4 exercises. Each: a title, level={1} সহজ | {2} মাঝারি | {3} চ্যালেঞ্জ, the task, one or more Hints (shown one at a time, in order), then exactly one Solution, last. */}
 
-### লেখকের একটা অংশ
+<Exercises>
 
-ছোট অনুচ্ছেদ, একটা ধারণা।
+<Exercise title="প্রথম কাজ" level={1}>
 
-</Concept>
+কাজটা কী, আর কোন কোড দিয়ে শুরু করবে।
 
-{/* 3. Code: a runnable, realistic example. title= shows the file name. */}
+<Hint>প্রথম ইঙ্গিত: কোথায় দেখতে হবে।</Hint>
 
-<Example>
+<Solution>
 
-উদাহরণটা কী দেখাবে, এক বাক্যে।
+সমাধানের কোড, আর কেন এটা কাজ করে।
 
-```js title="example.js"
-// চালানো যায় এমন বাস্তব উদাহরণ
-```
+</Solution>
 
-</Example>
+</Exercise>
 
-{/* 4. Common mistakes: neutral tone ("অনেকেই প্রথমে…"), never first person. */}
+<Exercise title="দ্বিতীয় কাজ" level={2}>
 
-<Mistakes>
+একটু কঠিন কাজ।
 
-1. **ভুলটার নাম** — অনেকেই প্রথমে … কেন ভুল, আর ঠিক উপায়টা কী।
+<Hint>প্রথম ইঙ্গিত।</Hint>
 
-</Mistakes>
+<Hint>দ্বিতীয় ইঙ্গিত, সমাধানের আরও কাছে।</Hint>
 
-{/* 5. Deep dive: closed by default, for experienced readers. hint is one line. */}
+<Solution>
 
-<DeepDive hint="Internals, edge case আর performance — প্রথমবার পড়ার সময় এড়িয়ে গেলেও চলবে।">
+সমাধান আর ব্যাখ্যা।
 
-### গভীরের একটা অংশ
+</Solution>
 
-Internals, trade-off বা edge case।
+</Exercise>
 
-</DeepDive>
+</Exercises>
 
-{/* 6. Practice with AI: 2–3 prompts that make the AI a tutor, not an answer machine. */}
+{/* 7. Practice with AI (included by default; leave out only when it would be filler): 2–3 prompts that make the AI a tutor, not an answer machine. Resources and prev/next are generated after this. */}
 
 <Practice>
 
 - **ধরন:** AI-কে এমনভাবে বলো যেন সে প্রশ্ন করে আর hint দেয়, সরাসরি উত্তর না দেয়।
 
 </Practice>
-
-{/* 7. Quiz: renders the frontmatter quiz. Prev/next lesson is generated. */}
-
-<Quiz />

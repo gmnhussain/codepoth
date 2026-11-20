@@ -1,6 +1,42 @@
 import { describe, expect, it } from "vitest"
 
-import { measureBody, readingMinutesOf, roundedDuration } from "./reading-time"
+import {
+  measureBody,
+  readingMinutesFrom,
+  readingMinutesOf,
+  roundedDuration,
+  withoutRanges,
+} from "./reading-time"
+
+describe("withoutRanges", () => {
+  it("blanks out the ranges in any order and keeps the rest", () => {
+    const body = "one two three four"
+    expect(
+      withoutRanges(body, [
+        [8, 13],
+        [0, 3],
+      ])
+    ).toBe("\n two \n four")
+  })
+
+  it("returns the body unchanged without ranges, and skips an overlapping one", () => {
+    expect(withoutRanges("এক দুই", [])).toBe("এক দুই")
+    expect(
+      withoutRanges("abcdef", [
+        [1, 4],
+        [2, 3],
+      ])
+    ).toBe("a\nef")
+  })
+})
+
+describe("readingMinutesFrom", () => {
+  it("rounds a measure up to whole minutes, at least 1", () => {
+    expect(readingMinutesFrom({ words: 0, codeLines: 0 })).toBe(1)
+    expect(readingMinutesFrom({ words: 151, codeLines: 0 })).toBe(2)
+    expect(readingMinutesFrom({ words: 0, codeLines: 21 })).toBe(3)
+  })
+})
 
 describe("roundedDuration", () => {
   it("rounds totals under 90 minutes to 5 minutes, never 0", () => {

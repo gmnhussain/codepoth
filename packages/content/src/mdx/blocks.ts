@@ -4,7 +4,9 @@ import { toString } from "mdast-util-to-string"
 import { visit } from "unist-util-visit"
 
 import type { LessonBlockId } from "./block-list"
-import { LESSON_BLOCKS } from "./block-list"
+import { GENERATED_SECTIONS, LESSON_BLOCKS } from "./block-list"
+import type { ComponentReport } from "./components"
+import { checkBlockComponents } from "./components"
 
 /** An author section: a `###` heading and the block it sits in. */
 export type LessonSection = {
@@ -35,10 +37,12 @@ function isNeutral(node: RootContent): boolean {
 }
 
 /**
- * Remark plugin: checks the block structure, gives every author `###` a
- * stable id and stores the sections on `file.data.sections`. Structure rules
- * apply to every lesson; completeness (every required block, nothing outside
- * a block) only to published lessons, since a draft may be a stub (ADR-0009).
+ * Remark plugin: checks the block structure and the components inside each
+ * block, gives every author `###` a stable id and stores the sections on
+ * `file.data.sections`, and the answers, hints and solutions on
+ * `file.data.unread`. Shape rules apply to every lesson; completeness (every
+ * required block and part, nothing outside a block) only to published
+ * lessons, since a draft may be a stub (ADR-0009, ADR-0018).
  */
 export function remarkLessonBlocks({
   isPublished,
@@ -46,9 +50,11 @@ export function remarkLessonBlocks({
   readonly isPublished: boolean
 }) {
   return (tree: Root, file: CompileFile): void => {
-    const problems: string[] = []
+    const report: ComponentReport = { problems: [], unread: [] }
+    const { problems } = report
     const slugger = new GithubSlugger()
     for (const block of LESSON_BLOCKS) slugger.slug(block.id)
+    for (const id of Object.values(GENERATED_SECTIONS)) slugger.slug(id)
 
     const sections: LessonSection[] = []
     const seen: LessonBlockId[] = []
@@ -56,11 +62,15 @@ export function remarkLessonBlocks({
 
     for (const node of tree.children) {
       const block = blockOf(node)
-      if (block === undefined) {
+      if (block === undefined || node.type !== "mdxJsxFlowElement") {
         if (isNeutral(node)) continue
         if (node.type === "heading") {
           problems.push(
             `heading "${toString(node)}" is outside a block; author sections are ### inside a block`
+          )
+        } else if (node.type === "mdxJsxFlowElement") {
+          problems.push(
+            `<${node.name ?? "fragment"}> is outside a block; components sit inside a block`
           )
         } else if (isPublished) {
           problems.push(`a published lesson has ${node.type} outside a block`)
@@ -80,6 +90,7 @@ export function remarkLessonBlocks({
         )
       }
       seen.push(block)
+      checkBlockComponents(node, block, { isPublished }, report)
 
       visit(node, "heading", (heading: Heading) => {
         const title = toString(heading)
@@ -110,6 +121,7 @@ export function remarkLessonBlocks({
     if (problems.length > 0) file.fail(problems.join("; "))
     file.data.sections = sections
     file.data.blocks = seen
+    file.data.unread = report.unread
   }
 }
 

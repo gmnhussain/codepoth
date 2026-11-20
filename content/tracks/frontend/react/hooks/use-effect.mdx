@@ -2,13 +2,28 @@
 id: frontend.react.hooks.use-effect
 title: useEffect ও Side Effects
 description: Component render হয়ে যাওয়ার পরে বাইরের দুনিয়ার সাথে কাজ করার জায়গা — data আনা, timer চালানো, subscription খোলা। এই পাঠে দেখবে কখন সেটা চলে, কখন আবার চলে, আর কীভাবে আগের কাজ গুছিয়ে রাখতে হয়।
-updated: 2026-11-11
+updated: 2026-11-19
 level: beginner
 draft: true
 glossary: [hook, race-condition, side-effect]
 prerequisites: [frontend.react.hooks.use-state]
+goals:
+  - useEffect দিয়ে render-এর পরে data আনতে, timer চালাতে পারবে
+  - dependency array দেখে বলতে পারবে effect কখন আবার চলবে
+  - cleanup লিখে timer বন্ধ করতে আর race condition ঠেকাতে পারবে
+  - চিনতে পারবে কোন কাজে effect আসলে দরকারই নেই
+resources:
+  - title: Synchronizing with Effects
+    url: https://react.dev/learn/synchronizing-with-effects
+    lang: en
+  - title: You Might Not Need an Effect
+    url: https://react.dev/learn/you-might-not-need-an-effect
+    lang: en
+  - title: useEffect (reference)
+    url: https://react.dev/reference/react/useEffect
+    lang: en
 quiz:
-  - question: useEffect(fn, []) কখন চলে?
+  - question: "`useEffect(fn, [])` কখন চলে?"
     options:
       - প্রতিটা render-এর পরে
       - শুধু প্রথমবার mount হওয়ার পরে
@@ -32,87 +47,111 @@ quiz:
       - "`useEffect(() => { document.title = name }, [name])`"
     answer: 0
     explanation: count বদলায় → effect চলে → আবার count বদলায় → আবার effect। Effect নিজেই নিজের dependency বদলাচ্ছে।
+  - question: নিচের effect কতবার চলবে?
+    code: |
+      function Chat({ roomId }) {
+        const options = { roomId }
+        useEffect(() => connect(options), [options])
+      }
+    options:
+      - শুধু প্রথমবার
+      - শুধু roomId বদলালে
+      - প্রতিটা render-এর পরে
+    answer: 2
+    explanation: "`options` প্রতি render-এ নতুন object, আর React dependency তুলনা করে `Object.is` দিয়ে — তাই প্রতিবারই “বদলেছে” ধরে। Dependency-তে সরাসরি `roomId` দিলে ঠিক হয়।"
 ---
-
-<Summary>
-
-- **useEffect** চলে render-এর **পরে** — UI স্ক্রিনে আঁকা শেষ হলে বাইরের কাজগুলো এখানে হয়।
-- **Dependency array** ঠিক করে কখন আবার চলবে: `[]` একবার, `[id]` id বদলালে, না দিলে প্রতিবার।
-- Effect থেকে যে ফাংশন **return** হয়, সেটা **cleanup** — পরের effect-এর আগে আর unmount-এর সময় চলে।
-
-</Summary>
 
 <Concept>
 
-React-এর মূল কাজ হলো state থেকে UI হিসাব করা — একই input দিলে একই output। কিন্তু একটা আসল অ্যাপের অনেক কাজ এই হিসাবের বাইরে পড়ে: সার্ভার থেকে data আনা, `document.title` বদলানো, WebSocket খোলা। এ ধরনের কাজকে বলে <Term id="side-effect">side effect</Term>।
+### সমস্যা: render-এর বাইরের কাজ
 
-Render-এর মাঝখানেই এসব করলে প্রতিবার render-এ নতুন request যাবে, আর React-এর হিসাবও এলোমেলো হয়ে যাবে। তাই নিয়মটা সহজ: আগে স্ক্রিনে আঁকো, তারপর effect চালাও।
+React-এর মূল কাজ হলো state থেকে UI হিসাব করা — একই state দিলে একই UI। কিন্তু একটা আসল অ্যাপের অনেক কাজ এই হিসাবের বাইরে পড়ে: সার্ভার থেকে data আনা, `document.title` বদলানো, timer চালানো, WebSocket খোলা। এ ধরনের কাজকে বলে <Term id="side-effect">side effect</Term>।
 
-<Steps>
+এসব কাজ component-এর ভেতরে সরাসরি লিখলে প্রতিটা render-এ আবার চলবে — প্রতিবার নতুন request, প্রতিবার নতুন timer। তাই React একটা আলাদা জায়গা দেয়: `useEffect` নামের <Term id="hook">hook</Term>। নিয়মটা সহজ — আগে স্ক্রিনে আঁকো, তারপর effect চালাও।
 
-1. **Render** — JSX হিসাব হয়
-2. **Commit** — DOM-এ বসে, স্ক্রিনে দেখা যায়
-3. **Effect** — fetch, timer, subscription
-4. **Cleanup** — পরের effect বা unmount-এর আগে
+### useEffect কখন চলে
 
-</Steps>
-
-### Dependency array-এর তিন রূপ
-
-- `useEffect(fn)` — প্রতিটা render-এর পরে। বেশিরভাগ ক্ষেত্রে এটা দরকার হয় না।
-- `useEffect(fn, [])` — শুধু প্রথম mount-এর পরে, একবার।
-- `useEffect(fn, [a, b])` — a বা b বদলালে আবার চলে।
-
-</Concept>
-
-<Example>
-
-একটা ইউজার প্রোফাইল component। `userId` বদলালে নতুন data আসবে, আর আগের অসমাপ্ত request বাতিল হবে।
-
-```jsx title="UserProfile.jsx"
+```jsx title="Counter.jsx"
 import { useEffect, useState } from "react"
 
-function UserProfile({ userId }) {
-  const [user, setUser] = useState(null)
+function Counter() {
+  const [count, setCount] = useState(0)
 
   useEffect(() => {
-    const controller = new AbortController()
+    // render শেষ হয়ে স্ক্রিনে দেখা যাওয়ার পরে চলে
+    document.title = `ক্লিক: ${count}`
+  }, [count])
 
-    fetch(`/api/users/${userId}`, { signal: controller.signal })
-      .then((res) => res.json())
-      .then(setUser)
-      .catch(() => {})
-
-    // cleanup: userId বদলালে আগের request বাতিল হবে
-    return () => controller.abort()
-  }, [userId]) // userId বদলালেই effect আবার চলবে
-
-  if (!user) return <p>লোড হচ্ছে…</p>
-  return <h2>{user.name}</h2>
+  return <button onClick={() => setCount(count + 1)}>{count}</button>
 }
 ```
 
-</Example>
+প্রতিটা ক্লিকে এই ক্রমে কাজ হয়:
 
-<Mistakes>
+<Steps>
 
-নতুনরা useEffect নিয়ে সবচেয়ে বেশি যে তিনটা জায়গায় আটকায়।
+1. **Render** — React JSX হিসাব করে
+2. **Commit** — বদলটা DOM-এ বসে, স্ক্রিনে দেখা যায়
+3. **Effect** — তোমার দেওয়া ফাংশন চলে (এখানে title বদলায়)
 
-1. **খালি array, অথচ ভেতরে userId** — অনেকেই প্রথমে dependency array খালি রেখে দেয়। তখন effect একবারই চলে — prop বদলালেও পুরনো data দেখায়। সহজ নিয়ম: effect-এর ভেতরে যা পড়া হয়, সব dependency-তে যাবে। ESLint-এর `exhaustive-deps` নিয়মটা চালু রাখলে এটা নিজেই ধরা পড়ে।
-2. **Effect-এ setState, dependency-তে সেই state** — State বদলায় → effect চলে → আবার state বদলায়। ফলাফল infinite loop, ট্যাব জমে যায়। প্রায়ই দেখা যায় এটা আসলে effect-ই না — render-এর সময় সরাসরি হিসাব করে ফেললেই চলে।
-3. **Cleanup ছাড়া fetch** — দ্রুত দুটো প্রোফাইলে ক্লিক করলে ধীর পুরনো response পরে এসে নতুনটাকে মুছে দিতে পারে — একে বলে <Term id="race-condition">race condition</Term>। `AbortController` দিয়ে cleanup-এ আগের request বাতিল করাই সমাধান।
+</Steps>
 
-</Mistakes>
+<Think>
 
-<DeepDive hint="Internals, edge case আর performance — প্রথমবার পড়ার সময় এড়িয়ে গেলেও চলবে।">
+StrictMode বাদ দিয়ে ধরো। নিচের component প্রথমবার স্ক্রিনে এলে console-এ কী কী, কোন ক্রমে দেখাবে?
 
-### useEffect বনাম useLayoutEffect
+```jsx
+function Demo() {
+  console.log("render")
+  useEffect(() => {
+    console.log("effect")
+  })
+  return <p>হ্যালো</p>
+}
+```
 
-useEffect চলে browser স্ক্রিন আঁকার **পরে**, তাই UI আটকায় না। useLayoutEffect চলে DOM বদলের পরে কিন্তু আঁকার **আগে** — কোনো element-এর মাপ নিয়ে সাথে সাথে position ঠিক করতে হলে (tooltip, popover) সেটা লাগে। অকারণে ব্যবহার করলে প্রতিটা frame দেরি হয়।
+<Answer>
 
-### Dependency তুলনা হয় `Object.is` দিয়ে
+```txt
+render
+effect
+```
 
-Render-এর ভেতরে বানানো object বা function প্রতিবার নতুন reference পায়, তাই effect প্রতিবারই চলে — দেখতে একই হলেও।
+Component-এর শরীর চলে render-এর সময়, effect চলে তার পরে। যত বারই component আবার render হোক, ক্রম একই থাকবে: আগে `render`, তারপর `effect`।
+
+</Answer>
+
+</Think>
+
+### Dependency array: কখন আবার চলবে
+
+`useEffect`-এর দ্বিতীয় argument হলো dependency array। React প্রতিটা render-এর পরে এর মানগুলো আগের render-এর সাথে মেলায়, আর কিছু বদলালে তবেই effect আবার চালায়।
+
+```jsx
+useEffect(fn) // প্রতিটা render-এর পরে — বেশিরভাগ সময় এটা লাগে না
+useEffect(fn, []) // শুধু প্রথম render-এর পরে, একবার
+useEffect(fn, [a, b]) // প্রথমবার, আর পরে a বা b বদলালে
+```
+
+মনে রাখার নিয়ম: **effect-এর ভেতরে props বা state থেকে যা পড়া হয়, সব dependency-তে যাবে।**
+
+<Pitfall>
+
+Array খালি রেখে ভেতরে prop পড়লে effect পুরনো মান নিয়েই আটকে থাকে। নিচের কোডে `userId` বদলালেও নতুন data আসবে না:
+
+```jsx
+useEffect(() => {
+  fetchUser(userId)
+}, []) // ❌ userId বাদ পড়েছে → [userId] হবে
+```
+
+ESLint-এর `react-hooks/exhaustive-deps` নিয়মটা চালু রাখলে এটা লেখার সময়ই ধরা পড়ে।
+
+</Pitfall>
+
+<DeepDive title="Dependency তুলনা হয় Object.is দিয়ে">
+
+React আগের আর নতুন মান মেলায় `Object.is` দিয়ে। Number বা string-এর বেলায় মান মিললেই “একই”। কিন্তু render-এর ভেতরে বানানো object বা function প্রতিবার নতুন reference পায় — দেখতে হুবহু এক হলেও।
 
 ```jsx
 // প্রতি render-এ নতুন object → effect প্রতিবার চলে
@@ -121,28 +160,296 @@ useEffect(() => {
   connect(options)
 }, [options])
 
-// সমাধান: primitive dependency
+// সমাধান: primitive মানটাই dependency
 useEffect(() => {
   connect({ userId })
 }, [userId])
 ```
 
-### StrictMode-এ দুবার চলা
+</DeepDive>
 
-Development-এ React ইচ্ছা করে mount → cleanup → mount করে। এটা bug না — cleanup ঠিকমতো লেখা আছে কিনা যাচাইয়ের পরীক্ষা। Production build-এ একবারই চলে।
+### Cleanup: আগের কাজ গুছিয়ে রাখা
 
-### Performance: সব কাজ effect না
+কিছু effect এমন জিনিস চালু করে যা নিজে থেকে থামে না — timer, subscription, চলমান request। Effect থেকে একটা ফাংশন **return** করলে React সেটাকে **cleanup** হিসেবে রাখে।
 
-Effect-এর ভেতরে setState মানে অন্তত একটা বাড়তি render। অন্য state থেকে হিসাব করা যায় এমন মান render-এর সময়ই বের করো, দরকার হলে `useMemo`। বড় অ্যাপে data fetching-এর জন্য framework বা React Query-র মতো library caching আর race condition দুটোই সামলায়।
+```jsx title="Clock.jsx"
+useEffect(() => {
+  const id = setInterval(() => {
+    console.log("টিক")
+  }, 1000)
+
+  // cleanup: timer বন্ধ করো
+  return () => clearInterval(id)
+}, [])
+```
+
+Cleanup চলে দুই সময়ে:
+
+- **পরের effect চলার আগে** — dependency বদলালে আগে পুরনোটা গুছিয়ে নেয়, তারপর নতুনটা চালায়।
+- **Unmount-এর সময়** — component স্ক্রিন থেকে সরে গেলে।
+
+Cleanup না থাকলে component সরে যাওয়ার পরেও timer চলতেই থাকবে, আর আবার mount হলে দুটো timer একসাথে চলবে।
+
+<Think>
+
+```jsx
+useEffect(() => {
+  console.log("শুরু", userId)
+  return () => console.log("শেষ", userId)
+}, [userId])
+```
+
+`userId` প্রথমে `1`, পরে `2` হলো। Console-এ পুরো ক্রমটা কী হবে?
+
+<Answer>
+
+```txt
+শুরু 1
+শেষ 1
+শুরু 2
+```
+
+`userId` বদলালে React আগে **পুরনো** effect-এর cleanup চালায় — তাই সেখানে এখনো `1` দেখায় — তারপর নতুন effect।
+
+</Answer>
+
+</Think>
+
+<DeepDive title="StrictMode-এ effect দুবার চলে কেন">
+
+Development-এ `<StrictMode>` থাকলে React ইচ্ছা করে mount → cleanup → mount করে। এটা bug না — cleanup ঠিকমতো লেখা আছে কিনা যাচাইয়ের পরীক্ষা। Cleanup ঠিক থাকলে দুবার চলায় কোনো পার্থক্য হয় না। Production build-এ একবারই চলে।
 
 </DeepDive>
+
+### কখন effect দরকার নেই
+
+Effect হলো React-এর বাইরের জিনিসের সাথে মিল রাখার জায়গা। যে কাজ React-এর ভেতরেই সারা যায়, সেখানে effect মানে বাড়তি render আর বাড়তি জটিলতা।
+
+- **অন্য state বা props থেকে হিসাব করা মান** — render-এর সময়ই বের করো।
+- **কোনো click বা submit-এর ফলে হওয়া কাজ** — event handler-এ লেখো, effect-এ না।
+
+```jsx
+// ❌ effect দিয়ে হিসাব — বাড়তি render, প্রথমবার ফাঁকা দেখায়
+const [fullName, setFullName] = useState("")
+useEffect(() => {
+  setFullName(first + " " + last)
+}, [first, last])
+
+// ✅ render-এর সময় সরাসরি হিসাব
+const fullName = first + " " + last
+```
+
+<Note>
+
+বড় অ্যাপে data fetching সাধারণত framework (যেমন Next.js) বা TanStack Query-র মতো library দিয়ে করা হয় — caching আর race condition দুটোই তারা সামলায়। তবু useEffect দিয়ে fetch কীভাবে কাজ করে সেটা জানা দরকার, কারণ ওই library-গুলোও ভেতরে একই ধারণায় চলে।
+
+</Note>
+
+<DeepDive title="useEffect বনাম useLayoutEffect">
+
+`useEffect` চলে browser স্ক্রিন আঁকার **পরে**, তাই UI আটকায় না। `useLayoutEffect` চলে DOM বদলের পরে কিন্তু আঁকার **আগে** — কোনো element-এর মাপ নিয়ে সাথে সাথে position ঠিক করতে হলে (tooltip, popover) সেটা লাগে। অকারণে ব্যবহার করলে প্রতিটা frame দেরি হয়।
+
+</DeepDive>
+
+</Concept>
+
+<Example>
+
+একটা ইউজার প্রোফাইল component, যেটা পাঠের সব অংশ একসাথে ব্যবহার করে: `userId` বদলালে নতুন data আনে, আর আগের অসমাপ্ত request বাতিল করে।
+
+**কোথায় চালাবে:** একটা React প্রজেক্টে (যেমন Vite দিয়ে বানানো) `src/UserProfile.jsx` ফাইল বানিয়ে কোডটা রাখো, তারপর `App.jsx`-এ `<UserProfile userId={1} />` বসাও। Data আসছে JSONPlaceholder নামের একটা ফ্রি test API থেকে।
+
+```jsx title="UserProfile.jsx"
+import { useEffect, useState } from "react"
+
+export function UserProfile({ userId }) {
+  const [user, setUser] = useState(null)
+
+  useEffect(() => {
+    const controller = new AbortController()
+
+    fetch(`https://jsonplaceholder.typicode.com/users/${userId}`, {
+      signal: controller.signal,
+    })
+      .then((res) => res.json())
+      .then(setUser)
+      .catch(() => {}) // বাতিল করা request-এর error উপেক্ষা
+
+    // cleanup: userId বদলালে বা component সরে গেলে আগের request বাতিল
+    return () => controller.abort()
+  }, [userId])
+
+  if (!user) return <p>লোড হচ্ছে…</p>
+  return <h2>{user.name}</h2>
+}
+```
+
+**যা দেখবে:** প্রথমে “লোড হচ্ছে…”, তারপর `Leanne Graham`। `userId={2}` দিলে অন্য নাম আসবে।
+
+</Example>
+
+<Mistakes>
+
+1. **পুরনো data দেখায়**
+   - **লক্ষণ:** prop বদলেছে, কিন্তু স্ক্রিনে আগের ইউজারই।
+   - **কেন:** dependency array খালি, অথচ effect-এর ভেতরে prop পড়া হচ্ছে।
+   - **ঠিক উপায়:** ভেতরে যা পড়া হয় সব dependency-তে দাও; `exhaustive-deps` নিয়ম চালু রাখো।
+
+2. **ট্যাব জমে যায়**
+   - **লক্ষণ:** console-এ `Maximum update depth exceeded` সতর্কবার্তা।
+   - **কেন:** effect যে state বদলায়, সেটাই আবার তার dependency — state বদলায় → effect চলে → আবার state বদলায়।
+   - **ঠিক উপায়:** প্রায়ই এটা আসলে effect-ই না; মানটা render-এর সময় হিসাব করো। দরকার হলে updater function (`setCount((c) => c + 1)`) দিয়ে dependency সরাও।
+
+3. **ভুল ইউজারের নাম আসে**
+   - **লক্ষণ:** দ্রুত দুটো প্রোফাইলে ক্লিক করলে মাঝে মাঝে আগেরটার নাম দেখায়।
+   - **কেন:** ধীর পুরনো response পরে এসে নতুনটাকে মুছে দেয় — একে বলে <Term id="race-condition">race condition</Term>।
+   - **ঠিক উপায়:** cleanup-এ `AbortController` দিয়ে আগের request বাতিল করো।
+
+4. **async ফাংশন সরাসরি effect-এ**
+   - **লক্ষণ:** console-এ `useEffect must not return anything besides a function…` সতর্কবার্তা।
+   - **কেন:** `async` ফাংশন সবসময় Promise return করে, অথচ effect থেকে শুধু cleanup ফাংশন return করা যায়।
+   - **ঠিক উপায়:** ভেতরে একটা async ফাংশন বানিয়ে সেটা ডাকো:
+
+   ```jsx
+   useEffect(() => {
+     async function load() {
+       const res = await fetch(url)
+       setData(await res.json())
+     }
+     load()
+   }, [url])
+   ```
+
+</Mistakes>
+
+<Summary>
+
+- **useEffect** চলে render-এর **পরে** — React-এর বাইরের কাজ (fetch, timer, `document.title`) এখানে হয়।
+- **Dependency array** ঠিক করে কখন আবার চলবে: `[]` একবার, `[id]` id বদলালে, না দিলে প্রতিবার। ভেতরে যা পড়ো, সব dependency-তে যাবে।
+- Effect থেকে return করা ফাংশন হলো **cleanup** — পরের effect-এর আগে আর unmount-এর সময় চলে।
+- অন্য মান থেকে হিসাব বা click-এর কাজের জন্য effect লাগে না।
+
+</Summary>
+
+<Quiz />
+
+<Exercises>
+
+<Exercise title="Title আটকে আছে" level={1}>
+
+এই কাউন্টারে বাটন চাপলে সংখ্যা বাড়ে, কিন্তু browser ট্যাবের title সবসময় “ক্লিক: 0” থাকে। Bug-টা খুঁজে ঠিক করো।
+
+```jsx
+function Counter() {
+  const [count, setCount] = useState(0)
+
+  useEffect(() => {
+    document.title = `ক্লিক: ${count}`
+  }, [])
+
+  return <button onClick={() => setCount(count + 1)}>{count}</button>
+}
+```
+
+<Hint>Effect-এর ভেতরে কোন state পড়া হচ্ছে? সেটা কি dependency-তে আছে?</Hint>
+
+<Solution>
+
+```jsx
+useEffect(() => {
+  document.title = `ক্লিক: ${count}`
+}, [count])
+```
+
+Effect `count` পড়ে, কিন্তু array খালি থাকায় শুধু প্রথমবার চলেছিল। `count` dependency-তে দিলে প্রতিবার count বদলালে title-ও বদলায়।
+
+</Solution>
+
+</Exercise>
+
+<Exercise title="Stopwatch" level={2}>
+
+একটা `Stopwatch` component বানাও যেটা প্রতি সেকেন্ডে সংখ্যা এক করে বাড়ায়। Component স্ক্রিন থেকে সরে গেলে timer যেন থেমে যায়।
+
+```jsx
+function Stopwatch() {
+  const [seconds, setSeconds] = useState(0)
+
+  // এখানে effect লেখো
+
+  return <p>{seconds} সেকেন্ড</p>
+}
+```
+
+<Hint>
+  `setInterval` timer চালু করে আর একটা id দেয়; `clearInterval(id)` সেটা থামায়।
+  কোনটা কোথায় যাবে?
+</Hint>
+
+<Hint>
+  `setSeconds(seconds + 1)` লিখলে আর array খালি রাখলে সংখ্যা 1-এ আটকে যায় —
+  কারণ ফাংশনটা প্রথম render-এর `seconds` (0) মনে রাখে। আগের মান থেকে নতুন মান
+  বানানোর আরেকটা উপায় আছে `setSeconds`-এ।
+</Hint>
+
+<Solution>
+
+```jsx
+useEffect(() => {
+  const id = setInterval(() => {
+    setSeconds((s) => s + 1)
+  }, 1000)
+
+  return () => clearInterval(id)
+}, [])
+```
+
+- `setSeconds((s) => s + 1)` — updater function সবসময় সর্বশেষ মান পায়, তাই effect-কে `seconds` পড়তে হয় না, আর array খালি রাখা যায়।
+- Cleanup-এ `clearInterval` — component সরে গেলে timer থামে; StrictMode-এ দুবার mount হলেও একটাই timer চলে।
+
+</Solution>
+
+</Exercise>
+
+<Exercise title="এই effect কি দরকার?" level={2}>
+
+নিচের component ঠিকমতো কাজ করে, কিন্তু একটা অপ্রয়োজনীয় effect আছে। সেটা সরিয়ে কোডটা সহজ করো।
+
+```jsx
+function Greeting({ firstName, lastName }) {
+  const [fullName, setFullName] = useState("")
+
+  useEffect(() => {
+    setFullName(firstName + " " + lastName)
+  }, [firstName, lastName])
+
+  return <h2>স্বাগতম, {fullName}</h2>
+}
+```
+
+<Hint>`fullName` কি নিজে কোনো নতুন তথ্য, নাকি props থেকেই হিসাব করা যায়?</Hint>
+
+<Solution>
+
+```jsx
+function Greeting({ firstName, lastName }) {
+  const fullName = firstName + " " + lastName
+  return <h2>স্বাগতম, {fullName}</h2>
+}
+```
+
+`fullName` props থেকেই হিসাব করা যায়, তাই আলাদা state বা effect লাগে না। আগের কোডে প্রথম render-এ নাম ফাঁকা দেখাত, তারপর effect চলে আরেকটা render হতো — এখন একবারেই ঠিক।
+
+</Solution>
+
+</Exercise>
+
+</Exercises>
 
 <Practice>
 
 - **বাগ খোঁজা:** আমাকে useEffect ব্যবহার করা ৫টা ছোট React component দাও, প্রতিটায় একটা করে লুকানো bug থাকবে। আমি নিজে খুঁজে বের করার পরে তবেই উত্তর দেখাবে।
-- **ধাপে ধাপে বানানো:** একটা search box বানাতে চাই যেখানে debounce আর cleanup দুটোই লাগবে। সরাসরি সমাধান দিও না — প্রতিটা ধাপে একটা করে hint দাও।
+- **ধাপে ধাপে বানানো:** একটা search box বানাতে চাই যেখানে টাইপ থামার ৫০০ms পরে search হবে (debounce) আর আগের request বাতিল হবে। সরাসরি সমাধান দিও না — প্রতিটা ধাপে একটা করে hint দাও।
 - **কোড রিভিউ:** আমার এই component-টা review করো: কোন dependency বাদ পড়েছে, কোথায় race condition হতে পারে, আর কোন effect আসলে দরকারই নেই — কারণসহ বলো।
 
 </Practice>
-
-<Quiz />

@@ -1,7 +1,7 @@
 import type { ContentOptions } from "./env"
 import type { ContentFiles, GlossaryFile, LessonFile } from "./files"
 import { lessonUrl, resolveTopicRef, topicKeyOf, topicUrl } from "./paths"
-import { readingMinutesOf } from "./reading-time"
+import { readingMinutesFrom } from "./reading-time"
 import type { MapData } from "./schemas/map.schema"
 import type { StartRoutes } from "./schemas/start-routes.schema"
 import type { TrackColor } from "@workspace/config/track-colors"
@@ -222,7 +222,7 @@ export function buildContentGraph(
         track: location.track,
         topicKey: key,
         groupKey,
-        readingMinutes: readingMinutesOf(lesson.content),
+        readingMinutes: readingMinutesFrom(lesson.reading),
         numberInTopic: topicLessonIds.length,
         numberInGroup,
       })

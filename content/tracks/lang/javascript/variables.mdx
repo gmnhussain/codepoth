@@ -2,9 +2,20 @@
 id: lang.javascript.variables
 title: "Variables: var, let ও const"
 description: প্রোগ্রামে মান মনে রাখার জন্য নাম দেওয়া বাক্স হলো variable। JavaScript-এ তিনভাবে variable বানানো যায় — কোনটা কখন ব্যবহার করবে, আর কেন var এড়িয়ে চলা ভালো, এই পাঠে সেটাই।
-updated: 2026-11-09
+updated: 2026-11-21
 level: beginner
 draft: true
+goals:
+  - var, let আর const-এর পার্থক্য scope, re-declare আর re-assign দিয়ে বলতে পারবে
+  - কোথায় const আর কোথায় let দরকার, বেছে নিতে পারবে
+  - hoisting আর TDZ-এর কারণে আসা error চিনে ঠিক করতে পারবে
+resources:
+  - title: "let — MDN"
+    url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/let
+    lang: en
+  - title: 'The old "var" — javascript.info'
+    url: https://javascript.info/var
+    lang: en
 quiz:
   - question: কোনটায় একবার মান দেওয়ার পরে নতুন মান assign করা যায় না?
     options: [var, let, const, তিনটাতেই যায়]
@@ -30,14 +41,6 @@ quiz:
     explanation: const শুধু user-কে নতুন object-এ assign করা আটকায়। একই object-এর property বদলানো চলে।
 ---
 
-<Summary>
-
-- ডিফল্ট হিসেবে **const** — মান একবার দিলে আর বদলাবে না, কোড পড়তেও সহজ।
-- মান পরে বদলাতে হলে **let** — শুধু যে block-এ লেখা, সেখানেই থাকে।
-- **var** পুরনো নিয়ম — function scope আর hoisting-এর কারণে অবাক করা bug দেয়; নতুন কোডে এড়িয়ে চলো।
-
-</Summary>
-
 <Concept>
 
 Variable হলো নাম দেওয়া একটা বাক্স, যেখানে প্রোগ্রাম কোনো মান মনে রাখে — একটা সংখ্যা, একটা লেখা বা একটা object। JavaScript-এ বাক্স বানানোর তিনটা উপায় আছে, আর তাদের পার্থক্য মূলত তিন জায়গায়: বাক্সটা কোথা থেকে দেখা যায় (scope), একই নামে আবার বানানো যায় কিনা, আর ভেতরের মান বদলানো যায় কিনা।
@@ -54,6 +57,12 @@ if (true) {
 }
 console.log(inside) // 'দেখা যায়' — block মানে না
 ```
+
+<DeepDive title="Global scope-এ var">
+
+Browser-এর সাধারণ `<script>`-এ (module-এ না) সবচেয়ে বাইরের স্তরে লেখা var সরাসরি `window`-এর property হয়ে যায় (`window.count`), let/const হয় না। অন্য script-এর একই নামের সাথে সংঘর্ষ এড়াতে এটাও var না দেওয়ার কারণ।
+
+</DeepDive>
 
 ### `let` — যে মান বদলাবে
 
@@ -79,6 +88,17 @@ const user = { name: "Rina" }
 user.name = "Mina" // চলবে — object-এর ভেতরটা বদলানো যায়
 ```
 
+<DeepDive title="সত্যিকারের অপরিবর্তনীয়তা: Object.freeze">
+
+const object-এর ভেতর আটকাতে চাইলে `Object.freeze` — তবে সেটা shallow, ভেতরের nested object বদলানো যায়।
+
+```js
+const cfg = Object.freeze({ debug: false })
+cfg.debug = true // চুপচাপ উপেক্ষা (strict mode-এ TypeError)
+```
+
+</DeepDive>
+
 ### তুলনা: কখন কোনটা
 
 | বৈশিষ্ট্য  | var                       | let                                        | const             |
@@ -90,17 +110,31 @@ user.name = "Mina" // চলবে — object-এর ভেতরটা বদ�
 
 ছোট নিয়ম: সবসময় **const** দিয়ে শুরু করো; মান বদলাতে হলে তখন **let**; আর **var** শুধু পুরনো কোড পড়ার সময় চিনতে পারলেই যথেষ্ট।
 
+<DeepDive title="Hoisting আসলে কী">
+
+কোড চালানোর আগে JavaScript engine প্রতিটা scope-এর সব declaration একবার পড়ে নেয়। var-কে সাথে সাথে `undefined` দিয়ে বসিয়ে দেয়; let আর const-এর নামও জানে, কিন্তু declaration-এর line না আসা পর্যন্ত TDZ-এ আটকে রাখে।
+
+</DeepDive>
+
+<DeepDive title="Performance-এ কি পার্থক্য আছে?">
+
+var, let আর const-এর গতির পার্থক্য আধুনিক engine-এ নগণ্য। বেছে নাও কোনটা পড়তে স্পষ্ট আর কম ভুলের সুযোগ দেয় — সাধারণত const।
+
+</DeepDive>
+
 </Concept>
 
 <Example>
 
 একই loop, শুধু `var` আর `let`-এর পার্থক্য। setTimeout কাজটা পরে চালায় — ততক্ষণে loop শেষ।
 
+**কোথায় চালাবে:** browser-এর DevTools console-এ পেস্ট করো, অথবা `variables.js` ফাইলে রেখে `node variables.js` চালাও।
+
 ```js title="variables.js"
 for (var i = 0; i < 3; i++) {
   setTimeout(() => console.log(i), 0)
 }
-// 3, 3, 3 — পুরো function-এ একটাই i
+// 3, 3, 3 — সব ঘুরে একটাই i
 
 for (let j = 0; j < 3; j++) {
   setTimeout(() => console.log(j), 0)
@@ -108,42 +142,123 @@ for (let j = 0; j < 3; j++) {
 // 0, 1, 2 — প্রতিবার নতুন j (block scope)
 ```
 
+**যা দেখবে:** প্রথমে `3` তিনবার, তারপর `0`, `1`, `2`।
+
 </Example>
 
 <Mistakes>
 
 variable নিয়ে নতুনদের সবচেয়ে চেনা তিনটা ভুল।
 
-1. **const মানে “কিছুই বদলাবে না” ভাবা** — অনেকেই ভাবে const দিলে object বা array পুরোপুরি জমে যায়। আসলে শুধু নতুন মান assign করা আটকায় — `user.name` বা `list.push()` ঠিকই চলে।
-2. **declare করার আগেই let ব্যবহার** — var হলে সেখানে চুপচাপ `undefined` আসে, কিন্তু let/const হলে ReferenceError। declaration থেকে শুরু করে সেই line পর্যন্ত জায়গাটাকে বলে Temporal Dead Zone (TDZ)।
-3. **loop-এ var** — উপরের কোডের মতো — callback-গুলো পরে চললে সবাই একই শেষ মান দেখে। loop-এ সবসময় let।
+1. **const দিয়েও object বদলে যায়**
+   - **লক্ষণ:** `const user` লেখার পরেও `user.name = "Mina"` চলে যায়, কোনো error আসে না।
+   - **কেন:** const শুধু variable-টাকে নতুন মান assign করা আটকায়; ভেতরের object বা array আগের মতোই বদলানো যায় — `user.name` বা `list.push()` ঠিকই চলে।
+   - **ঠিক উপায়:** const মানে “একই object”, “একই মান” না। ভেতরটাও আটকাতে চাইলে `Object.freeze`।
+
+2. **declare করার আগেই let ব্যবহার**
+   - **লক্ষণ:** `ReferenceError: Cannot access 'x' before initialization`
+   - **কেন:** let/const-এর declaration-এর line না আসা পর্যন্ত নামটা Temporal Dead Zone (TDZ)-এ থাকে। var হলে এখানে চুপচাপ `undefined` আসত।
+   - **ঠিক উপায়:** variable ব্যবহারের আগে declare করো।
+
+3. **loop-এ var**
+   - **লক্ষণ:** loop-এর callback-গুলো `0, 1, 2`-এর বদলে `3, 3, 3` দেখায়।
+   - **কেন:** var পুরো function-এ একটাই `i` বানায়; callback-গুলো পরে চলে, ততক্ষণে `i` হয়ে গেছে 3।
+   - **ঠিক উপায়:** loop-এ সবসময় `let` — প্রতিবার নতুন `i`।
 
 </Mistakes>
 
-<DeepDive hint="Hoisting, TDZ, global scope আর Object.freeze — প্রথমবার পড়ার সময় এড়িয়ে গেলেও চলবে।">
+<Summary>
 
-### Hoisting আসলে কী
+- ডিফল্ট হিসেবে **const** — মান একবার দিলে আর বদলাবে না, কোড পড়তেও সহজ।
+- মান পরে বদলাতে হলে **let** — শুধু যে block-এ লেখা, সেখানেই থাকে।
+- **var** পুরনো নিয়ম — function scope আর hoisting-এর কারণে অবাক করা bug দেয়; নতুন কোডে এড়িয়ে চলো।
 
-কোড চালানোর আগে JavaScript engine প্রতিটা scope-এর সব declaration একবার পড়ে নেয়। var-কে সাথে সাথে `undefined` দিয়ে বসিয়ে দেয়; let আর const-এর নামও জানে, কিন্তু declaration-এর line না আসা পর্যন্ত TDZ-এ আটকে রাখে।
+</Summary>
 
-### Global scope-এ var
+<Quiz />
 
-Browser-এ সবচেয়ে বাইরের স্তরে লেখা var সরাসরি `window`-এর property হয়ে যায় (`window.count`), let/const হয় না। অন্য script-এর একই নামের সাথে সংঘর্ষ এড়াতে এটাও var না দেওয়ার কারণ।
+<Exercises>
 
-### সত্যিকারের অপরিবর্তনীয়তা
+<Exercise title="মোট যোগফল আসে না" level={1}>
 
-const object-এর ভেতর আটকাতে চাইলে `Object.freeze` — তবে সেটা shallow, ভেতরের nested object বদলানো যায়।
+নিচের কোড 1 থেকে 3 যোগ করে `6` দেখানোর কথা, কিন্তু চালালে error আসে: `TypeError: Assignment to constant variable.` কোডটা ঠিক করো।
 
 ```js
-const cfg = Object.freeze({ debug: false })
-cfg.debug = true // চুপচাপ উপেক্ষা (strict mode-এ TypeError)
+const total = 0
+for (let i = 1; i <= 3; i++) {
+  total = total + i
+}
+console.log(total)
 ```
 
-### Performance
+<Hint>
+  কোন variable-এ loop-এর ভেতরে বারবার নতুন মান দেওয়া হচ্ছে? সেটা কি const দিয়ে
+  বানানো যায়?
+</Hint>
 
-var, let আর const-এর গতির পার্থক্য আধুনিক engine-এ নগণ্য। বেছে নাও কোনটা পড়তে স্পষ্ট আর কম ভুলের সুযোগ দেয় — সাধারণত const।
+<Solution>
 
-</DeepDive>
+```js
+let total = 0
+for (let i = 1; i <= 3; i++) {
+  total = total + i
+}
+console.log(total) // 6
+```
+
+`total`-এ প্রতিবার নতুন মান assign হয়, তাই সেটা `let` হতে হবে। `const` শুধু তখনই, যখন একবার মান দেওয়ার পরে আর কখনো assign করা হয় না।
+
+</Solution>
+
+</Exercise>
+
+<Exercise title="var সরিয়ে দাও" level={2}>
+
+নিচের function-এর প্রতিটা `var` বদলে `let` বা `const` বসাও — যেখানে সম্ভব `const`। তারপর বলো, শেষ line-টা এখন কী করবে।
+
+```js
+function greet(names) {
+  var message = "হ্যালো"
+  for (var i = 0; i < names.length; i++) {
+    var name = names[i]
+    console.log(message + ", " + name)
+  }
+  console.log(i) // loop-এর বাইরে
+}
+```
+
+<Hint>
+  প্রতিটা variable দেখো: declare করার পরে কি কখনো তাতে নতুন মান assign হয়? না
+  হলে সেটা const।
+</Hint>
+
+<Hint>
+  `name` loop-এর প্রতি ঘুরে নতুন করে বানানো হয় — এক ঘুরের মধ্যে কি সেটা বদলায়?
+  আর `i` let হলে loop-এর বাইরে থেকে কি দেখা যায়?
+</Hint>
+
+<Solution>
+
+```js
+function greet(names) {
+  const message = "হ্যালো"
+  for (let i = 0; i < names.length; i++) {
+    const name = names[i]
+    console.log(message + ", " + name)
+  }
+  console.log(i) // ReferenceError: i is not defined
+}
+```
+
+- `message` আর `name`-এ কখনো নতুন মান assign হয় না, তাই `const`। `name` প্রতি ঘুরে নতুন variable, তাই const-এ সমস্যা নেই।
+- `i` প্রতি ঘুরে বাড়ে, তাই `let`।
+- `let i` শুধু loop-এর block-এ থাকে, তাই শেষ line এখন `ReferenceError` দেয় — var-এর সময় সেটা `names.length` দেখাত। Line-টা মুছে দাও, বা loop-এর পরে দরকার হলে আলাদা variable রাখো।
+
+</Solution>
+
+</Exercise>
+
+</Exercises>
 
 <Practice>
 
@@ -152,5 +267,3 @@ var, let আর const-এর গতির পার্থক্য আধুন�
 - **রিফ্যাক্টর:** একটা পুরনো, var-ভর্তি ফাংশন দাও। আমি সেটা let/const-এ বদলাব, তুমি review করে বলবে কোথায় const দেওয়া উচিত ছিল আর কেন।
 
 </Practice>
-
-<Quiz />

@@ -6,6 +6,9 @@ import { configDefaults, defineConfig } from "vitest/config"
 export default defineConfig({
   // The `@/*` path from tsconfig.json; `@workspace/*` packages do not match it.
   resolve: { alias: { "@": fileURLToPath(new URL(".", import.meta.url)) } },
+  // tsconfig.json keeps JSX for Next.js (`jsx: preserve`); tests that import
+  // a component compile it with the automatic React runtime.
+  oxc: { jsx: { runtime: "automatic" } },
   test: {
     // Playwright's end-to-end specs (`*.spec.ts`) run with `pnpm test:e2e`.
     exclude: [...configDefaults.exclude, "e2e/**"],

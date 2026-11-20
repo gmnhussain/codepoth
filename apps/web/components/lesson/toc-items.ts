@@ -1,10 +1,14 @@
 import { t } from "@workspace/config/t"
+import { GENERATED_SECTIONS } from "@workspace/content/blocks"
 import type { GraphLesson } from "@workspace/content/graph"
 
 import type { TocItem } from "@/components/lesson/lesson-toc"
 
-/** Id of the prev/next section's heading (lesson-pager.tsx). */
-export const PAGER_HEADING_ID = "next-heading"
+/**
+ * Id of the prev/next section's heading (lesson-pager.tsx); reserved, so no
+ * author section takes it.
+ */
+export const PAGER_HEADING_ID = GENERATED_SECTIONS.next
 
 /**
  * TOC entries for a lesson, built at build time: the blocks it has (a quiz

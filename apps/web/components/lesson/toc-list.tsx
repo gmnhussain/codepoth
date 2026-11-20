@@ -14,7 +14,7 @@ export function TocList({
 }: {
   readonly items: readonly TocItem[]
   readonly activeId: string | undefined
-  readonly onNavigate: (id: string) => void
+  readonly onNavigate: () => void
   readonly variant: "sidebar" | "bar"
 }) {
   // The bar is the touch layout: 44px links. The sidebar is for a mouse,
@@ -25,7 +25,7 @@ export function TocList({
     <a
       href={`#${id}`}
       onClick={() => {
-        onNavigate(id)
+        onNavigate()
       }}
       {...(id === activeId ? { "aria-current": "location" as const } : {})}
       className={cn(

@@ -51,7 +51,7 @@ export async function generateMetadata({
 /**
  * A lesson: track navigation (left from `lg`, a drawer below), header, the
  * MDX body, prev/next, and "এই পাঠে" (right from `xl`, a bar above the
- * summary below).
+ * lesson body below).
  */
 export default async function LessonPage({ params }: LessonPageProps) {
   const graph = getContentGraph()

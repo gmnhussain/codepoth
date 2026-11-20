@@ -4,8 +4,11 @@ import remarkGfm from "remark-gfm"
 
 import { remarkAboutPage } from "./about"
 import type { LessonBlockId } from "./block-list"
+import type { BodyMeasure } from "../reading-time"
+import { measureBody, withoutRanges } from "../reading-time"
 import type { LessonSection } from "./blocks"
 import { remarkLessonBlocks } from "./blocks"
+import type { SourceSpan } from "./components"
 
 /**
  * MDX is compiled at build time (ADR-0011): the result is a function body
@@ -29,11 +32,16 @@ const prettyCodeOptions = {
   defaultLang: { block: "plaintext", inline: "plaintext" },
 }
 
-/** A compiled lesson body, the blocks it has (in order) and its author sections. */
+/**
+ * A compiled lesson body, the blocks it has (in order), its author sections,
+ * and its words and code lines for reading time, without answers, hints and
+ * solutions (ADR-0018).
+ */
 export type CompiledLesson = {
   readonly code: string
   readonly blocks: readonly LessonBlockId[]
   readonly sections: readonly LessonSection[]
+  readonly reading: BodyMeasure
 }
 
 /** Compiles a lesson body; throws if its block structure breaks a rule. */
@@ -48,7 +56,13 @@ export async function compileLesson(
   })
   const sections = file.data.sections as readonly LessonSection[] | undefined
   const blocks = file.data.blocks as readonly LessonBlockId[] | undefined
-  return { code: String(file), blocks: blocks ?? [], sections: sections ?? [] }
+  const unread = file.data.unread as readonly SourceSpan[] | undefined
+  return {
+    code: String(file),
+    blocks: blocks ?? [],
+    sections: sections ?? [],
+    reading: measureBody(withoutRanges(source, unread ?? [])),
+  }
 }
 
 /** Compiles a glossary definition (plain MDX, no template blocks). */

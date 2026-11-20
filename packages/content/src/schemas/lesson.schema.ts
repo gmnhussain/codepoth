@@ -16,6 +16,25 @@ export const QUIZ_QUESTIONS = { min: 3, max: 5 } as const
 /** How many options a quiz question has (ADR-0009). */
 export const QUIZ_OPTIONS = { min: 2, max: 4 } as const
 
+/** How many goals a lesson states (ADR-0018). */
+export const LESSON_GOALS = { min: 3, max: 5 } as const
+
+/** How many further-reading links a lesson may list (ADR-0018). */
+export const LESSON_RESOURCES = { min: 1, max: 5 } as const
+
+/** Languages a further-reading link may be in; `en` shows a marker. */
+export const RESOURCE_LANGS = ["bn", "en"] as const
+
+/** One further-reading link in a lesson's `resources`. */
+export const resourceSchema = z.strictObject({
+  title: textSchema,
+  url: z.url({
+    protocol: /^https$/,
+    error: "A resource url is an https:// link",
+  }),
+  lang: z.enum(RESOURCE_LANGS).optional(),
+})
+
 /** Old lesson URL kept as a redirect: `/learn/<track>/<topic>/<lesson>`. */
 const PREVIOUS_SLUG = /^\/learn(?:\/[a-z0-9]+(?:-[a-z0-9]+)*){3}$/
 
@@ -65,6 +84,18 @@ const lessonFields = z.strictObject({
     .min(QUIZ_QUESTIONS.min)
     .max(QUIZ_QUESTIONS.max)
     .optional(),
+  /** What the reader will be able to do; required unless `draft` is true (ADR-0018). */
+  goals: z
+    .array(textSchema)
+    .min(LESSON_GOALS.min)
+    .max(LESSON_GOALS.max)
+    .optional(),
+  /** Further reading, shown after the last block (ADR-0018). */
+  resources: z
+    .array(resourceSchema)
+    .min(LESSON_RESOURCES.min)
+    .max(LESSON_RESOURCES.max)
+    .optional(),
 })
 
 /** Rules across fields (ADR-0009). */
@@ -79,6 +110,7 @@ function checkLesson(
       "level",
       "published",
       "quiz",
+      "goals",
     ] as const) {
       if (lesson[field] === undefined) {
         ctx.addIssue({

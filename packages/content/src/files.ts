@@ -1,6 +1,7 @@
 import type { LessonBlockId } from "./mdx/block-list"
 import type { LessonSection } from "./mdx/blocks"
 import type { LessonLocation, MetaLocation } from "./paths"
+import type { BodyMeasure } from "./reading-time"
 import type { GlossaryTerm } from "./schemas/glossary-term.schema"
 import type { GroupMeta } from "./schemas/group-meta.schema"
 import type { LessonFrontmatter } from "./schemas/lesson.schema"
@@ -23,6 +24,8 @@ export type LessonFile = LessonFrontmatter & {
   readonly blocks: readonly LessonBlockId[]
   /** Author sections (`###`) and the block each sits in. */
   readonly sections: readonly LessonSection[]
+  /** Words and code lines for reading time, without answers, hints and solutions. */
+  readonly reading: BodyMeasure
 }
 
 /** A glossary entry after schema validation; `id` is its file name. */

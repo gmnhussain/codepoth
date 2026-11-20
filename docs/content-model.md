@@ -94,6 +94,14 @@ draft: false # optional, default false
 glossary: [side-effect, race-condition]
 prerequisites: [frontend.react.hooks.use-state]
 previousSlugs: [] # optional: old URL paths after a move, e.g. /learn/frontend/react/old-name
+goals: # 3–5 outcomes ("…পারবে"); required unless draft: true
+  - useEffect দিয়ে render-এর পরে data আনতে পারবে
+  - dependency array দেখে বলতে পারবে effect কখন আবার চলবে
+  - cleanup লিখে timer বন্ধ করতে পারবে
+resources: # optional, 1–5 further-reading links; https only
+  - title: Synchronizing with Effects
+    url: https://react.dev/learn/synchronizing-with-effects
+    lang: en # optional: bn | en; en shows a marker
 quiz: # 3–5 questions; required unless draft: true
   - question: useEffect(fn, []) কখন চলে?
     options:
@@ -113,9 +121,11 @@ quiz: # 3–5 questions; required unless draft: true
 ---
 ```
 
-- Reading time is computed at build time, not written by hand: prose words ÷ a Bangla words-per-minute constant + code lines ÷ 10 per minute, rounded up, at least 1 minute.
+- Reading time is computed at build time, not written by hand: prose words ÷ a Bangla words-per-minute constant + code lines ÷ 10 per minute, rounded up, at least 1 minute. The text and code inside `<Answer>`, `<Hint>` and `<Solution>` are not counted; deep dives and exercise tasks are ([ADR-0018](decisions/ADR-0018-lesson-template-v2.md)). The compiler finds those parts on the parsed MDX, so a code block that only shows `<Hint>` as text still counts.
+- `goals` are shown in the lesson header under "এই পাঠে শিখবে"; `resources` after the last block under "আরও পড়ো".
 - "নতুন / হালনাগাদ" tags and the "নতুন কী" list are computed at build time from `published` and `updated` (30-day window), so they are as fresh as the last build.
-- Completeness rules apply only to published lessons (`draft` false): `description`, `level`, `published` and `quiz` are required, and so are the seven template blocks. A draft may be an incomplete stub. `updated` is never before `published`.
+- Completeness rules apply only to published lessons (`draft` false): `description`, `level`, `published`, `quiz` and `goals` are required, and so are the required template blocks and their parts (below). A draft may be an incomplete stub. `updated` is never before `published`.
+- There is no `kind` field; a project template is deferred ([ADR-0018](decisions/ADR-0018-lesson-template-v2.md)).
 - Each quiz question has 2–4 options, a valid `answer` index and an `explanation`.
 - Quiz text is plain text; the only markup is `backticks` for inline code, in the question, the options and the explanation (e.g. ``"`useEffect(fn, [])`"``; quote the YAML string). A longer snippet goes in `code`.
 
@@ -187,20 +197,35 @@ Computed at build time in `packages/content/src/graph.ts`, never written by hand
 
 ## Lesson template
 
-Every lesson follows `content/_templates/lesson.mdx`. Each block is an MDX component, in this order:
+Every lesson follows `content/_templates/lesson.mdx` ([ADR-0018](decisions/ADR-0018-lesson-template-v2.md)). Each block is an MDX component, in this fixed order. Optional blocks may be left out; no block appears twice.
 
-| #   | Block                               | Component    | Notes                                                                |
-| --- | ----------------------------------- | ------------ | -------------------------------------------------------------------- |
-| 1   | Summary (এক নজরে / TL;DR)           | `<Summary>`  | 3 bullets                                                            |
-| 2   | Concept (ধারণা)                     | `<Concept>`  | prose, author sections (`###`), diagrams                             |
-| 3   | Code (কোডে দেখি)                    | `<Example>`  | runnable, realistic example                                          |
-| 4   | Common mistakes (সাধারণ ভুল)        | `<Mistakes>` | neutral tone ("অনেকেই প্রথমে…")                                      |
-| 5   | Deep dive (গভীরে যাও)               | `<DeepDive>` | collapsible, closed by default, for experienced readers              |
-| 6   | Practice with AI (AI দিয়ে অনুশীলন) | `<Practice>` | 2–3 copyable prompts that make the AI a tutor, not an answer machine |
-| 7   | Quiz (কুইজ)                         | `<Quiz />`   | renders the frontmatter `quiz`                                       |
-| 8   | Prev/next lesson                    | —            | generated, not written                                               |
+| #   | Block                               | Component     | Required | Notes                                                                                 |
+| --- | ----------------------------------- | ------------- | -------- | ------------------------------------------------------------------------------------- |
+| 1   | Concept (ধারণা)                     | `<Concept>`   | yes      | prose and code interleaved, author sections (`###`); the only block with inline parts |
+| 2   | Code (কোডে দেখি)                    | `<Example>`   | no       | one complete, realistic example: where to run it and what you will see                |
+| 3   | Common mistakes (সাধারণ ভুল)        | `<Mistakes>`  | no       | each item: symptom (the real error message) → why → fix                               |
+| 4   | Summary (এক নজরে / TL;DR)           | `<Summary>`   | yes      | 3–5 bullets, a recap                                                                  |
+| 5   | Quiz (কুইজ)                         | `<Quiz />`    | yes      | renders the frontmatter `quiz`                                                        |
+| 6   | Exercises (নিজে করো)                | `<Exercises>` | yes      | 2–4 `<Exercise>`                                                                      |
+| 7   | Practice with AI (AI দিয়ে অনুশীলন) | `<Practice>`  | no       | 2–3 copyable prompts that make the AI a tutor, not an answer machine                  |
+| —   | Further reading (আরও পড়ো)          | —             | —        | generated from `resources`                                                            |
+| —   | Prev/next lesson                    | —             | —        | generated, not written                                                                |
 
-- Lesson bodies are compiled at build time ([ADR-0011](decisions/ADR-0011-mdx-compiled-at-build-time.md)). In every lesson the build fails if a block is out of order or appears twice, if a `#`/`##` heading sits inside a block, or if a heading sits outside a block. A published lesson also fails if a block is missing or any content sits outside a block. Each `###` is tagged with the block it sits in, which gives the nested TOC. Blocks have no numbers ([ADR-0018](decisions/ADR-0018-lesson-template-v2.md)).
-- Glossary terms are marked with `<Term id="side-effect">side effect</Term>`.
+Components inside blocks:
+
+| Component                                  | Where                         | Rules                                                                                    |
+| ------------------------------------------ | ----------------------------- | ---------------------------------------------------------------------------------------- |
+| `<Note>`, `<Tip>`, `<Pitfall>`, `<Steps>`  | inside Concept                | a side remark, a practical habit, a trap; numbered steps                                 |
+| `<Think>`                                  | inside Concept                | a question with exactly one `<Answer>` as its last part, collapsed                       |
+| `<DeepDive title="…" hint?="…">`           | inside Concept                | collapsed; internals, trade-offs or edge cases; may appear several times                 |
+| `<Exercise title="…" level={1 \| 2 \| 3}>` | directly inside `<Exercises>` | the task, then ≥1 `<Hint>`, then exactly one `<Solution>`, last                          |
+| `<Hint>`, `<Solution>`                     | directly inside `<Exercise>`  | hints open one at a time, in order; the solution is collapsed and can be opened any time |
+| `<Term id="…">`                            | any block                     | a glossary link: `<Term id="side-effect">side effect</Term>`                             |
+
+- Lesson bodies are compiled at build time ([ADR-0011](decisions/ADR-0011-mdx-compiled-at-build-time.md)); the rules live in `packages/content/src/mdx/blocks.ts` and `components.ts`.
+- In every lesson, drafts included, the build fails on a wrong shape: a block out of order or twice, a `#`/`##` heading inside a block, a heading outside a block or inside a component, a component outside a block or in the wrong place, an unknown component name, a Think or DeepDive inside another, two Answers or Solutions, an Answer or Solution that is not last, more than 4 exercises, a missing `title`, or a `level` other than `{1}`, `{2}` or `{3}`.
+- A published lesson also fails if something is missing: a required block, a Think's Answer, fewer than 2 exercises, an exercise without a Hint or a Solution; or if any content sits outside a block.
+- Each `###` is tagged with the block it sits in, which gives the nested TOC. Inline parts (Think, DeepDive, exercises) are not in the TOC. Blocks have no numbers.
+- Answers, hints and solutions are left out of the search index, so a search excerpt never gives away an exercise.
 
 Writing style for lesson content: see [writing-guide.md](writing-guide.md).

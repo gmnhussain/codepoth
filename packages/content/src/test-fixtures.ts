@@ -1,4 +1,5 @@
 import type { ContentFiles, LessonFile } from "./files"
+import { measureBody } from "./reading-time"
 import type { LessonFrontmatter } from "./schemas/lesson.schema"
 
 /**
@@ -31,6 +32,7 @@ export function must<T>(value: T | undefined): T {
 
 /** A published lesson with sensible defaults. */
 export function lesson(input: LessonInput): LessonFile {
+  const content = input.content ?? "কয়েকটা শব্দ।"
   return {
     title: input.id,
     description: "বর্ণনা।",
@@ -42,11 +44,12 @@ export function lesson(input: LessonInput): LessonFile {
     prerequisites: [],
     previousSlugs: [],
     quiz: QUIZ,
-    content: "কয়েকটা শব্দ।",
     mdx: "",
     blocks: [],
     sections: [],
     ...input,
+    content,
+    reading: measureBody(content),
   }
 }
 
