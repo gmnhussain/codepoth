@@ -21,7 +21,7 @@ export function TocList({
   // and grows to 44px on touch screens (design.md#accessibility).
   const height =
     variant === "bar" ? "min-h-11" : "min-h-9 pointer-coarse:min-h-11"
-  const link = (id: string, label: string, number?: string) => (
+  const link = (id: string, label: string) => (
     <a
       href={`#${id}`}
       onClick={() => {
@@ -33,11 +33,6 @@ export function TocList({
         "flex items-center gap-2 border-s-2 border-transparent py-1 ps-3 text-sm leading-snug text-muted-foreground hover:text-foreground aria-[current=location]:border-track-dot aria-[current=location]:font-semibold aria-[current=location]:text-foreground"
       )}
     >
-      {number === undefined ? null : (
-        <span aria-hidden="true" className="font-mono text-xs">
-          {number}
-        </span>
-      )}
       <span>{label}</span>
     </a>
   )
@@ -45,7 +40,7 @@ export function TocList({
     <ol className="flex flex-col">
       {items.map((item) => (
         <li key={item.id}>
-          {link(item.id, item.label, item.number)}
+          {link(item.id, item.label)}
           {item.children.length === 0 ? null : (
             <ol className="ms-4">
               {item.children.map((child) => (

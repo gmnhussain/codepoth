@@ -39,7 +39,7 @@ export function formatList(items: readonly string[]): string {
   return listFormat.format(items)
 }
 
-/** Formats a number with at least two Bangla digits, e.g. `1` → `"০১"` (block numbers). */
+/** Formats a number with at least two Bangla digits, e.g. `1` → `"০১"` (track numbers). */
 export function formatTwoDigits(value: number): string {
   return twoDigitFormat.format(value)
 }

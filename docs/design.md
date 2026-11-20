@@ -202,7 +202,7 @@ Site search with Pagefind ([ADR-0015](decisions/ADR-0015-site-search-with-pagefi
 
 The MDX components for lesson bodies live in `apps/web/components/mdx/` and are rendered on the server.
 
-- Each block is a `<section>` with the block's id and a numbered `h2` (`০১` …, computed; the summary has no number). Author sections are `h3`.
+- Each block is a `<section>` with the block's id and an `h2` with the block's title; blocks have no numbers ([ADR-0018](decisions/ADR-0018-lesson-template-v2.md)). Author sections are `h3`.
 - `<Summary>`: tinted card in the track colour (`border-track/30 bg-track/5`).
 - `<Mistakes>` and `<Steps>`: the author writes a plain numbered list; the component renumbers it with Bangla digits (round badges for mistakes, "ধাপ ১" cards for steps).
 - `<DeepDive>`: a native `<details>`, closed by default, with the "অভিজ্ঞদের জন্য" chip and the one-line `hint`.
@@ -227,7 +227,7 @@ The MDX components for lesson bodies live in `apps/web/components/mdx/` and are 
 - Track navigation: the track's topics on a vertical line in the track colour; interchange topics have a ring. The current topic opens to its groups (`<details>`, current group open) or loose lessons; the current lesson is marked (`aria-current="page"`). A note explains an interchange. The nav sets its own `data-track-color`, because the drawer renders outside the page wrapper.
 - Header chips (track · line, position): below `sm` one line that scrolls sideways, never wrapped, so the header's height does not depend on the font; a focusable region named "পাঠের তথ্য" so the keyboard can scroll it. From `sm` they wrap.
 - Tables in lesson bodies scroll sideways inside a focusable region named "টেবিল" (markdown tables have no caption); code blocks, in the lesson and in quiz questions, are focusable for the same reason.
-- "এই পাঠে": the lesson's blocks with the author's `###` sections nested under them, numbered like the blocks, and prev/next. The current entry (`aria-current="location"`) follows the scroll position; a link into the closed deep dive opens it first.
+- "এই পাঠে": the lesson's blocks with the author's `###` sections nested under them, and prev/next, without numbers. The current entry (`aria-current="location"`) follows the scroll position; a link into the closed deep dive opens it first.
 - Reader progress ([ADR-0014](decisions/ADR-0014-reader-progress-implementation.md)): every mark renders its first-visit state on the server and changes in place after hydration, so nothing moves.
   - Header: below the meta line (a top border), "বুকমার্ক" and "পাঠ শেষ" toggles. Their labels never change; `aria-pressed` carries the state, so a screen reader announces it once (ARIA toggle-button pattern). The eye sees a filled bookmark, and the done toggle turns primary with its tick. Fixed labels also mean a state change never changes the button's width. If saving fails, a status line under them says so and the toggle keeps its state.
   - Track navigation: each lesson has a 16px state mark (filled tick: done, ring with a dot: in progress, ring: not started; `role="img"` with the state as its name); each group and topic a "২/৩" count (`aria-hidden`, read as "৩টির ২টি শেষ"), right-aligned in a box as wide as "total/total"; a finished group shows a tick in a slot that is always there. A note under the nav: "টিক চিহ্ন তোমার নিজের অগ্রগতি — এই ব্রাউজারে সেভ থাকে।"

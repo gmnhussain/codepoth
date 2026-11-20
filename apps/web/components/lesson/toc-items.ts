@@ -1,6 +1,4 @@
-import { formatTwoDigits } from "@workspace/config/format"
 import { t } from "@workspace/config/t"
-import { blockNumberOf, NEXT_SECTION_NUMBER } from "@workspace/content/blocks"
 import type { GraphLesson } from "@workspace/content/graph"
 
 import type { TocItem } from "@/components/lesson/lesson-toc"
@@ -19,24 +17,15 @@ export function tocItemsFor(
 ): TocItem[] {
   const hasQuiz = (lesson.quiz?.length ?? 0) > 0
   const blocks = lesson.blocks.filter((block) => block !== "quiz" || hasQuiz)
-  const items: TocItem[] = blocks.map((block) => {
-    const number = blockNumberOf(block)
-    return {
-      id: block,
-      label: t(`blocks.${block}`),
-      number: number === undefined ? undefined : formatTwoDigits(number),
-      children: lesson.sections
-        .filter((section) => section.block === block)
-        .map((section) => ({ id: section.id, label: section.title })),
-    }
-  })
+  const items: TocItem[] = blocks.map((block) => ({
+    id: block,
+    label: t(`blocks.${block}`),
+    children: lesson.sections
+      .filter((section) => section.block === block)
+      .map((section) => ({ id: section.id, label: section.title })),
+  }))
   if (hasPager) {
-    items.push({
-      id: PAGER_HEADING_ID,
-      label: t("blocks.next"),
-      number: formatTwoDigits(NEXT_SECTION_NUMBER),
-      children: [],
-    })
+    items.push({ id: PAGER_HEADING_ID, label: t("blocks.next"), children: [] })
   }
   return items
 }

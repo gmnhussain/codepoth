@@ -27,9 +27,9 @@ export const OUTPUT_DIR = path.join("public", "pagefind")
 
 /**
  * Left out of every page's words: what assistive technology skips as
- * decoration (section numbers, avatar initials, separators, the copy
- * button's text) is not searchable text either. Without this, a number
- * fused with the next word ("০১ধারণা") would be indexed as one word.
+ * decoration (avatar initials, separators, the copy button's text, line
+ * numbers) is not searchable text either. Without this, a decoration fused
+ * with the next word would be indexed as one word (ADR-0015).
  */
 export const EXCLUDE_SELECTORS = ['[aria-hidden="true"]']
 

@@ -8,11 +8,10 @@ import { TocList } from "@/components/lesson/toc-list"
 import { useActiveId } from "@/components/lesson/use-active-id"
 import { useT } from "@/lib/labels-context"
 
-/** One TOC entry: a block (numbered) or an author section under it. */
+/** One TOC entry: a block, with the author's sections under it. */
 export type TocItem = {
   readonly id: string
   readonly label: string
-  readonly number?: string | undefined
   readonly children: readonly { readonly id: string; readonly label: string }[]
 }
 

@@ -191,7 +191,7 @@ Every lesson follows `content/_templates/lesson.mdx`. Each block is an MDX compo
 
 | #   | Block                               | Component    | Notes                                                                |
 | --- | ----------------------------------- | ------------ | -------------------------------------------------------------------- |
-| 1   | Summary (এক নজরে / TL;DR)           | `<Summary>`  | 3 bullets; no block number                                           |
+| 1   | Summary (এক নজরে / TL;DR)           | `<Summary>`  | 3 bullets                                                            |
 | 2   | Concept (ধারণা)                     | `<Concept>`  | prose, author sections (`###`), diagrams                             |
 | 3   | Code (কোডে দেখি)                    | `<Example>`  | runnable, realistic example                                          |
 | 4   | Common mistakes (সাধারণ ভুল)        | `<Mistakes>` | neutral tone ("অনেকেই প্রথমে…")                                      |
@@ -200,7 +200,7 @@ Every lesson follows `content/_templates/lesson.mdx`. Each block is an MDX compo
 | 7   | Quiz (কুইজ)                         | `<Quiz />`   | renders the frontmatter `quiz`                                       |
 | 8   | Prev/next lesson                    | —            | generated, not written                                               |
 
-- Lesson bodies are compiled at build time ([ADR-0011](decisions/ADR-0011-mdx-compiled-at-build-time.md)). In every lesson the build fails if a block is out of order or appears twice, if a `#`/`##` heading sits inside a block, or if a heading sits outside a block. A published lesson also fails if a block is missing or any content sits outside a block. Each `###` is tagged with the block it sits in, which gives the nested TOC. Block numbers (০১ …) are computed.
+- Lesson bodies are compiled at build time ([ADR-0011](decisions/ADR-0011-mdx-compiled-at-build-time.md)). In every lesson the build fails if a block is out of order or appears twice, if a `#`/`##` heading sits inside a block, or if a heading sits outside a block. A published lesson also fails if a block is missing or any content sits outside a block. Each `###` is tagged with the block it sits in, which gives the nested TOC. Blocks have no numbers ([ADR-0018](decisions/ADR-0018-lesson-template-v2.md)).
 - Glossary terms are marked with `<Term id="side-effect">side effect</Term>`.
 
 Writing style for lesson content: see [writing-guide.md](writing-guide.md).
