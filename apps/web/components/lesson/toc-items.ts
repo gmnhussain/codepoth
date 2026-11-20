@@ -13,7 +13,8 @@ export const PAGER_HEADING_ID = GENERATED_SECTIONS.next
 /**
  * TOC entries for a lesson, built at build time: the blocks it has (a quiz
  * only if it has questions) with author sections nested under their block,
- * then prev/next when the lesson has a neighbour.
+ * then further reading when the lesson has resources, and prev/next when it
+ * has a neighbour.
  */
 export function tocItemsFor(
   lesson: GraphLesson,
@@ -28,6 +29,13 @@ export function tocItemsFor(
       .filter((section) => section.block === block)
       .map((section) => ({ id: section.id, label: section.title })),
   }))
+  if ((lesson.resources?.length ?? 0) > 0) {
+    items.push({
+      id: GENERATED_SECTIONS.resources,
+      label: t("lesson.resources"),
+      children: [],
+    })
+  }
   if (hasPager) {
     items.push({ id: PAGER_HEADING_ID, label: t("blocks.next"), children: [] })
   }

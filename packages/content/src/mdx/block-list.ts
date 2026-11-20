@@ -37,10 +37,12 @@ export const INNER_COMPONENTS = [
 ] as const
 
 /**
- * Ids of the sections the page adds after the blocks. Author sections never
- * get them, so a `###` cannot clash with a generated section's anchor.
+ * Ids the page adds around the blocks: the goals heading in the header, and
+ * the further-reading and prev/next sections after the blocks. Author
+ * sections never get them, so a `###` cannot clash with their anchors.
  */
 export const GENERATED_SECTIONS = {
+  goals: "goals-heading",
   resources: "resources",
   next: "next-heading",
 } as const

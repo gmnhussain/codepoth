@@ -16,6 +16,7 @@ import { LessonNavDrawer } from "@/components/lesson/lesson-nav-drawer"
 import { LessonPager } from "@/components/lesson/lesson-pager"
 import { LessonProgressCard } from "@/components/lesson/lesson-progress-card"
 import { LessonProgressRecorder } from "@/components/lesson/lesson-progress-recorder"
+import { LessonResources } from "@/components/lesson/lesson-resources"
 import { LessonToc } from "@/components/lesson/lesson-toc"
 import { flatTocIds } from "@/components/lesson/toc-ids"
 import { tocItemsFor } from "@/components/lesson/toc-items"
@@ -130,6 +131,9 @@ export default async function LessonPage({ params }: LessonPageProps) {
               code={lesson.mdx}
               components={lessonComponentsFor(lesson)}
             />
+            {lesson.resources === undefined ? null : (
+              <LessonResources resources={lesson.resources} />
+            )}
             <LessonPager graph={graph} lessonId={lesson.id} />
           </article>
           {tocItems.length > 0 ? (

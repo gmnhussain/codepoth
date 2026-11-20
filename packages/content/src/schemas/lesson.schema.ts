@@ -141,3 +141,6 @@ export const lessonDocumentSchema = lessonFields
 
 /** Validated lesson frontmatter. */
 export type LessonFrontmatter = z.infer<typeof lessonFrontmatterSchema>
+
+/** One further-reading link of a lesson. */
+export type LessonResource = z.infer<typeof resourceSchema>

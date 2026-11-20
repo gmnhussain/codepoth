@@ -7,6 +7,7 @@ import {
   formatTwoDigits,
 } from "@workspace/config/format"
 import { t } from "@workspace/config/t"
+import { GENERATED_SECTIONS } from "@workspace/content/blocks"
 import type { ContentGraph, GraphLesson } from "@workspace/content/graph"
 import {
   groupAnchorOf,
@@ -18,8 +19,9 @@ import { Chip } from "@/components/chip"
 import { LessonActions } from "@/components/lesson/lesson-actions"
 
 /**
- * Breadcrumb, position chips, title, description, and the updated/reading-time
- * line with the bookmark and "পাঠ শেষ" toggles.
+ * Breadcrumb, position chips, title, description, the goals ("এই পাঠে
+ * শিখবে"), and the updated/reading-time line with the bookmark and "পাঠ শেষ"
+ * toggles.
  */
 export function LessonHeader({
   graph,
@@ -61,8 +63,8 @@ export function LessonHeader({
   ]
 
   return (
-    // Only the title and description are this lesson's words for the search
-    // index; the rest is left out (ADR-0015).
+    // Only the title, description and goals are this lesson's words for the
+    // search index; the rest is left out (ADR-0015, ADR-0018).
     <header className="flex flex-col gap-5">
       <div
         data-pagefind-ignore="all"
@@ -137,6 +139,27 @@ export function LessonHeader({
         <p className="text-lg leading-reading text-foreground/80">
           {lesson.description}
         </p>
+      )}
+      {lesson.goals === undefined ? null : (
+        // The goals are the lesson's own words and stay searchable; the
+        // label does not (ADR-0018).
+        <section
+          aria-labelledby={GENERATED_SECTIONS.goals}
+          className="flex flex-col gap-2"
+        >
+          <h2
+            id={GENERATED_SECTIONS.goals}
+            data-pagefind-ignore="all"
+            className="text-base font-semibold"
+          >
+            {t("lesson.goals")}
+          </h2>
+          <ul className="flex list-disc flex-col gap-1.5 ps-6 leading-reading marker:text-muted-foreground">
+            {lesson.goals.map((goal) => (
+              <li key={goal}>{goal}</li>
+            ))}
+          </ul>
+        </section>
       )}
       <div
         data-pagefind-ignore="all"
