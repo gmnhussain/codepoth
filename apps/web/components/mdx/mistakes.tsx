@@ -25,7 +25,9 @@ export function Mistakes({ children }: { readonly children?: ReactNode }) {
               >
                 {formatNumber(index + 1)}
               </span>
-              <div className="leading-reading">{item}</div>
+              {/* min-w-0: a code block in an item scrolls inside it
+                  instead of widening the page. */}
+              <div className="min-w-0 flex-1 leading-reading">{item}</div>
             </li>
           ))}
         </ol>
