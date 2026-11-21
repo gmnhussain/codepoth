@@ -6,7 +6,7 @@ import type { QuizQuestion } from "@/components/mdx/quiz"
 import { QuizQuestions } from "@/components/mdx/quiz"
 
 /**
- * Block 7: the quiz. The section and its heading are server-rendered; the
+ * The Quiz block. The section and its heading are server-rendered; the
  * questions are the interactive island. A draft without a quiz renders
  * nothing.
  */

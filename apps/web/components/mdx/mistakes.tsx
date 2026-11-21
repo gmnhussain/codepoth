@@ -6,8 +6,8 @@ import { BlockSection } from "@/components/mdx/block-section"
 import { withNumberedItems } from "@/components/mdx/numbered-items"
 
 /**
- * Block 4: common mistakes in a dashed card. The author's numbered list
- * becomes items with round Bangla number badges.
+ * The Mistakes block: common mistakes in a dashed card. The author's
+ * numbered list becomes items with round Bangla number badges.
  */
 export function Mistakes({ children }: { readonly children?: ReactNode }) {
   return (

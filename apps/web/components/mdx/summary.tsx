@@ -2,7 +2,7 @@ import type { ReactNode } from "react"
 
 import { BlockSection } from "@/components/mdx/block-section"
 
-/** Block 1: the TL;DR, a tinted card in the track colour. */
+/** The Summary block: the recap, a tinted card in the track colour. */
 export function Summary({ children }: { readonly children?: ReactNode }) {
   return (
     <BlockSection

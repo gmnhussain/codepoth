@@ -31,7 +31,7 @@ function splitPrompt(content: ReactNode): {
 }
 
 /**
- * Block 6: AI practice prompts. Each item of the author's list becomes a row
+ * The Practice block: AI practice prompts. Each item of the author's list becomes a row
  * with its kind, the prompt and a copy button that copies the prompt only.
  */
 export function Practice({ children }: { readonly children?: ReactNode }) {

@@ -7,7 +7,7 @@ import { BlockHeading } from "@/components/mdx/block-heading"
 
 /**
  * One template block on the page: a section with the block's id (the TOC
- * and "#quiz" links target it) and its numbered h2.
+ * and "#quiz" links target it) and its h2.
  */
 export function BlockSection({
   block,
