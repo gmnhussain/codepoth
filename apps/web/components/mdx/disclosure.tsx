@@ -36,7 +36,9 @@ export function Disclosure({
           className="size-4 shrink-0 text-muted-foreground group-open/disclosure:rotate-180 motion-safe:transition-transform"
         />
       </summary>
-      <div className="flex flex-col gap-4 border-t px-4 pt-4 pb-5 leading-reading">
+      {/* Spaced blocks, not a flex column: a one-line element's text and
+          inline code stay on one line. */}
+      <div className="space-y-4 border-t px-4 pt-4 pb-5 leading-reading">
         {children}
       </div>
     </details>

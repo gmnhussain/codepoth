@@ -40,7 +40,9 @@ export function DeepDive({
           className="mt-1 size-5 shrink-0 text-muted-foreground group-open/deep-dive:rotate-180 motion-safe:transition-transform"
         />
       </summary>
-      <div className="flex flex-col gap-5 border-t px-5 pt-5 pb-6 leading-reading sm:px-6">
+      {/* Spaced blocks, not a flex column: a one-line element's text and
+          inline code stay on one line. */}
+      <div className="space-y-5 border-t px-5 pt-5 pb-6 leading-reading sm:px-6">
         {children}
       </div>
     </details>

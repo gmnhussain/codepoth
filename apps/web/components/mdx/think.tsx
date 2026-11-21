@@ -20,7 +20,9 @@ export function Think({ children }: { readonly children?: ReactNode }) {
         />
         {t("lesson.think")}
       </p>
-      {children}
+      {/* Spaced blocks, not flex items: a one-line element's text and
+          inline code stay on one line. */}
+      <div className="space-y-4">{children}</div>
     </div>
   )
 }

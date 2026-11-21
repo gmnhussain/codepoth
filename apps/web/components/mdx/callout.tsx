@@ -50,7 +50,9 @@ export function Callout({
         <Icon aria-hidden="true" className={cn("size-4 shrink-0", icon)} />
         {t(`lesson.${tone}`)}
       </p>
-      {children}
+      {/* Spaced blocks, not flex items: a one-line element's text and
+          inline code stay on one line. */}
+      <div className="space-y-3">{children}</div>
     </div>
   )
 }
