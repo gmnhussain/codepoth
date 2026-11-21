@@ -331,3 +331,20 @@ Earlier attempts, same method:
 - Inlined, the stylesheet grows from about 14 to 20 KB gzip and FCP and LCP come about 0.2–0.25 s later; as files they stay within the Hind-only build's range. (The earlier inlined `block` variant measured LCP about 0.7 s later on Home, with text held invisible during the block period, and Lighthouse's simulated throttling reported 3.9 s on Home and the Map because it modelled the inlined `data:` fonts as downloads.)
 - Lighthouse's default simulated throttling (`pnpm lighthouse`) measured the Hind-only build at LCP 0.93 s (Home), 0.98 s (lesson) and 0.91 s (Map), and the inlined width-matched build at 0.96, 1.07 and 0.91 s.
 - These are local numbers on HTTP/1.1; the deployed preview (HTTP/2) is still to be measured.
+
+## Lesson template v2 (2026-11-21)
+
+The new lesson parts ([ADR-0018](../decisions/ADR-0018-lesson-template-v2.md)) are server components; Think's answer, DeepDive, hints and solutions are native `<details>`, and hints show one at a time with CSS only, so they add no browser code.
+
+### First Load JS
+
+**Method (this table only):** the same as [End of Phase 5](#first-load-js-1): for each route, the gzip size (Node `zlib`, default level) of every distinct `<script src>` in the route's pre-rendered HTML, `noModule` scripts left out, summed. Both columns are local builds with drafts, measured the same day.
+
+| Route                 | `main` (`7a8970d`) | Lesson template v2 |
+| --------------------- | ------------------ | ------------------ |
+| Home                  | 182.5 KB           | 182.5 KB           |
+| Lesson (`use-effect`) | 205.6 KB           | 205.5 KB           |
+| Lesson (`variables`)  | 205.6 KB           | 205.5 KB           |
+| Topic (React)         | 185.4 KB           | 185.4 KB           |
+
+The lesson route is 0.1 KB smaller: the TOC no longer opens a closed `<details>` before it scrolls, because no TOC entry can sit inside one.
