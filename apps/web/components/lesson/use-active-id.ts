@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 
 /** Distance from the top of the viewport at which a heading counts as current. */
-const ACTIVE_OFFSET_PX = 120
+export const ACTIVE_OFFSET_PX = 120
 
 /**
  * The id of the last heading (of `ids`, in reading order) that has scrolled

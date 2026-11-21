@@ -1,5 +1,7 @@
 import type { Page } from "@playwright/test"
 
+import { ACTIVE_OFFSET_PX } from "@/components/lesson/use-active-id"
+
 import { t } from "./support/labels"
 import {
   LAYOUT_SHIFT_LIMIT,
@@ -16,10 +18,14 @@ import { expect, test } from "./support/test"
 const TARGET_SECTION = 3
 
 /** Wheel steps until a heading reaches the top of the viewport. */
-const MAX_WHEEL_STEPS = 60
-const WHEEL_STEP_PX = 300
-/** Where a section counts as reached: below the sticky header. */
-const READ_LINE_PX = 200
+const MAX_WHEEL_STEPS = 180
+/** Small enough that the wheel stops before the next heading passes the line. */
+const WHEEL_STEP_PX = 100
+/**
+ * Where the wheel stops: the heading a little above the line at which the
+ * page counts a section as current, so the saved section is the target.
+ */
+const READ_LINE_PX = ACTIVE_OFFSET_PX - 20
 
 let lesson: BuiltLesson
 
