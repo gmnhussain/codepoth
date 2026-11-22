@@ -19,9 +19,9 @@ import { Chip } from "@/components/chip"
 import { LessonActions } from "@/components/lesson/lesson-actions"
 
 /**
- * Breadcrumb, position chips, title, description, the goals ("এই পাঠে
- * শিখবে"), and the updated/reading-time line with the bookmark and "পাঠ শেষ"
- * toggles.
+ * Breadcrumb, position chips, title, description, the updated/reading-time
+ * line with the bookmark and "পাঠ শেষ" toggles, and the goals ("এই পাঠে
+ * শিখবে").
  */
 export function LessonHeader({
   graph,
@@ -140,6 +140,17 @@ export function LessonHeader({
           {lesson.description}
         </p>
       )}
+      <div
+        data-pagefind-ignore="all"
+        className="flex flex-wrap items-start justify-between gap-3 border-t pt-4"
+      >
+        <p className="py-1.5 text-sm text-muted-foreground">
+          {t("lesson.updated", { date: formatDate(lesson.updated) })}
+          <span aria-hidden="true"> · </span>
+          {t("lesson.readingTime", { n: formatNumber(lesson.readingMinutes) })}
+        </p>
+        <LessonActions lessonId={lesson.id} />
+      </div>
       {lesson.goals === undefined ? null : (
         // The goals are the lesson's own words and stay searchable; the
         // label does not (ADR-0018).
@@ -161,17 +172,6 @@ export function LessonHeader({
           </ul>
         </section>
       )}
-      <div
-        data-pagefind-ignore="all"
-        className="flex flex-wrap items-start justify-between gap-3 border-t pt-4"
-      >
-        <p className="py-1.5 text-sm text-muted-foreground">
-          {t("lesson.updated", { date: formatDate(lesson.updated) })}
-          <span aria-hidden="true"> · </span>
-          {t("lesson.readingTime", { n: formatNumber(lesson.readingMinutes) })}
-        </p>
-        <LessonActions lessonId={lesson.id} />
-      </div>
     </header>
   )
 }
