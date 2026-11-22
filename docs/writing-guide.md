@@ -14,7 +14,7 @@ Rules for lesson and glossary content. Structure, frontmatter and what the build
 ## Lesson parts
 
 - **Goals:** 3–5 outcomes the reader can check, each ending in "…পারবে" ("useEffect দিয়ে data আনতে পারবে"). Name a skill, not a topic.
-- **Concept:** prose and code interleaved, one `###` section per idea. Use the inline parts only where they help:
+- **Concept:** prose and code interleaved, one `###` section per idea. Open with a familiar problem, analogy or question (a queue at a bank counter, a recipe), and only then name and define the topic: the concrete case first, the term second. Use the inline parts only where they help:
   - `<Note>` for background or a side remark, `<Tip>` for a practical habit, `<Pitfall>` for a trap the reader is likely to fall into right here.
   - `<Think>`: a question to stop and predict (an output, an order, a cause) before reading on, with one short `<Answer>` that says why.
   - `<DeepDive title="…">`: only for real internals, trade-offs or edge cases, next to the idea they explain. Not for content every reader needs.
