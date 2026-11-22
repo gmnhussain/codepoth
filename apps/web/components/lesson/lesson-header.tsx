@@ -1,5 +1,6 @@
 import type { ReactNode } from "react"
 import Link from "next/link"
+import { TargetIcon } from "lucide-react"
 
 import {
   formatDate,
@@ -153,19 +154,25 @@ export function LessonHeader({
       </div>
       {lesson.goals === undefined ? null : (
         // The goals are the lesson's own words and stay searchable; the
-        // label does not (ADR-0018).
+        // label does not (ADR-0018). A framed card, unlike the tinted
+        // Summary card, so the two ends of the lesson are told apart; dots,
+        // not ticks, because a tick means "done" on this site.
         <section
           aria-labelledby={GENERATED_SECTIONS.goals}
-          className="flex flex-col gap-2"
+          className="flex flex-col gap-3 rounded-2xl border bg-card p-5 sm:px-6"
         >
           <h2
             id={GENERATED_SECTIONS.goals}
             data-pagefind-ignore="all"
-            className="text-base font-semibold"
+            className="flex items-center gap-2 text-base font-semibold"
           >
+            <TargetIcon
+              aria-hidden="true"
+              className="size-4 shrink-0 text-track-dot"
+            />
             {t("lesson.goals")}
           </h2>
-          <ul className="flex list-disc flex-col gap-1.5 ps-6 leading-reading marker:text-muted-foreground">
+          <ul className="flex list-disc flex-col gap-1.5 ps-6 leading-reading marker:text-track-dot">
             {lesson.goals.map((goal) => (
               <li key={goal}>{goal}</li>
             ))}
