@@ -201,7 +201,7 @@ Every lesson follows `content/_templates/lesson.mdx` ([ADR-0018](decisions/ADR-0
 
 | #   | Block                               | Component     | Required | Notes                                                                                 |
 | --- | ----------------------------------- | ------------- | -------- | ------------------------------------------------------------------------------------- |
-| 1   | Concept (ধারণা)                     | `<Concept>`   | yes      | prose and code interleaved, author sections (`###`); the only block with inline parts |
+| 1   | Concept (মূল পাঠ)                   | `<Concept>`   | yes      | prose and code interleaved, author sections (`###`); the only block with inline parts |
 | 2   | Code (কোডে দেখি)                    | `<Example>`   | no       | one complete, realistic example: where to run it and what you will see                |
 | 3   | Common mistakes (সাধারণ ভুল)        | `<Mistakes>`  | no       | each item: symptom (the real error message) → why → fix                               |
 | 4   | Summary (এক নজরে / TL;DR)           | `<Summary>`   | yes      | 3–5 bullets, a recap                                                                  |
