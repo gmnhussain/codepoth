@@ -1,6 +1,444 @@
 ---
 id: lang.javascript.function-scope
 title: "Function ও Scope"
-updated: 2026-11-14
+description: Function হলো নাম দেওয়া কোডের টুকরো, যেটা যতবার খুশি চালানো যায়। এই পাঠে দেখবে function কীভাবে লেখে আর ডাকে, মান কীভাবে ভেতরে যায় আর ফেরত আসে, আর কোন variable কোথা থেকে দেখা যায় — scope।
+updated: 2026-11-22
+level: beginner
 draft: true
+glossary: [closure]
+prerequisites: [lang.javascript.variables]
+goals:
+  - parameter আর return দিয়ে নিজের function লিখতে আর ডাকতে পারবে
+  - function declaration, function expression আর arrow function চিনে বেছে নিতে পারবে
+  - কোড দেখে বলতে পারবে কোন variable কোথা থেকে দেখা যায়
+  - return ভুলে যাওয়া আর scope-এর বাইরের variable-এর error চিনে ঠিক করতে পারবে
+resources:
+  - title: "Functions — MDN"
+    url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Functions
+    lang: en
+  - title: "Functions — javascript.info"
+    url: https://javascript.info/function-basics
+    lang: en
+  - title: "Arrow functions, the basics — javascript.info"
+    url: https://javascript.info/arrow-functions-basics
+    lang: en
+  - title: "Scope — MDN Glossary"
+    url: https://developer.mozilla.org/en-US/docs/Glossary/Scope
+    lang: en
+quiz:
+  - question: নিচের কোড কী দেখাবে?
+    code: |
+      function add(a, b) {
+        a + b
+      }
+      console.log(add(2, 3))
+    options: ["5", undefined, ReferenceError]
+    answer: 1
+    explanation: function-এর ভেতরে `a + b` হিসাব হয়, কিন্তু `return` নেই, তাই function কিছু ফেরত দেয় না — ফল `undefined`।
+  - question: নিচের কোড শেষ line-এ কী দেখাবে?
+    code: |
+      let x = "বাইরে"
+      function f() {
+        let x = "ভেতরে"
+        return x
+      }
+      f()
+      console.log(x)
+    options: ['`"বাইরে"`', '`"ভেতরে"`', ReferenceError]
+    answer: 0
+    explanation: function-এর ভেতরের `x` একটা আলাদা, নতুন variable — বাইরের `x`-কে শুধু ভেতর থেকে আড়াল করে (shadowing), বদলায় না।
+  - question: কোনটা কোডে লেখার আগেই call করা যায়?
+    options:
+      - "`function greet() {}` — function declaration"
+      - "`const greet = function () {}` — function expression"
+      - "`const greet = () => {}` — arrow function"
+    answer: 0
+    explanation: function declaration পুরোটা hoist হয়, তাই আগে call করা যায়। বাকি দুটো const variable-এ রাখা — declaration-এর line আসার আগে TDZ-এ থাকে, call করলে ReferenceError।
+  - question: নিচের কোড কী দেখাবে?
+    code: |
+      function greet(name = "বন্ধু") {
+        return "হ্যালো, " + name
+      }
+      console.log(greet())
+    options: ['`"হ্যালো, undefined"`', '`"হ্যালো, বন্ধু"`', TypeError]
+    answer: 1
+    explanation: argument না দিলে parameter-এর মান হয় `undefined`, আর তখন default মান `"বন্ধু"` বসে যায়।
 ---
+
+<Concept>
+
+ধরো, প্রতিদিন সকালে চা বানাতে হয়। প্রতিবার কেউ নতুন করে ভাবে না কী কী লাগবে আর কোন ক্রমে — একটা রেসিপি আছে: নাম “চা”, উপকরণ পানি, চা-পাতা আর চিনি, ধাপগুলো লেখা, আর শেষে হাতে আসে এক কাপ চা। চিনি কম বা বেশি দিলে একই রেসিপি থেকেই একটু আলাদা চা।
+
+প্রোগ্রামেও একই কাজ বারবার লাগে — দামের যোগফল বের করা, একটা লেখা সাজানো, একটা নিয়ম যাচাই করা। প্রতিবার একই কোড নতুন করে না লিখে, কোডটাকে একটা নাম দিয়ে রেখে দেওয়া যায়, তারপর দরকার হলে নাম ধরে ডাকলেই চলে। কোডের এই রেসিপিই হলো **function**: উপকরণ হলো parameter, ধাপগুলো তার body, আর হাতে আসা চা হলো ফেরত দেওয়া মান।
+
+### Function লেখা আর ডাকা
+
+`function` শব্দ, তারপর নাম, বন্ধনীর ভেতরে parameter, আর `{ }`-এর ভেতরে কাজ। নাম লিখে বন্ধনী দিলে function চলে — একে বলে call করা।
+
+```js title="greet.js"
+function greet(name) {
+  return "হ্যালো, " + name
+}
+
+const message = greet("রিনা") // call: "রিনা" যায় name-এ
+console.log(message) // হ্যালো, রিনা
+```
+
+এখানে `name` হলো **parameter** — function-এর ভেতরের একটা variable। আর call করার সময় যে মান দেওয়া হয় (`"রিনা"`), তাকে বলে **argument**। `return` কাজ থামিয়ে মানটা call-এর জায়গায় ফেরত পাঠায়।
+
+একটা call-এ ভেতরে ভেতরে এই ক্রমে কাজ হয়:
+
+<Steps>
+
+1. **Argument বসে** — `"রিনা"` চলে যায় parameter `name`-এ
+2. **Body চলে** — `{ }`-এর ভেতরের কোড ওপর থেকে নিচে
+3. **return** — কাজ থামে, মানটা ফেরত যায়
+4. **মান বসে** — call-এর জায়গায় ফেরত আসা মান, এখানে `message`-এ
+
+</Steps>
+
+<Note>
+
+`return` না লিখলে, বা শুধু `return;` লিখলে, function ফেরত দেয় `undefined`। সব function-কে মান ফেরত দিতে হবে এমন না — `console.log` করে বা কিছু বদলে কাজ শেষ করাও চলে।
+
+</Note>
+
+### Parameter আর default মান
+
+একটা function-এ একাধিক parameter থাকতে পারে, কমা দিয়ে আলাদা। কোনো argument না দিলে সেই parameter-এর মান হয় `undefined` — আর তা দিয়ে হিসাব করলে অবাক করা ফল আসে, যেমন `NaN`। এড়াতে parameter-এ default মান দেওয়া যায়: argument না এলে সেটা বসে।
+
+```js
+function price(amount, quantity = 1) {
+  return amount * quantity
+}
+
+price(20, 3) // 60
+price(20) // 20 — quantity পেল default মান 1
+```
+
+<Tip>
+
+Function-এর নাম দাও কাজ দিয়ে, ক্রিয়াপদে: `calculateTotal`, `getUser`, `isValidEmail`। নাম পড়েই যেন বোঝা যায় function কী করে আর কী ফেরত দেয়।
+
+</Tip>
+
+### Function লেখার তিন উপায়
+
+একই function তিনভাবে লেখা যায়। এই পাঠের কাজে তিনটাই এক — পার্থক্য লেখার ধরনে আর hoisting-এ। (Arrow function-এর আরেকটা পার্থক্য আছে, `this` নিয়ে; সেটা পরে আসবে।)
+
+```js
+// ১. function declaration
+function square(n) {
+  return n * n
+}
+
+// ২. function expression — function-কে একটা variable-এ রাখা
+const squareExpr = function (n) {
+  return n * n
+}
+
+// ৩. arrow function — ছোট লেখা; এক expression হলে return লাগে না
+const squareArrow = (n) => n * n
+```
+
+**Function declaration** পুরোটা hoist হয়, তাই ফাইলের যেকোনো জায়গা থেকে call করা যায় — লেখার আগেও। বাকি দুটো `const` variable-এ রাখা, তাই variables পাঠের TDZ-এর নিয়ম মানে: declaration-এর line আসার আগে call করলে `ReferenceError`।
+
+ছোট নিয়ম: নাম দেওয়া, আলাদা কাজের জন্য function declaration; অন্য function-কে দেওয়ার মতো ছোট function-এর (যেমন `map`, `setTimeout`) জন্য arrow function।
+
+<Pitfall>
+
+Arrow function-এ `=>`-এর পরে `{ }` দিলে সেটা আর এক expression থাকে না, পুরো body হয়ে যায় — তখন `return` নিজে লিখতে হয়। `(n) => { n * 2 }` ফেরত দেয় `undefined`; ঠিক হলো `(n) => n * 2` বা `(n) => { return n * 2 }`।
+
+</Pitfall>
+
+### Scope: কোন variable কোথা থেকে দেখা যায়
+
+প্রতিটা variable-এর একটা এলাকা আছে, যার ভেতর থেকে তাকে দেখা যায় — একে বলে scope। তিন রকম scope:
+
+- **Global scope:** সব function আর block-এর বাইরে লেখা variable। সব জায়গা থেকে দেখা যায়।
+- **Function scope:** function-এর ভেতরে লেখা variable আর parameter। শুধু সেই function-এর ভেতরে থাকে, call শেষ হলে হারিয়ে যায়।
+- **Block scope:** `{ }`-এর ভেতরে `let`/`const` দিয়ে লেখা variable — যেমন `if` বা `for`-এর ভেতরে।
+
+নিয়মটা একমুখী: ভেতর থেকে বাইরের variable দেখা যায়, বাইরে থেকে ভেতরেরটা দেখা যায় না। অনেকটা গাড়ির কালো কাচের মতো — ভেতরে বসে বাইরের সব দেখা যায়, বাইরে থেকে ভেতরের কিছু না।
+
+```js
+const shop = "রহিম স্টোর" // global
+
+function receipt(total) {
+  const line = shop + ": " + total // ভেতর থেকে বাইরের shop দেখা যায়
+  return line
+}
+
+receipt(120) // "রহিম স্টোর: 120"
+console.log(line) // ReferenceError: line is not defined
+```
+
+কোনো নাম পেলে JavaScript প্রথমে খোঁজে নিজের scope-এ; না পেলে এক ধাপ বাইরে, তারপর আরও বাইরে — global পর্যন্ত। কোথাও না পেলে `ReferenceError`। এই খোঁজার পথকে বলে **scope chain**।
+
+<Think>
+
+নিচের কোড চালালে console-এ কী কী, কোন ক্রমে দেখাবে?
+
+```js
+let color = "লাল"
+
+function paint() {
+  let color = "নীল"
+  console.log(color)
+}
+
+paint()
+console.log(color)
+```
+
+<Answer>
+
+```txt
+নীল
+লাল
+```
+
+`paint`-এর ভেতরে একই নামে নতুন `color` বানানো হয়েছে। ভেতরে খোঁজার সময় সেটাই আগে পাওয়া যায়, তাই `নীল`। বাইরের `color` কেউ বদলায়নি — ভেতরের নামটা শুধু তাকে আড়াল করেছে। একে বলে **shadowing**।
+
+</Answer>
+
+</Think>
+
+<DeepDive title="Lexical scope: লেখার জায়গাই ঠিক করে" hint="পরের পাঠ Closure-এর ভিত্তি।">
+
+একটা function কোন বাইরের variable দেখবে, সেটা ঠিক হয় function-টা কোডে **কোথায় লেখা** হয়েছে তা দিয়ে — কোথা থেকে call হচ্ছে তা দিয়ে না। একে বলে lexical scope।
+
+```js
+const place = "বাইরের"
+
+function show() {
+  console.log(place)
+}
+
+function run() {
+  const place = "ভেতরের"
+  show()
+}
+
+run() // "বাইরের"
+```
+
+`show` লেখা হয়েছে global-এ, তাই তার বাইরের scope হলো global — `run`-এর ভেতর থেকে call হলেও সে `run`-এর `place` দেখে না। এই নিয়মের কারণেই একটা function তার জন্মের জায়গার variable মনে রাখতে পারে, এমনকি বাইরের function শেষ হয়ে যাওয়ার পরেও — একে বলে <Term id="closure">closure</Term>, পরের পাঠের বিষয়।
+
+</DeepDive>
+
+</Concept>
+
+<Example>
+
+একটা ছোট দোকানের বিল: প্রতিটা জিনিসের দাম, মোট যোগফল আর ডেলিভারি চার্জ। এখানে একসাথে আছে parameter, default মান, return, একটা function থেকে আরেকটা call, আর scope।
+
+**কোথায় চালাবে:** `cart.js` ফাইলে রেখে terminal-এ `node cart.js` চালাও, অথবা browser-এর DevTools console-এ পেস্ট করো।
+
+```js title="cart.js"
+const DELIVERY_FEE = 50 // global: সব function দেখতে পায়
+
+function lineTotal(price, quantity = 1) {
+  return price * quantity
+}
+
+function cartTotal(items) {
+  let sum = 0 // শুধু cartTotal-এর ভেতরে
+  for (const item of items) {
+    sum = sum + lineTotal(item.price, item.quantity)
+  }
+  return sum + DELIVERY_FEE
+}
+
+const items = [
+  { name: "কলম", price: 20, quantity: 3 },
+  { name: "খাতা", price: 60 }, // quantity নেই — default 1
+]
+
+console.log(cartTotal(items))
+console.log(typeof sum) // বাইরে থেকে sum দেখা যায় কি?
+```
+
+**যা দেখবে:** প্রথমে `170` (কলম ৬০ + খাতা ৬০ + ডেলিভারি ৫০), তারপর `undefined` — `sum` আছে শুধু `cartTotal`-এর ভেতরে। (`typeof` অচেনা নামেও error দেয় না, `"undefined"` বলে; সরাসরি `console.log(sum)` লিখলে `ReferenceError` আসত।)
+
+</Example>
+
+<Mistakes>
+
+Function আর scope নিয়ে নতুনদের সবচেয়ে চেনা চারটা ভুল।
+
+1. **return ভুলে যাওয়া**
+   - **লক্ষণ:** function হিসাব ঠিকই করে, কিন্তু ফল আসে `undefined`।
+   - **কেন:** হিসাবটা function-এর ভেতরেই থেকে যায়; `return` না থাকলে function ফেরত দেয় `undefined`। Arrow function-এ `{ }` দিলেও একই ব্যাপার।
+   - **ঠিক উপায়:** যে মান বাইরে লাগবে, সেটা `return` করো। এক expression-এর arrow function হলে `{ }` বাদ দাও।
+
+2. **function-এর ভেতরের variable বাইরে থেকে ব্যবহার**
+   - **লক্ষণ:** `ReferenceError: total is not defined`
+   - **কেন:** function-এর ভেতরের variable শুধু সেই function-এর scope-এ থাকে, call শেষ হলে আর থাকে না।
+   - **ঠিক উপায়:** মানটা `return` করো আর call-এর জায়গায় একটা variable-এ রাখো: `const total = cartTotal(items)`।
+
+3. **const-এ রাখা function লেখার আগেই call**
+   - **লক্ষণ:** `ReferenceError: Cannot access 'greet' before initialization`
+   - **কেন:** function expression আর arrow function একটা `const` variable-এ থাকে, তাই declaration-এর line আসার আগে TDZ-এ থাকে।
+   - **ঠিক উপায়:** call-এর আগে function লেখো, অথবা ফাইলের যেকোনো জায়গা থেকে ডাকতে হলে function declaration ব্যবহার করো।
+
+4. **argument কম দেওয়া**
+   - **লক্ষণ:** হিসাবের ফল আসে `NaN`, বা লেখায় `undefined` বসে যায়।
+   - **কেন:** যে parameter-এর argument আসেনি, তার মান `undefined`; `5 + undefined` হলো `NaN`।
+   - **ঠিক উপায়:** সব argument দাও, অথবা যেটা বাদ যেতে পারে তাতে default মান রাখো: `function add(a, b = 0)`।
+
+</Mistakes>
+
+<Summary>
+
+- Function হলো নাম দেওয়া কোডের টুকরো: parameter দিয়ে মান ভেতরে যায়, `return` দিয়ে ফেরত আসে; `return` না থাকলে ফল `undefined`।
+- Argument না দিলে parameter `undefined` হয় — দরকার হলে default মান দাও।
+- তিনভাবে লেখা যায়: function declaration (hoist হয়, আগেও call করা যায়), function expression আর arrow function (const-এ রাখা, TDZ মানে)।
+- Scope ঠিক করে variable কোথা থেকে দেখা যায়: ভেতর থেকে বাইরেরটা দেখা যায়, বাইরে থেকে ভেতরেরটা না।
+- Function কোন বাইরের variable দেখবে, সেটা ঠিক হয় সে কোথায় লেখা তা দিয়ে — এটাই <Term id="closure">closure</Term>-এর ভিত্তি।
+
+</Summary>
+
+<Quiz />
+
+<Exercises>
+
+<Exercise title="গড় আসে না" level={1}>
+
+নিচের function তিনটা নম্বরের গড় দেখানোর কথা, কিন্তু চালালে আসে `undefined`। কোডটা ঠিক করো যাতে `20` দেখায়।
+
+```js
+function average(a, b, c) {
+  const sum = a + b + c
+  sum / 3
+}
+
+console.log(average(10, 20, 30))
+```
+
+<Hint>হিসাবটা ঠিকই হচ্ছে। কিন্তু function তার ফল বাইরে পাঠাচ্ছে কীভাবে?</Hint>
+
+<Solution>
+
+```js
+function average(a, b, c) {
+  const sum = a + b + c
+  return sum / 3
+}
+
+console.log(average(10, 20, 30)) // 20
+```
+
+`sum / 3` হিসাব হচ্ছিল, কিন্তু ফলটা কোথাও যাচ্ছিল না। `return` না থাকলে function ফেরত দেয় `undefined`; `return` বসালে ভাগফলটা call-এর জায়গায় ফিরে আসে।
+
+</Solution>
+
+</Exercise>
+
+<Exercise title="গোনা আটকে আছে ১-এ" level={2}>
+
+প্রতিবার call করলে `increment` এক বাড়িয়ে নতুন সংখ্যা দেখানোর কথা — `1`, তারপর `2`, তারপর `3`। কিন্তু প্রতিবারই আসে `1`। কেন, আর কীভাবে ঠিক করবে?
+
+```js
+function increment() {
+  let count = 0
+  count = count + 1
+  return count
+}
+
+console.log(increment()) // 1
+console.log(increment()) // 1 — 2 আসার কথা
+console.log(increment()) // 1 — 3 আসার কথা
+```
+
+<Hint>প্রতিটা call-এ `count` কোথায় তৈরি হচ্ছে, আর তখন তার মান কত?</Hint>
+
+<Hint>
+  Function-এর ভেতরের variable call শেষ হলেই হারিয়ে যায়। কোথায় রাখলে সব call
+  একই `count` দেখবে?
+</Hint>
+
+<Solution>
+
+```js
+let count = 0
+
+function increment() {
+  count = count + 1
+  return count
+}
+
+console.log(increment()) // 1
+console.log(increment()) // 2
+console.log(increment()) // 3
+```
+
+আগে `count` ছিল function-এর ভেতরে, তাই প্রতি call-এ নতুন করে `0` থেকে শুরু হতো আর call শেষে হারিয়ে যেত। বাইরে রাখলে সব call একই variable দেখে (scope chain ধরে বাইরে খুঁজে পায়), তাই মান জমতে থাকে।
+
+এতে একটা সমস্যা থাকে: `count` এখন global, যেকোনো কোড সেটা বদলে ফেলতে পারে। Variable বাইরে না রেখেও মনে রাখার ভালো উপায় হলো closure — পরের পাঠে।
+
+</Solution>
+
+</Exercise>
+
+<Exercise title="কে কোন level দেখে?" level={3}>
+
+চালানোর আগে অনুমান করো: নিচের কোড console-এ কী কী, কোন ক্রমে দেখাবে? তারপর চালিয়ে মিলিয়ে নাও, আর প্রতিটা line কেন এমন, এক বাক্যে বলো।
+
+```js
+const level = "global"
+
+function outer() {
+  const level = "outer"
+
+  function inner() {
+    console.log(level)
+  }
+
+  return inner
+}
+
+function other() {
+  const level = "other"
+  const fn = outer()
+  fn()
+}
+
+other()
+console.log(level)
+```
+
+<Hint>`fn` আসলে কোন function? সেটা কোডে কোথায় লেখা?</Hint>
+
+<Hint>
+  `inner` call হচ্ছে `other`-এর ভেতর থেকে, কিন্তু scope ঠিক হয় লেখার জায়গা
+  দিয়ে। `inner` লেখা আছে কার ভেতরে?
+</Hint>
+
+<Hint>শেষ line global-এ লেখা। সেখান থেকে কোন `level` দেখা যায়?</Hint>
+
+<Solution>
+
+```txt
+outer
+global
+```
+
+- `outer()` ফেরত দেয় `inner` function, সেটাই `fn`। `inner` লেখা আছে `outer`-এর ভেতরে, তাই তার বাইরের scope হলো `outer` — সে দেখে `"outer"`। `other`-এর ভেতর থেকে call হলেও `other`-এর `level` তার scope chain-এ নেই (lexical scope)।
+- শেষ line global-এ, তাই global-এর `level` — `"global"`। ভেতরের দুটো `level` শুধু নিজের function-এ থেকে বাইরেরটাকে আড়াল করেছিল, বদলায়নি।
+
+`outer` শেষ হয়ে যাওয়ার পরেও `inner` তার `level` মনে রেখেছে — এটাই closure।
+
+</Solution>
+
+</Exercise>
+
+</Exercises>
+
+<Practice>
+
+- **ব্যাখ্যা যাচাই:** আমি parameter, argument আর return-এর পার্থক্য নিজের ভাষায় লিখছি — তুমি ভুল বা অসম্পূর্ণ জায়গাগুলো ধরিয়ে দাও, কিন্তু ঠিক উত্তরটা সরাসরি লিখে দিও না।
+- **Scope অনুমান:** nested function আর একই নামের variable দিয়ে ৫টা ছোট কোড দাও। প্রতিটার output আমি আগে অনুমান করব, তারপর তুমি scope chain ধরে ব্যাখ্যা দেবে কেন এমন হলো।
+- **রিফ্যাক্টর:** একই হিসাব তিন জায়গায় কপি করা একটা ছোট প্রোগ্রাম দাও। আমি সেটা function-এ ভাগ করব, তুমি review করে বলবে নাম, parameter আর return ঠিক আছে কি না — নিজে সমাধান লিখে দিও না।
+
+</Practice>
