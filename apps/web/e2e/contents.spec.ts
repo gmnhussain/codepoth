@@ -2,6 +2,11 @@ import { formatNumber } from "@workspace/config/format"
 
 import { markDone } from "@/lib/progress/operations"
 
+import {
+  BODY_FONT_FAMILY,
+  DIGITS_FONT_FAMILY,
+  openWithoutFont,
+} from "./support/fonts"
 import { t } from "./support/labels"
 import {
   LAYOUT_SHIFT_LIMIT,
@@ -20,6 +25,12 @@ const ENGLISH_WORD = /[A-Za-z]{3,}/
 
 /** The lesson rows the island shows or hides (contents-controls.tsx). */
 const LESSON_ROW = "[data-lesson-search]"
+
+/** The narrowest supported viewport (routes.spec.ts sweeps it too). */
+const NARROW_VIEWPORT = { width: 320, height: 800 }
+
+/** The weight the stats' digits use (`font-semibold`). */
+const STATS_WEIGHT = "600"
 
 // Outside the describe below: a load with ?q= shifts by design, a known
 // shift (performance.md "Known layout shift"). Recorded, not asserted.
@@ -53,6 +64,35 @@ test.describe("contents", () => {
     expect(await layoutShiftTotal(page), "layout shift").toBeLessThan(
       LAYOUT_SHIFT_LIMIT
     )
+  })
+
+  // A reader whose body font misses the first paint sees the stats in the
+  // wider system fallback until the digits face swaps in. The layout shift
+  // is asserted in afterEach, once the swap has settled.
+  test("the digits swapping in over the fallback font shift nothing", async ({
+    page,
+    browser,
+    browserProblems,
+  }) => {
+    await page.setViewportSize(NARROW_VIEWPORT)
+    await openWithoutFont(
+      page,
+      browser,
+      browserProblems,
+      BODY_FONT_FAMILY,
+      "/contents"
+    )
+    await page.waitForFunction(
+      ({ family, weight }) =>
+        Array.from(document.fonts).some(
+          (face) =>
+            face.family.replace(/^["']|["']$/g, "") === family &&
+            face.weight === weight &&
+            face.status === "loaded"
+        ),
+      { family: DIGITS_FONT_FAMILY, weight: STATS_WEIGHT }
+    )
+    await page.waitForLoadState("networkidle")
   })
 
   test("the status filter shows only done lessons and back", async ({

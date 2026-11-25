@@ -1,65 +1,17 @@
-import type { Browser, Page } from "@playwright/test"
+import type { Page } from "@playwright/test"
 
-import type { BrowserProblems } from "./support/test"
+import {
+  BODY_FONT_FAMILY,
+  DIGITS_FONT_FAMILY,
+  fontFaceRules,
+  fontFaceUrls,
+  openWithoutFont,
+} from "./support/fonts"
+import type { FontFaceRule } from "./support/fonts"
 import { expect, test } from "./support/test"
 
 /** The code font's `font-family` in next/font's `@font-face` rules. */
 const CODE_FONT_FAMILY = "JetBrains Mono"
-/**
- * The Bangla digits face's `font-family`
- * (packages/ui/src/styles/bangla-digits/bangla-digits.css).
- */
-const DIGITS_FONT_FAMILY = "banglaDigits"
-
-/** One `@font-face` rule of the page, its `url()`s made absolute. */
-type FontFaceRule = {
-  readonly family: string
-  readonly weight: string
-  readonly unicodeRange: string
-  /** The `src` descriptor with every `url()` absolute. */
-  readonly src: string
-  readonly urls: readonly string[]
-}
-
-/** The page's `@font-face` rules for `family`. */
-function fontFaceRules(page: Page, family: string): Promise<FontFaceRule[]> {
-  return page.evaluate((wanted) => {
-    const URL_PATTERN = /url\(\s*["']?([^"')]+)["']?\s*\)/g
-    const found: FontFaceRule[] = []
-    for (const sheet of Array.from(document.styleSheets)) {
-      const base = sheet.href ?? document.baseURI
-      for (const rule of Array.from(sheet.cssRules)) {
-        if (!(rule instanceof CSSFontFaceRule)) continue
-        const name = rule.style
-          .getPropertyValue("font-family")
-          .replace(/^["']|["']$/g, "")
-        if (name !== wanted) continue
-        const urls: string[] = []
-        const src = rule.style
-          .getPropertyValue("src")
-          .replace(URL_PATTERN, (_, url: string) => {
-            const absolute = new URL(url, base).href
-            urls.push(absolute)
-            return `url("${absolute}")`
-          })
-        found.push({
-          family: name,
-          weight: rule.style.getPropertyValue("font-weight") || "400",
-          unicodeRange:
-            rule.style.getPropertyValue("unicode-range") || "U+0-10FFFF",
-          src,
-          urls,
-        })
-      }
-    }
-    return found
-  }, family)
-}
-
-/** Absolute URLs of every file the page's `@font-face` rules for `family` use. */
-async function fontFaceUrls(page: Page, family: string): Promise<string[]> {
-  return (await fontFaceRules(page, family)).flatMap((rule) => rule.urls)
-}
 
 /** Absolute URLs of the page's `<link rel="preload" as="font">` elements. */
 function preloadedFontUrls(page: Page): Promise<string[]> {
@@ -83,8 +35,6 @@ const ALL_DIGITS = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮
 const ALL_DIGITS_PATTERN = /[০-৯]/gu
 /** Latin letters (sample text, not a UI label). */
 const LATIN = "Hamburgefonstiv"
-/** The body font's `font-family` in next/font's `@font-face` rules. */
-const BODY_FONT_FAMILY = "Hind Siliguri"
 /**
  * The digits face's name inside the font files (packages/ui/src/styles/
  * bangla-digits/make-digits.py); Chrome reports it with the weight's style
@@ -100,33 +50,6 @@ const WIDTH_SAMPLES = [
   "১১টির ০টি শেষ",
   "০১২৩৪৫৬৭৮৯",
 ]
-
-/**
- * Blocks every file of `family`'s `@font-face` rules for `page`, then opens
- * the home page there. The files are read from a separate first visit.
- */
-async function openWithoutFont(
-  page: Page,
-  browser: Browser,
-  browserProblems: BrowserProblems,
-  family: string
-): Promise<void> {
-  const probe = await browser.newContext()
-  const probePage = await probe.newPage()
-  await probePage.goto("/")
-  const blocked = new Set(await fontFaceUrls(probePage, family))
-  await probe.close()
-  expect(blocked.size, `@font-face files for ${family}`).toBeGreaterThan(0)
-
-  browserProblems.allow(/ERR_BLOCKED_BY_CLIENT/)
-  await page.route("**/*.woff2", (route) =>
-    blocked.has(route.request().url())
-      ? route.abort("blockedbyclient")
-      : route.fallback()
-  )
-  await page.goto("/")
-  await page.evaluate(() => document.fonts.ready)
-}
 
 /**
  * Width of `text` in a span added to the page, styled by `className` or,
@@ -170,7 +93,13 @@ test.describe("fonts", { tag: "@both" }, () => {
   // the file fails) sees the fallback stack in globals.css.
   test.describe("without the code font", () => {
     test.beforeEach(async ({ page, browser, browserProblems }) => {
-      await openWithoutFont(page, browser, browserProblems, CODE_FONT_FAMILY)
+      await openWithoutFont(
+        page,
+        browser,
+        browserProblems,
+        CODE_FONT_FAMILY,
+        "/"
+      )
     })
 
     test("Latin in code is still monospaced", async ({ page }) => {

@@ -316,6 +316,7 @@ Earlier attempts, same method:
 
 - **End-to-end sweep, files-swap.** 1,462 + 54 passed. 89 of 235 routes recorded a shift above 0, most 0.0005 or less; the largest, 0.0077 on `/learn/tools/npm`, reproduced once in 10 loads at 768 px with 4× CPU (the "start this topic" block moving 74 px at 489 ms) and not in 20 loads of the Hind-only build; the cause is not confirmed, most likely the same fallback-width case.
 - **Not from the digits.** On the lesson page at 375 px with 4× CPU, the Hind-only build shows two shifts after the first paint while the page hydrates: the breadcrumb's last-but-one item wrapping to a second line (0.0094) and the bookmark and done buttons moving 44 px down (0.0111, over the 0.01 limit). They are to be fixed separately.
+- **Contents stats at 320 px (found and fixed 2026-11-25).** When Hind Siliguri missed the first paint, the stats on `/contents` (drafts build) wrapped to two lines in the wider fallback and went back to one when the digits face arrived: a shift of 0.1197, recorded once in an end-to-end sweep and on every load with Hind's files blocked (delaying only the digits face gave 0). The stats now have a narrower column gap below `sm`, so they fit on one line in both; `contents.spec.ts` loads the page with Hind blocked and asserts the limit. Measured on Windows: the fallback, and so the widths, depend on the system's fonts.
 
 ### Lighthouse
 

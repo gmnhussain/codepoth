@@ -69,7 +69,10 @@ export default function ContentsPage() {
               {t("contents.intro")}
             </p>
           </div>
-          <dl className="flex flex-wrap gap-7">
+          {/* A narrower column gap on phones keeps the stats on one line in
+            the wider fallback font too, so the digits face swapping in does
+            not unwrap them and shift the page. */}
+          <dl className="flex flex-wrap gap-x-4 gap-y-7 sm:gap-7">
             {stats.map((stat) => (
               <div key={stat.label} className="flex flex-col">
                 <dt className="text-sm font-semibold text-muted-foreground">
